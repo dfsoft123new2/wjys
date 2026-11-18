@@ -113,7 +113,10 @@ button{font:inherit;color:inherit}
 .prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:6px}
 .prog div{height:100%;background:var(--cyan)}
 .tgl{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;user-select:none}
-.tgl input{accent-color:var(--amber);width:16px;height:16px}
+.tgl input[type=checkbox]{accent-color:var(--amber);width:16px;height:16px}
+.weight-control{display:grid;grid-template-columns:auto minmax(0,1fr) 2ch;align-items:center;gap:8px;margin-top:8px;font-size:13px}
+.weight-control input[type=range]{width:100%;min-width:0;height:30px;margin:0;accent-color:var(--amber);cursor:pointer}
+.weight-control b{text-align:right;font-variant-numeric:tabular-nums}
 select,input[type=text],textarea{font:inherit;background:var(--paper);color:var(--ink);border:1px solid var(--line2);border-radius:7px;padding:4px 8px}
 input[type=text]{width:110px}
 textarea{width:100%;min-height:90px;font-size:12px}
@@ -1333,7 +1336,7 @@ VIEWS.cst = () => {
     const u = cstUnl(S, c.id);
     h += `<div class="card ${u ? '' : 'dim'}"><div class="t"><span><span class="sym l">${c.s}</span> <span class="nm">${c.n}</span></span><span class="muted">${u ? '' : c.how}</span></div>
     <div class="ds">${c.d}</div>${u ? `<div class="muted">已算出 <b class="num" ${B('cd_' + c.id, () => fmtInt(S.cst.D[c.id]))}></b> 位 · 效果 <b class="cy" ${B('ce_' + c.id, () => c.e(S.cst.D[c.id]))}></b></div>
-    <div class="row"><label class="tgl">权重 <input type="range" min="0" max="10" step="1" value="${S.cst.w[c.id]}" data-in="w:${c.id}" aria-label="${c.n}权重"> <b ${B('cw_' + c.id, () => String(S.cst.w[c.id]))}></b></label></div>` : ''}</div>`;
+    <label class="weight-control"><span>权重</span><input type="range" min="0" max="10" step="1" value="${S.cst.w[c.id]}" data-in="w:${c.id}" aria-label="${c.n}权重"><b ${B('cw_' + c.id, () => String(S.cst.w[c.id]))}></b></label>` : ''}</div>`;
   });
   return h + `</div><p class="note">位数的增长速度会随位数增加而放缓（约为时间的 2/3 次方），把算力集中给一个常数收益递减。常数位数永久保留。</p>`;
 };
