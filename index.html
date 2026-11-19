@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>无尽演算 v1.2.2</title>
+<title>无尽演算 v1.3.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -187,6 +187,16 @@ ul.ms{padding-left:18px;margin:6px 0;font-size:13.5px}
 .gpal{width:34px;height:34px;border-radius:50%;border:2px solid var(--line2);cursor:pointer}
 .gpal.c1{background:#E8A33D} .gpal.c2{background:#3AA6D0} .gpal.c3{background:#D9604A} .gpal.c4{background:#5DB37A}
 .gpal.sel{border-color:var(--ink);box-shadow:0 0 0 2px var(--amber)}
+/* 黑洞与星路 */
+.bhc{width:100%;max-width:320px;display:block;margin:6px auto;border-radius:10px;background:#02060d}
+.spc{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.spn{font-size:12px;border:1px solid var(--line2);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.spn.own{background:var(--cyanBg);border-color:var(--cyan);color:var(--cyan)}
+.spn.nx{border-color:var(--amber);color:var(--amber);font-weight:600}
+.spn.lk{border-style:dashed;opacity:.6}
+.spn.dull{opacity:.45}
+.spn.lk::before{content:"🔒";font-size:10px;margin-right:2px}
+.card.spon{border-color:var(--amber)}
 /* 无穷之塔 */
 .tower{display:flex;flex-direction:column;gap:6px;max-width:340px;margin:0 auto}
 .twf{border:1px solid var(--line2);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--paper);font-size:14px}
@@ -341,6 +351,8 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
   [data-skin="workspace"] .wrap[data-view="factor"] #view{max-height:55dvh}
 }
 @media(max-width:640px){
+  html{overflow:hidden}
+  body{height:calc(100dvh - 54px - env(safe-area-inset-bottom,0px));min-height:0;overflow:auto}
   .brand{font-size:17px}.brand small{font-size:10px;margin-left:5px}.top{gap:5px}.top-tools{gap:5px}.tierb{font-size:12px;padding:2px 7px}.skin-picker .skin-label{display:none}
   .skin-picker select{font-size:12px;padding-inline:4px}.signature{font-size:21px}.signature-limit small{font-size:9px}
   .grid{grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr))}
@@ -350,7 +362,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 </head>
 <body>
 <div class="wrap" id="shell" data-view="factor">
-  <header class="top"><div class="brand">无尽演算<small>v1.2.2</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
+  <header class="top"><div class="brand">无尽演算<small>v1.3.0</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
   <div class="rail-brand" aria-hidden="true"><b>Σ</b><strong>无尽演算</strong><em>Axiom</em></div>
   <section class="hero" id="hero">
     <div class="pts"><span class="big num" id="pts">0</span><span class="lbl">点数</span></div>
@@ -373,7 +385,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 <script>
 /* ===================== 公式晋升 v1.0.0 · 核心引擎（后端） ===================== */
 'use strict';
-const VERSION = '1.2.2';
+const VERSION = '1.3.0';
 const NI = -Infinity, L10 = Math.log10;
 /* 所有大数一律以 log10 存储：la=对数加，ls=对数减 */
 function la(a, b) { if (a === NI) return b; if (b === NI) return a; if (a < b) { const t = a; a = b; b = t; } const d = b - a; return d < -17 ? a : a + L10(1 + Math.pow(10, d)); }
@@ -384,7 +396,7 @@ const pz = l => l > 0 ? l : 0;
 const sq = (L, s, h) => L > s ? (L - s) * (L - s) * h : 0;
 const K = { // 主要平衡常数：获取量 = 10^(k·(lgP−需求)^q)
   rbReq: 4, rbK: 0.5, rbQ: 0.75, pfReq: 25, pfK: 0.25, pfQ: 0.6, axReq: 130, axK: 0.22, axQ: 0.55,
-  promo: { 1: 25, 2: 120, 3: 500, 4: 1500, 5: 10000, 6: 2e7 }, endGoal: 2e7, extGoal: 1e8, alS: 0.2, scAt: 1e8, scQ: 0.5, psS: 0.45, trReq: 10000, trK: 1, trQ: 0.4, omS: 0.40,
+  promo: { 1: 25, 2: 120, 3: 500, 4: 1500, 5: 10000, 6: 2e7 }, endGoal: 2e7, extGoal: 1e8, alS: 0.2, scAt: 1e8, scQ: 0.5, muG: 0.245, psS: 0.45, trReq: 10000, trK: 1, trQ: 0.4, omS: 0.40,
 };
 
 /* ---------------- 数字格式化 ---------------- */
@@ -659,6 +671,12 @@ const RS = [
   { id: 's40', t: 7, cur: 'OR', c: 1000, h: 48, n: '内模型理论', d: 'ℵ +0.02' },
   { id: 's41', t: 7, cur: 'OR', c: 1150, h: 72, n: '马丁极大', d: 'ℵ +0.03' },
   { id: 's42', t: 7, cur: 'OR', c: 1300, h: 96, n: '绝对无限', d: 'ℵ +0.04' },
+  { id: 's43', t: 7, cur: 'SI', c: 1, h: 24, n: '广义相对论', d: '黑洞倍增时间 ×0.8' },
+  { id: 's44', t: 7, cur: 'SI', c: 3, h: 36, n: '霍金辐射', d: '霍金辐射 ×3' },
+  { id: 's45', t: 7, cur: 'SI', c: 5, h: 48, n: '全息原理', d: '视界系数 β +0.03' },
+  { id: 's46', t: 7, cur: 'SI', c: 7, h: 48, n: '弦论', d: '深空指数 q +0.03' },
+  { id: 's47', t: 7, cur: 'SI', c: 9, h: 60, n: '圈量子引力', d: '奇点获取 ×10，μ ×1.1' },
+  { id: 's48', t: 7, cur: 'SI', c: 11, h: 72, n: '万物理论', d: 'ℵ +0.02，黑洞倍增时间 ×0.8' },
 ];
 const RSM = {}; RS.forEach(x => { RSM[x.id] = x; (x.un || []).forEach(u => { UPG[u].rq = x.id; }); });
 
@@ -792,6 +810,22 @@ const ACH = [
   ['五千万', '点数达到 e5e7', S => S.P >= 5e7],
   ['ee8', '点数达到 ee8', S => S.P >= 1e8],
   ['深空', '在深空中让点数达到 e2e8', S => S.P >= 2e8],
+  ['坍缩', '完成第一次坍缩', S => S.bh.col >= 1],
+  ['恒星级', '黑洞质量达到 10^5', S => S.bh.M >= 5],
+  ['超大质量', '黑洞质量达到 10^10', S => S.bh.M >= 10],
+  ['星际旅人', '走过全部 6 条星路', S => Object.keys(S.bh.vis).length >= 6],
+  ['登峰', '任意属性达到 10 级', S => CLS.some(c => rec(S, c.id) >= 10)],
+  ['六边形战士', '所有属性都达到 8 级', S => CLS.every(c => rec(S, c.id) >= 8)],
+  ['第一声', '探测到第一个引力波事件', S => S.bh.gw >= 1],
+  ['千新星', '探测到 GW170817', S => S.bh.gw >= 9],
+  ['引力波天文学', '探测到 30 个引力波事件', S => S.bh.gw >= 30],
+  ['全天巡天', '探测到 90 个引力波事件', S => S.bh.gw >= 90],
+  ['ee10', '点数达到 ee10', S => S.P >= 1e10],
+  ['ee12', '点数达到 ee12', S => S.P >= 1e12],
+  ['ee15', '点数达到 ee15', S => S.P >= 1e15],
+  ['工坊大师', '辐射工坊升级总等级达到 40', S => Object.values(S.bh.rs).reduce((a, b) => a + b, 0) >= 40],
+  ['平直时空', '深空指数 q 达到 0.75', S => bhOn(S) && bhQ(S) >= 0.75],
+  ['回溯', '解锁全部 5 项回溯拓展', S => XP13.every(x => xpOn(S, x.id))],
   ['阿列夫', 'ℵ 达到 1.1', S => (G.al || 1) >= 1.1],
   ['基数之谜', '完成猜想 19–20 的全部难度', S => (S.cc[19] || 0) >= 3 && (S.cc[20] || 0) >= 3],
 ];
@@ -808,10 +842,11 @@ function newState() {
     u: {}, chal: 0, cc: {},
     res: { done: {}, act: [] },
     cst: { D: { pi: 0, e: 0, phi: 0, r2: 0, ga: 0, de: 0, z3: 0, ge: 0 }, w: { pi: 1, e: 1, phi: 1, r2: 1, ga: 1, de: 1, z3: 1, ge: 1 }, got: {} },
-    auto: { a: 1, b: 1, dt: 1, c: 1, d: 1, l: 1, rb: { on: 0, m: 0, v: '1' }, pf: { on: 0, m: 0, v: '1' }, ax: { on: 0, m: 0, v: '1' }, tr: { on: 0, m: 0, v: '1' }, cj: 1 },
+    auto: { col: { on: 0, v: '0.05' }, a: 1, b: 1, dt: 1, c: 1, d: 1, l: 1, rb: { on: 0, m: 0, v: '1' }, pf: { on: 0, m: 0, v: '1' }, ax: { on: 0, m: 0, v: '1' }, tr: { on: 0, m: 0, v: '1' }, cj: 1 },
     pr: { n: 1, L: 0 }, ms: { 3: [], 4: [], 5: [] }, boostT: 0,
     OR: NI, ORc: NI, trN: 0, trT: 0, trTot: 0, chap: 0,
     om: { w: 0, c1: 1, t1: 0, c2: 1, t2: 0 }, ac: { got: {}, seat: [], xp: {} }, lm: { g: [], q: 0, t: 0, max: 1 }, gc: {},
+    bh: { col: 0, xh: 0, M: 0, SI: NI, SIt: NI, path: '', k: 0, rec: {}, vis: {}, rs: {}, R: 0, gw: 0, gt: 0, ct: 0, sw: 0 },
     tw: { f: 0, p: 0, c: 2, t: 0 }, fz: { n: 0, ch: 5, t: 0, cur: 0, rem: 0, fs: [] },
     fr: { cantor: 0, koch: 0, sier: 0, hilb: 0 }, mp: { p: 2, w: 0, L: 0, n: 0 },
     IN: 0, INt: 0, ex: { act: [], n: 0 }, sw: {}, g24: { h: [], ch: 3, t: 0, n: 0 }, ng: {},
@@ -902,8 +937,9 @@ function recalc(S) {
   else if (T === 2) p = c * (G.A + G.B) + G.Rf + G.THf;
   else if (T === 3) p = c * (G.A + G.B) + (c - 1 + G.tE) * G.Tf + G.Rf + G.THf + G.AXf;
   else { p = c * (G.A + G.B + G.D) + (c - 1 + G.tE) * G.Tf + G.Rf + G.lam * (G.THf + G.AXf); if (T >= 5) p += (c + G.lam) * G.K; }
-  G.Om = T >= 6 ? omega6(S) : 1; G.psi = T >= 6 ? psi6(S) : 1; G.al = T >= 7 ? aleph7(S) : 1; G.F = p; G.EX = Math.pow(G.Om * G.psi, G.al); if (T >= 6) p *= G.EX;
-  G.scRaw = p; G.sc = false; if (T >= 7 && p > K.scAt) { p = K.scAt * Math.pow(p / K.scAt, K.scQ); G.sc = true; }
+  G.Om = T >= 6 ? omega6(S) : 1; G.psi = T >= 6 ? psi6(S) : 1; G.al = T >= 7 ? aleph7(S) + bhAl(S) : 1; G.mu = bhMu(S); G.F = p; G.EX = Math.pow(G.Om * G.psi, G.al) * G.mu; if (T >= 6) p *= G.EX;
+  G.scA = bhOn(S) ? K.scAt * Math.pow(10, Math.min(290, bhBeta(S) * bhMeff(S))) : K.scAt; G.scQ = bhOn(S) ? bhQ(S) : K.scQ;
+  G.scRaw = p; G.sc = false; if (T >= 7 && p > G.scA) { p = G.scA * Math.pow(p / G.scA, G.scQ); G.sc = true; }
   if (ch === 4) p *= 0.5; if (ch === 5) p *= 0.75;
   if (S.boostT > 0) p += 3 * T;
   G.prod = p; G.pps = p - L10(G.dt);
@@ -930,14 +966,14 @@ function recalc(S) {
   G.trGain = (T >= 6 && S.P >= trq) ? G.trE * Math.pow(S.P - trq, G.trQ) + trM : NI; if (G.trGain < 0) G.trGain = NI;
   G.omR = T >= 6 ? omRate(S) : 0; G.freeL = S.trTot >= 8;
   G.resSpd = T >= 6 ? (1 + 0.03 * acL(S, 'rie')) * swMul(S, 'resSpd') : 1;
-  G.cpu = T >= 4 ? (1 + l1(S.AXc)) * (h('x12') ? 3 : 1) * (R('s11') ? 3 : 1) * (R('s17') ? 5 : 1) * (T >= 5 ? 2 : 1) * (T >= 6 ? 1 + 0.5 * acL(S, 'eul') : 1) : 0;
+  G.cpu = T >= 4 ? (1 + l1(S.AXc)) * (h('x12') ? 3 : 1) * (R('s11') ? 3 : 1) * (R('s17') ? 5 : 1) * (T >= 5 ? 2 : 1) * (T >= 6 ? 1 + 0.5 * acL(S, 'eul') : 1) * (xpOn(S, 'xcs') ? 10 : 1) : 0;
   G.free = S.pfTot >= 30; G.freeD = S.axTot >= 50;
   return G;
 }
 
 /* ---------------- 购买 ---------------- */
-function curGet(S, c) { return c === 'P' ? S.P : c === 'RP' ? S.RP : c === 'TH' ? S.TH : c === 'OR' ? S.OR : S.AX; }
-function curSet(S, c, v) { if (c === 'P') S.P = v; else if (c === 'RP') S.RP = v; else if (c === 'TH') S.TH = v; else if (c === 'OR') S.OR = v; else S.AX = v; }
+function curGet(S, c) { if (c === 'SI') return S.bh.SI; return c === 'P' ? S.P : c === 'RP' ? S.RP : c === 'TH' ? S.TH : c === 'OR' ? S.OR : S.AX; }
+function curSet(S, c, v) { if (c === 'SI') { S.bh.SI = v; return; } if (c === 'P') S.P = v; else if (c === 'RP') S.RP = v; else if (c === 'TH') S.TH = v; else if (c === 'OR') S.OR = v; else S.AX = v; }
 function factorMax(S, id) { // 可购买上限（Δ 到最小值后不可再买）
   if (id === 'dt') { const b = S.u.p7 === 1 ? 0.9 : 0.92, mn = S.u.r15 === 1 ? 0.05 : 0.1; return Math.ceil(L10(mn) / L10(b)); }
   return Infinity;
@@ -999,7 +1035,7 @@ function resetPoints(S, keepF) {
   if (!keepF) { S.lv.a = 1; S.lv.b = 0; S.lv.dt = 0; S.lv.c = 0; }
 }
 function resetRebirthLayer(S) {
-  S.RP = NI; S.RPc = NI; S.rbN = 0;
+  S.RP = NI; if (!(S.bh && S.bh.col >= 1)) S.RPc = NI; S.rbN = 0;
   const keepAll = S.pfTot >= 12, keepRow = S.pfTot >= 5, keepBasic = S.pfTot >= 1;
   RU.forEach(x => {
     if (S.u[x.id] !== 1) return;
@@ -1012,7 +1048,7 @@ function resetRebirthLayer(S) {
   resetPoints(S, false);
 }
 function resetProofLayer(S) {
-  S.TH = NI; S.THc = NI; S.pfN = 0; S.pfT = 0; S.lv.d = 0;
+  const keep = S.bh && S.bh.col >= 1; S.TH = NI; if (!keep) { S.THc = NI; S.lv.d = 0; } S.pfN = 0; S.pfT = 0;
   const keepAll = S.axTot >= 12, keepRow = S.axTot >= 4;
   PU.forEach(x => {
     if (S.u[x.id] !== 1) return;
@@ -1073,7 +1109,7 @@ function doPromote(S) {
 
 /* ---------------- 研究 ---------------- */
 function resCan(S, id) {
-  const r = RSM[id]; if (!r || S.res.done[id] || S.tier < r.t || (r.ch && S.chap < r.ch)) return false;
+  const r = RSM[id]; if (!r || S.res.done[id] || S.tier < r.t || (r.ch && S.chap < r.ch) || (r.cur === 'SI' && !bhOn(S))) return false;
   if (S.res.act.some(a => a.id === id)) return false;
   if (S.res.act.length >= resSlots(S)) return false;
   return curGet(S, r.cur) >= r.c;
@@ -1096,6 +1132,7 @@ function runAuto(S) {
   for (const id of ['l', 'd', 'c', 'b', 'a', 'dt']) if (S.auto[id] && autoUnl(S, id)) buyFactor(S, id, true);
   recalc(S);
   if (S.chal && S.auto.cj && S.P >= chalGoal(S, S.chal)) { doProof(S); return 'cj'; }
+  if (bhOn(S) && rsLv(S, 'auto') >= 1 && S.auto.col.on && !S.chal) { const x = colX(S), d = parseFloat(S.auto.col.v) || 0.05; if (colGain(S) !== NI && x >= S.bh.xh + d) { doCollapse(S); return 'col'; } }
   if (S.tier >= 6) {
     if (acSeated(S, 'tur')) { while (S.om.c1 >= 1) useOm1(S); if (S.chap >= 5) while (S.om.c2 >= 1) useOm2(S); }
     if (S.trTot >= 12) lmMergeAll(S);
@@ -1119,9 +1156,10 @@ function step(S, dt) {
   }
   // 常数
   if (S.tier >= 4 && G.cpu > 0) cstStep(S, dt);
-  if (S.tier >= 2) { S.pr.n += G.sieveV * dt; }
+  if (S.tier >= 2) { S.pr.n = Math.min(1e300, S.pr.n + G.sieveV * dt); }
   if (S.tier >= 5) mpStep(S, dt);
   if (S.tier >= 7) step7(S, dt);
+  if (S.tier >= 7) step13(S, dt);
   if (S.tier >= 6) step6(S, dt);
   if (S.boostT > 0) S.boostT = Math.max(0, S.boostT - dt);
   recalc(S);
@@ -1157,7 +1195,7 @@ const PRM_MS = [ // 素数里程碑（按已发现素数个数的 lg）
 ];
 function sieveCost(L) { return 2 + 2 * L + 0.1 * L * L; } // 定理（log）
 function sieveSpeed(S) { if (S.tier < 2) return 0; const p = PRM(S); return Math.pow(2, S.pr.L) * Math.pow(10, 0.5 * (S.tier - 2)) * (p >= 2 ? 2 : 1) * (p >= 4 ? 3 : 1) * (p >= 7 ? 5 : 1); }
-function buySieve(S) { const c = sieveCost(S.pr.L); if (S.tier < 2 || S.TH < c) return false; S.TH = ls(S.TH, c); S.pr.L++; return true; }
+function buySieve(S) { const c = sieveCost(S.pr.L); if (S.tier < 2 || S.pr.L >= 80 || S.TH < c) return false; S.TH = ls(S.TH, c); S.pr.L++; return true; }
 function isPrimeBig(n) { // 小于 2^53 的确定性 Miller–Rabin（BigInt）
   n = Math.floor(n); if (n < 2) return false; if (n <= PT.N) return !PT.s[n];
   if (n % 2 === 0 || n % 3 === 0) return false; if (typeof BigInt === 'undefined' || n > 9e15) return false;
@@ -1184,6 +1222,7 @@ function applySpark(S, kind) {
   if (kind === 'res') { S.res.act.forEach(a => a.t = Math.max(1, a.t - 1200)); return '所有进行中的研究提前 20 分钟'; }
   if (kind === 'sieve') { S.pr.n += G.sieveV * 3600; return '素数筛推进 1 小时'; }
   if (kind === 'cst' && S.tier >= 4) { recalc(S); for (let i = 0; i < 6; i++) cstStep(S, 300); return '常数计算推进 30 分钟'; }
+  if (kind === 'bh' && bhOn(S)) { S.bh.M += 0.4343 / bhTau(S); return '黑洞吸积推进 1 小时'; }
   if (kind === 'tower' && S.tier >= 7) { twClimb(S, 3600); return '无穷之塔攀登 1 小时'; }
   if (kind === 'omega' && S.tier >= 6) { S.om.w += G.omR * 3600; return 'ω 引擎推进 1 小时'; }
   if (kind === 'lemma' && S.tier >= 6) { for (let i = 0; i < 3; i++) lmSpawn(S); return '获得 3 个引理'; }
@@ -1195,11 +1234,96 @@ function cstStep(S, dt) {
     const r = G.cpu * S.cst.w[c.id] / wsum * ((c.id === 'pi' || c.id === 'de') && S.tier >= 6 ? 1 + acL(S, 'arc') : 1), D0 = S.cst.D[c.id]; S.cst.D[c.id] = Math.pow(Math.pow(1 + D0, 1.5) + 1.5 * r * dt, 2 / 3) - 1; });
 }
 
+/* ===================== v1.3.0 · 坍缩与黑洞（第六重置层） ===================== */
+const CLS = [
+  { id: 'mass', n: '质量', d: L => `黑洞的倍增时间 ÷${fx(1 + 0.12 * L, 2)}` },
+  { id: 'curv', n: '曲率', d: L => `深空指数 q +${fx(0.025 * L, 3)}` },
+  { id: 'hor', n: '视界', d: L => `视界系数 β +${fx(0.015 * L, 3)}` },
+  { id: 'ent', n: '熵', d: L => `奇点获取 ×${fx(Math.pow(1 + L, 1.5), 2)}` },
+  { id: 'rad', n: '辐射', d: L => `霍金辐射 ×${fx(1 + 0.4 * L, 2)}` },
+  { id: 'grav', n: '引力', d: L => `ℵ +${fx(0.004 * L, 3)}，μ 的指数 ×${fx(1 + 0.04 * L, 2)}` },
+];
+const CLSM = {}; CLS.forEach(c => CLSM[c.id] = c);
+const SPATH = [
+  { id: 'red', n: '红巨星之路', c0: 0, cs: 0.55, d: '质量与熵：便宜、稳健的起步', nodes: [['mass', 1], ['ent', 1], ['mass', 2], ['ent', 2], ['mass', 3], ['mass', 4], ['ent', 3], ['mass', 5], ['ent', 4], ['mass', 6], ['mass', 7], ['ent', 5], ['mass', 8], ['ent', 6], ['mass', 9]] },
+  { id: 'wd', n: '白矮星之路', c0: 0.4, cs: 0.6, d: '曲率与视界：直接推高深空的天花板', nodes: [['curv', 1], ['hor', 1], ['curv', 2], ['hor', 2], ['curv', 3], ['hor', 3], ['curv', 4], ['hor', 4], ['curv', 5], ['hor', 5], ['curv', 6], ['hor', 6], ['curv', 7], ['hor', 7], ['curv', 8]] },
+  { id: 'pul', n: '脉冲星之路', c0: 0.8, cs: 0.6, d: '辐射与熵：喂饱辐射工坊', nodes: [['rad', 1], ['rad', 2], ['ent', 2], ['rad', 3], ['ent', 3], ['rad', 4], ['rad', 5], ['ent', 5], ['rad', 6], ['rad', 7], ['ent', 7], ['rad', 8], ['rad', 9], ['ent', 9], ['rad', 10]] },
+  { id: 'ns', n: '中子星之路', c0: 1.2, cs: 0.62, d: '引力与质量：放大公式的指数', nodes: [['grav', 1], ['grav', 2], ['mass', 3], ['grav', 3], ['grav', 4], ['mass', 5, { mass: 3 }], ['grav', 5], ['mass', 7], ['grav', 6], ['grav', 7, { curv: 3 }], ['mass', 9], ['grav', 8], ['grav', 9, { hor: 4 }], ['mass', 11], ['grav', 10]] },
+  { id: 'bh', n: '黑洞之路', c0: 3, cs: 0.7, enter: { mass: 4 }, d: '视界、曲率、引力的高阶节点', nodes: [['hor', 3], ['curv', 3], ['hor', 5], ['grav', 4], ['curv', 5], ['hor', 7, { mass: 6 }], ['curv', 7], ['grav', 7], ['hor', 9, { ent: 4 }], ['curv', 9], ['hor', 10], ['grav', 10, { mass: 8 }], ['curv', 11], ['hor', 12], ['curv', 12]] },
+  { id: 'qs', n: '类星体之路', c0: 6, cs: 0.75, enter: { mass: 6, ent: 4, rad: 4 }, d: '六种属性的终极节点', nodes: [['mass', 10], ['ent', 8], ['rad', 9], ['hor', 11], ['curv', 10], ['grav', 11], ['mass', 12], ['ent', 10], ['rad', 11], ['hor', 13], ['curv', 13], ['grav', 13], ['mass', 14], ['ent', 12], ['hor', 15]] },
+];
+const SPM = {}; SPATH.forEach(p => SPM[p.id] = p);
+const RSHOP = [
+  { id: 'acc', n: '吸积加速', b: 50, g: 3, max: 20, d: '黑洞倍增时间 ×0.92（最短 12 小时）' },
+  { id: 'sig', n: '奇点增幅', b: 80, g: 3.2, max: 20, d: '奇点获取 ×1.5' },
+  { id: 'hor', n: '视界扩张', b: 120, g: 3.5, max: 20, d: '视界系数 β +0.005' },
+  { id: 'lens', n: '引力透镜', b: 200, g: 3.5, max: 15, d: 'ℵ +0.002' },
+  { id: 'det', n: '探测器灵敏度', b: 100, g: 3, max: 5, d: '引力波探测速度 ×1.4' },
+  { id: 'auto', n: '自动坍缩器', b: 500, g: 1, max: 1, d: '解锁自动坍缩' },
+];
+const RSHM = {}; RSHOP.forEach(r => RSHM[r.id] = r);
+const GWN = [['GW150914', '双黑洞并合', '人类第一次直接探测到引力波'], ['GW151012', '双黑洞并合', ''], ['GW151226', '双黑洞并合', ''], ['GW170104', '双黑洞并合', ''], ['GW170608', '双黑洞并合', '已知质量最轻的双黑洞之一'], ['GW170729', '双黑洞并合', ''], ['GW170809', '双黑洞并合', ''], ['GW170814', '双黑洞并合', '第一次三台探测器同时观测'], ['GW170817', '双中子星并合', '同时观测到电磁对应体：千新星'], ['GW170818', '双黑洞并合', ''], ['GW170823', '双黑洞并合', ''], ['GW190412', '双黑洞并合', '两个黑洞质量差异悬殊'], ['GW190425', '双中子星并合', ''], ['GW190521', '双黑洞并合', '并合后形成中等质量黑洞'], ['GW190814', '致密双星并合', '较轻的天体质量成谜'], ['GW200105', '黑洞–中子星并合', ''], ['GW200115', '黑洞–中子星并合', '']];
+const GWE = [['奇点获取 ×1.08'], ['黑洞倍增时间 ×0.97'], ['ℵ +0.002']];
+const XP13 = [ // 回溯：用属性门槛解锁旧玩法的拓展
+  { id: 'xfr', c: 'curv', L: 5, n: '分形回溯', d: '所有分形的最高迭代 +2' },
+  { id: 'xac', c: 'mass', L: 6, n: '学院扩建', d: '学院席位 +2' },
+  { id: 'xtw', c: 'grav', L: 6, n: '高塔回响', d: '无穷之塔攀登速度 ×2，并出现新的传说楼层' },
+  { id: 'xom', c: 'rad', L: 5, n: '序数共振', d: 'ω 引擎技能充能速度 ×2' },
+  { id: 'xcs', c: 'ent', L: 6, n: '常数熵增', d: '算力 ×10' },
+];
+const CM = [ // 坍缩里程碑
+  { n: 1, d: '黑洞诞生（初始质量 10² M☉）；解锁星路、霍金辐射与引力波观测站；重生、证明、公理化、超限不再清空累计货币' },
+  { n: 5, d: '霍金辐射 ×2' },
+  { n: 10, d: '引力波探测速度 ×1.5' },
+  { n: 20, d: '奇点获取 ×3' },
+  { n: 40, d: '黑洞倍增时间 ×0.9' },
+];
+function bhOn(S) { return S.tier >= 7 && S.bh.col >= 1; }
+function rec(S, c) { return S.bh.rec[c] || 0; }
+function xpOn(S, id) { const x = XP13.find(q => q.id === id); return !!x && bhOn(S) && rec(S, x.c) >= x.L; }
+function reqOk(S, r) { if (!r) return true; for (const k in r) if (rec(S, k) < r[k]) return false; return true; }
+function spCost(p, j) { return p.c0 + p.cs * j; }
+function spSpent(S) { const p = SPM[S.bh.path]; if (!p) return NI; let t = NI; for (let j = 0; j < S.bh.k; j++) t = la(t, spCost(p, j)); return t; }
+function spCanBuy(S) { const p = SPM[S.bh.path]; if (!bhOn(S) || !p || S.bh.k >= p.nodes.length) return false; const nd = p.nodes[S.bh.k]; return reqOk(S, nd[2]) && S.bh.SI >= spCost(p, S.bh.k); }
+function spBuy(S) { if (!spCanBuy(S)) return false; const p = SPM[S.bh.path], nd = p.nodes[S.bh.k]; S.bh.SI = ls(S.bh.SI, spCost(p, S.bh.k)); S.bh.k++; if (nd[1] > rec(S, nd[0])) S.bh.rec[nd[0]] = nd[1]; S.bh.vis[p.id] = 1; return true; }
+function spSwitch(S, id) { const p = SPM[id]; if (!bhOn(S) || !p || id === S.bh.path || !reqOk(S, p.enter)) return false; S.bh.SI = la(S.bh.SI, spSpent(S)); S.bh.path = id; S.bh.k = 0; S.bh.sw = (S.bh.sw || 0) + 1; resetPoints(S, false); recalc(S); return true; }
+function rsLv(S, id) { return S.bh.rs[id] || 0; }
+function rsCost(S, id) { const r = RSHM[id]; return r.b * Math.pow(r.g, rsLv(S, id)); }
+function rsBuy(S, id) { const r = RSHM[id]; if (!bhOn(S) || (r.max && rsLv(S, id) >= r.max) || S.bh.R < rsCost(S, id)) return false; S.bh.R -= rsCost(S, id); S.bh.rs[id] = rsLv(S, id) + 1; return true; }
+function gwCount(S, k) { const n = Math.min(90, S.bh.gw); return Math.floor(n / 3) + (n % 3 > k ? 1 : 0); }
+function bhTau(S) { return Math.max(12, 30 / (1 + 0.12 * rec(S, 'mass')) * Math.pow(0.92, rsLv(S, 'acc')) * (S.res.done.s43 ? 0.8 : 1) * (S.res.done.s48 ? 0.8 : 1) * Math.pow(0.97, gwCount(S, 1)) * (S.bh.col >= 40 ? 0.9 : 1)); }
+function siMult(S) { return Math.pow(1 + rec(S, 'ent'), 1.5) * Math.pow(1.5, rsLv(S, 'sig')) * Math.pow(1.08, gwCount(S, 0)) * (S.res.done.s47 ? 10 : 1) * (S.bh.col >= 20 ? 3 : 1); }
+function radRate(S) { return 0.03 * (1 + 0.4 * rec(S, 'rad')) * (1 + 0.3 * S.bh.M) * (S.res.done.s44 ? 3 : 1) * (S.bh.col >= 5 ? 2 : 1); }
+function gwSpeed(S) { return Math.pow(1.4, rsLv(S, 'det')) * (S.bh.col >= 10 ? 1.5 : 1); }
+function bhBeta(S) { return 0.1 + 0.015 * rec(S, 'hor') + 0.005 * rsLv(S, 'hor') + (S.res.done.s45 ? 0.03 : 0); }
+function bhQ(S) { return Math.min(0.9, 0.5 + 0.025 * rec(S, 'curv') + (S.res.done.s46 ? 0.03 : 0)); }
+function bhMeff(S) { const M = S.bh.M; return M <= 17 ? M : 17 + 2 * Math.sqrt(M - 17); }
+function bhMu(S) { return bhOn(S) ? Math.pow(10, Math.min(250, K.muG * bhMeff(S) * (1 + 0.04 * rec(S, 'grav')))) * (S.res.done.s47 ? 1.1 : 1) : 1; }
+function bhAl(S) { return bhOn(S) ? 0.004 * rec(S, 'grav') + 0.002 * gwCount(S, 2) + 0.002 * rsLv(S, 'lens') + (S.res.done.s48 ? 0.02 : 0) : 0; }
+function colX(S) { return S.P > 0 ? L10(S.P) : NI; } // lg(lg 点数)
+function colGain(S) {
+  const x = colX(S); if (S.tier < 7 || S.P < 1e8 || !(x > S.bh.xh)) return NI;
+  const a = 1.2 * (x - 8), b = S.bh.xh > 0 ? 1.2 * (S.bh.xh - 8) : NI; const d = b === NI ? a : ls(a, b); if (d === NI) return NI;
+  return d + L10(siMult(S));
+}
+function canCollapse(S) { return !S.chal && colGain(S) !== NI; }
+function doCollapse(S) {
+  if (!canCollapse(S)) return false; const g = colGain(S), x = colX(S), xh0 = S.bh.xh > 0 ? S.bh.xh : 8;
+  S.bh.SI = la(S.bh.SI, g); S.bh.SIt = la(S.bh.SIt, g); if (S.bh.col === 0) S.bh.M = 2; S.bh.xh = x; S.bh.col++; S.bh.ct = 0;
+  S.OR = NI; resetPoints(S, false); recalc(S); return true;
+}
+function step13(S, dt) {
+  if (!bhOn(S)) return;
+  S.bh.M += dt / 3600 * 0.4343 / bhTau(S); S.bh.ct += dt;
+  S.bh.R += radRate(S) * dt;
+  S.bh.gt += dt * gwSpeed(S); while (S.bh.gt >= 86400) { S.bh.gt -= 86400; S.bh.gw++; }
+}
+
 /* ===================== v1.2.2 · 七阶「基数」（最终阶段） ===================== */
 /* ---------- 无穷之塔 ---------- */
-const TWN = { 10: '古戈尔', 20: '古戈尔普勒克斯', 30: '斯丘斯数', 40: '葛立恒数', 50: 'TREE(3)', 60: '忙碌海狸', 70: '拉约数', 80: 'ε₀', 90: 'ℵ₀', 100: 'ℵ_ω', 110: '不可达基数', 120: '可测基数', 130: '伍丁基数', 140: '超紧致基数', 150: '莱茵哈特基数' };
-const TWD = { 10: '10 的 100 次方', 20: '10 的古戈尔次方', 30: '曾用于素数计数函数的上界', 40: '曾被吉尼斯纪录收录为数学证明中出现过的最大数', 50: '源自树的嵌入问题，远超葛立恒数', 60: '图灵机能写出的最多个 1，不可计算', 70: '用一阶集合论语言描述的最大数', 80: '第一个无法用 ω 的有限次加、乘、幂到达的序数', 90: '最小的无穷基数，自然数的个数', 100: '第 ω 个无穷基数', 110: '无法从更小的基数「构造」出来', 120: '存在非平凡的超滤', 130: '与决定性公理密切相关', 140: '一致性强度极高的大基数', 150: '与选择公理矛盾的基数' };
-function twSpeed(S) { return (0.6 + 0.01 * L10(1 + S.om.w)) * (S.res.done.s39 ? 2 : 1) * (S.u.o23 === 1 ? 1.5 : 1); }
+const TWN = { 10: '古戈尔', 20: '古戈尔普勒克斯', 30: '斯丘斯数', 40: '葛立恒数', 50: 'TREE(3)', 60: '忙碌海狸', 70: '拉约数', 80: 'ε₀', 90: 'ℵ₀', 100: 'ℵ_ω', 110: '不可达基数', 120: '可测基数', 130: '伍丁基数', 140: '超紧致基数', 150: '莱茵哈特基数', 160: '伯克利基数', 180: '康托尔的绝对无限', 200: '视界之外' };
+const TWD = { 10: '10 的 100 次方', 20: '10 的古戈尔次方', 30: '曾用于素数计数函数的上界', 40: '曾被吉尼斯纪录收录为数学证明中出现过的最大数', 50: '源自树的嵌入问题，远超葛立恒数', 60: '图灵机能写出的最多个 1，不可计算', 70: '用一阶集合论语言描述的最大数', 80: '第一个无法用 ω 的有限次加、乘、幂到达的序数', 90: '最小的无穷基数，自然数的个数', 100: '第 ω 个无穷基数', 110: '无法从更小的基数「构造」出来', 120: '存在非平凡的超滤', 130: '与决定性公理密切相关', 140: '一致性强度极高的大基数', 150: '与选择公理矛盾的基数', 160: '比莱茵哈特基数更强的假想基数', 180: '康托尔用来称呼「所有数」的总体', 200: '高塔回响解锁后才能抵达的地方' };
+function twSpeed(S) { return (0.6 + 0.01 * L10(1 + S.om.w)) * (S.res.done.s39 ? 2 : 1) * (S.u.o23 === 1 ? 1.5 : 1) * (xpOn(S, 'xtw') ? 2 : 1); }
 function twFloorTime(n) { return 3600 * (1 + n / 15); }
 function twAdvance(S, floors) { let f = floors; while (f > 0) { const need = 1 - S.tw.p; if (f >= need) { f -= need; S.tw.p = 0; S.tw.f++; } else { S.tw.p += f; f = 0; } } }
 function twClimb(S, sec) { let left = sec * twSpeed(S), guard = 0; while (left > 0 && guard++ < 1000) { const T = twFloorTime(S.tw.f), need = (1 - S.tw.p) * T; if (left >= need) { left -= need; S.tw.p = 0; S.tw.f++; } else { S.tw.p += left / T; left = 0; } } }
@@ -1237,7 +1361,8 @@ const FR = [
 const FRM = {}; FR.forEach(f => FRM[f.id] = f);
 function frUnl(S, f) { return S.tier >= 5 && (!f.rs || !!S.res.done[f.rs]); }
 function frCost(f, L) { return f.c0 + f.cs * L; }
-function frCan(S, id) { const f = FRM[id], L = S.fr[id] || 0; return !!f && frUnl(S, f) && L < f.max && S.AX >= frCost(f, L); }
+function frMax(S, f) { return f.max + (xpOn(S, 'xfr') ? 2 : 0); }
+function frCan(S, id) { const f = FRM[id], L = S.fr[id] || 0; return !!f && frUnl(S, f) && L < frMax(S, f) && S.AX >= frCost(f, L); }
 function frBuy(S, id) { if (!frCan(S, id)) return false; const f = FRM[id]; S.AX = ls(S.AX, frCost(f, S.fr[id] || 0)); S.fr[id] = (S.fr[id] || 0) + 1; return true; }
 function frSum(S) { let s = 0; FR.forEach(f => s += (S.fr[f.id] || 0) * f.dim); return s; }
 /* ---------- 梅森素数搜寻 ---------- */
@@ -1332,7 +1457,7 @@ function lvOf(xp) { return 1 + Math.floor(Math.log2(1 + (xp || 0) / 300)); }
 function xpFor(L) { return 300 * (Math.pow(2, L - 1) - 1); }
 function acSeated(S, id) { return S.ac.seat.indexOf(id) >= 0; }
 function acL(S, id) { if (!S.ac || !S.ac.got[id] || S.chal === 14) return 0; const L = lvOf(S.ac.xp[id]); return acSeated(S, id) ? L : 0.25 * L; }
-function acSeats(S) { return 2 + (S.trTot >= 3 ? 1 : 0) + (S.chap >= 3 ? 1 : 0) + (S.res.done.s21 ? 1 : 0) + (S.u.o14 === 1 ? 1 : 0) + (S.chap >= 6 ? 1 : 0) + swAdd(S, 'seat'); }
+function acSeats(S) { return 2 + (S.trTot >= 3 ? 1 : 0) + (S.chap >= 3 ? 1 : 0) + (S.res.done.s21 ? 1 : 0) + (S.u.o14 === 1 ? 1 : 0) + (S.chap >= 6 ? 1 : 0) + swAdd(S, 'seat') + (xpOn(S, 'xac') ? 2 : 0); }
 function acNext(S) { return MATH.find(m => !S.ac.got[m.id]); }
 function acRecruit(S) { const m = acNext(S); if (!m || S.tier < 6 || S.chap < 1 || (m.i >= 12 && S.chap < 10) || S.OR < m.c) return false; S.OR = ls(S.OR, m.c); S.ac.got[m.id] = 1; S.ac.xp[m.id] = 0; if (S.ac.seat.length < acSeats(S)) S.ac.seat.push(m.id); return true; }
 function acSeat(S, id) { if (!S.ac.got[id] || (typeof exOn === 'function' && exOn(S, id))) return false; const i = S.ac.seat.indexOf(id); if (i >= 0) { S.ac.seat.splice(i, 1); return true; } if (S.ac.seat.length >= acSeats(S)) return false; S.ac.seat.push(id); return true; }
@@ -1348,8 +1473,8 @@ function omRate(S) {
   return r;
 }
 function omMul1(S) { return (S.u.o13b === 1 ? 3 : 2) + 0.05 * acL(S, 'can'); }
-function useOm1(S) { if (S.tier < 6 || S.om.c1 < 1) return false; S.om.c1--; S.om.w = Math.max(1, S.om.w) * omMul1(S); S.st.om1 = (S.st.om1 || 0) + 1; return true; }
-function useOm2(S) { if (S.tier < 6 || S.chap < 5 || S.om.c2 < 1) return false; S.om.c2--; S.om.w = Math.max(1, S.om.w) * 10; return true; }
+function useOm1(S) { if (S.tier < 6 || S.om.c1 < 1) return false; S.om.c1--; S.om.w = Math.min(1e300, Math.max(1, S.om.w) * omMul1(S)); S.st.om1 = (S.st.om1 || 0) + 1; return true; }
+function useOm2(S) { if (S.tier < 6 || S.chap < 5 || S.om.c2 < 1) return false; S.om.c2--; S.om.w = Math.min(1e300, Math.max(1, S.om.w) * 10); return true; }
 const OM1T = 21600, OM2T = 86400;
 /* ---------- 引理工坊 ---------- */
 function lmMult(S) { return (1 + 0.15 * acL(S, 'fib')) * (S.u.o8 === 1 ? 2 : 1) * (S.res.done.s23 ? 2 : 1) * swMul(S, 'lm') * (S.res.done.s29 ? 2 : 1); }
@@ -1393,15 +1518,15 @@ function omega6(S) {
 }
 /* ---------- 超限重置 ---------- */
 function resetAxiomLayer(S) {
-  S.AX = NI; S.AXc = NI; S.axN = 0; S.axT = 0; S.lv.l = 0;
+  const keep = S.bh && S.bh.col >= 1; S.AX = NI; if (!keep) { S.AXc = NI; S.lv.l = 0; } S.axN = 0; S.axT = 0;
   if (S.trTot < 1) AU.forEach(x => { if (S.u[x.id] === 1) delete S.u[x.id]; });
   resetProofLayer(S);
 }
 function canTrans(S) { return S.tier >= 6 && G.trGain >= 0 && !S.chal; }
 function doTrans(S) { if (!canTrans(S)) return false; const g = G.trGain; S.OR = la(S.OR, g); S.ORc = la(S.ORc, g); S.trN++; S.trTot++; S.trT = 0; resetAxiomLayer(S); recalc(S); return true; }
 function step6(S, dt) {
-  S.om.w += (S.chal === 12 ? 0 : G.omR || 0) * dt;
-  const r1 = S.u.o4 === 1 ? 1.5 : 1;
+  S.om.w = Math.min(1e300, S.om.w + (S.chal === 12 ? 0 : G.omR || 0) * dt);
+  const r1 = (S.u.o4 === 1 ? 1.5 : 1) * (xpOn(S, 'xom') ? 2 : 1);
   if (S.om.c1 < 3) { S.om.t1 += dt * r1; while (S.om.t1 >= OM1T && S.om.c1 < 3) { S.om.t1 -= OM1T; S.om.c1++; } } if (S.om.c1 >= 3) S.om.t1 = 0;
   if (S.chap >= 5) { if (S.om.c2 < 2) { S.om.t2 += dt * r1; while (S.om.t2 >= OM2T && S.om.c2 < 2) { S.om.t2 -= OM2T; S.om.c2++; } } if (S.om.c2 >= 2) S.om.t2 = 0; }
   while (S.ac.seat.length > acSeats(S)) S.ac.seat.pop();
@@ -1560,12 +1685,12 @@ function deserialize(str) {
 function encodeSave(S) { const s = serialize(S); return typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(s))) : Buffer.from(s).toString('base64'); }
 function decodeSave(b) { const s = typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(b.trim()))) : Buffer.from(b, 'base64').toString(); return deserialize(s); }
 
-if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, TWN, TWD, twSpeed, twFloorTime, twAdvance, twSprint, twClimb, FZP, fzDeal, fzTap, aleph7, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
+if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, CLS, CLSM, SPATH, SPM, RSHOP, RSHM, GWN, GWE, XP13, CM, bhOn, rec, xpOn, reqOk, spCost, spSpent, spCanBuy, spBuy, spSwitch, rsLv, rsCost, rsBuy, gwCount, bhTau, siMult, radRate, gwSpeed, bhBeta, bhQ, bhMu, bhAl, colX, colGain, canCollapse, doCollapse, bhMeff, frMax, TWN, TWD, twSpeed, twFloorTime, twAdvance, twSprint, twClimb, FZP, fzDeal, fzTap, aleph7, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
 
 /* ===================== 公式晋升 v1.0.0 · 界面（前端） ===================== */
 const SAVE_KEY = 'formula-ascend-save-v1';
 const SKIN_KEY = 'formula-ascend-skin';
-const CURN = { P: '点数', RP: '重生点', TH: '定理', AX: '公理', OR: '序数', IN: '灵感' };
+const CURN = { P: '点数', RP: '重生点', TH: '定理', AX: '公理', OR: '序数', IN: '灵感', SI: '奇点' };
 const TIERN = ['', '一阶', '二阶', '三阶', '四阶', '五阶', '六阶', '七阶'];
 let S, view = 'factor', viewSig = '', binds = [], lastFrame = Date.now(), lastSec = 0, cloud = null, cloudBusy = false, lastCloud = 0;
 let msSel = { 3: 0, 4: 0, 5: 0 }, msSize = 3, primeCache = { n: -1, p: 0, at: 0 }, spark = null, nextSpark = Date.now() + rnd(200, 420) * 1000, modalQ = [], modalOpen = false, heroTier = 0;
@@ -1606,6 +1731,7 @@ function offline(sec, silent) {
   if (S.tier >= 2) li.push(`素数筛已检验到 ${fmtInt(S.pr.n)}`);
   if (S.tier >= 6) li.push(`ω 增长到 ${fmtBig(S.om.w)}，Ω = ${fx(G.Om, 3)}`);
   if (S.tier >= 7) li.push(`无穷之塔到达第 ${S.tw.f + 1} 层，ℵ = ${fx(G.al, 4)}`);
+  if (bhOn(S)) li.push(`黑洞质量增长到 10^${fx(S.bh.M, 2)} M☉，辐射 ${fmtBig(S.bh.R)}，探测到 ${S.bh.gw} 个引力波事件`);
   if (S.chap >= 7 && S.ex.n > b.exn) li.push(`完成远征 ${S.ex.n - b.exn} 次，现有灵感 ${fmtBig(S.IN)}`);
   if (S.chap >= 8 && S.g24.ch > 0) li.push(`二十四点有 ${S.g24.ch} 手牌等你来玩`);
   modal('欢迎回来', `<p>你离开了 <b>${fmtT(sec)}</b>，离线期间游戏照常运行：</p><ul>${li.map(x => '<li>' + x + '</li>').join('')}</ul><p class="note">自动购买与自动重置在离线时同样生效。</p>`);
@@ -1655,6 +1781,7 @@ function applySkin(value, remember = false) {
   $('skin').value = skin;
   if (remember) { try { localStorage.setItem(SKIN_KEY, skin); } catch (e) { } }
   if (view === 'pr') drawUlam();
+  if (view === 'col') drawBH();
   if (view === 'fr') FR.forEach(f => drawFractal(f.id));
 }
 function loadSkin() {
@@ -1665,7 +1792,7 @@ function loadSkin() {
 
 /* ---------------- 新功能说明 ---------------- */
 const NEWS = [
-  { k: 'welcome', c: () => true, t: '欢迎来到无尽演算', b: '<p>每隔一个时间间隔 Δ，你会获得等于公式结果的点数。用点数升级公式里的因子，让产量越来越高。</p><p>你的目标是<b>晋升</b>：每次晋升，公式升高一阶、变得更复杂，并解锁新玩法。v1.2.2 最高为七阶。</p>' },
+  { k: 'welcome', c: () => true, t: '欢迎来到无尽演算', b: '<p>每隔一个时间间隔 Δ，你会获得等于公式结果的点数。用点数升级公式里的因子，让产量越来越高。</p><p>你的目标是<b>晋升</b>：每次晋升，公式升高一阶、变得更复杂，并解锁新玩法。v1.3.0 最高为七阶。</p>' },
   { k: 'rb', c: () => S.P >= 3.5 || S.rbTot > 0, t: '重生', b: '<p>点数达到 1e4 后可以重生：清空点数与因子，换取<b>重生点</b>。</p><p>累计重生点决定重生因子 <i>r</i>，重生点还能购买<b>重生升级树</b>。</p>' },
   { k: 'tree', c: () => S.rbTot >= 1, t: '升级树与分支', b: '<p>升级按树状排列，必须先买前置节点。标有「择一」的分叉只能选一条路，两条路风格不同、都能通关。</p><p>想换路线时可以「重置升级树」：已花费的货币全额退还，但会触发一次该层的重置。</p>' },
   { k: 't2', c: () => S.tier >= 2, t: '二阶：证明、研究所、素数筛', b: '<p><b>证明</b>：点数达到 1e25 后可证明，重置重生层，获得<b>定理</b>。累计定理提供 θ，并解锁证明升级树与永久里程碑。</p><p><b>研究所</b>：消耗定理（之后还有公理）开始限时研究，离线也会推进。</p><p><b>素数筛</b>：一台永不停歇的筛子逐个检验整数，已发现的素数个数永久加成 a。它跨越所有晋升持续累积。</p>' },
@@ -1689,6 +1816,8 @@ const NEWS = [
   { k: 'v12c12', c: () => S.tier >= 6 && S.chap >= 12, t: '第十三章 · 奇点', b: '<p>ψ 获得额外加成，远征新地点「混沌之海」开放。ee7 就在眼前。</p>' },
   { k: 'v12c13', c: () => S.tier >= 6 && S.chap >= 13, t: '第十四章 · ee7', b: '<p>10 的 1000 万次方。从 a·b·r 到 [ … ]<sup>Ω·ψ</sup>，你走了很远。</p><p>但还有最后一阶：点数达到 <b>e2e7</b>，即可晋升<b>七阶</b>——最终阶段。</p>' },
   { k: 'deep', c: () => S.tier >= 7 && G.sc, t: '深空', b: '<p>你的产量越过了 <b>ee8</b>。在这片深空里，数量级的增长会被稀释：超过 ee8 的部分按平方根计算。</p><p>进度不会停下，只是每一步都更费力。未来版本的新玩法，会带你走得更远。</p>' },
+  { k: 'v13', c: () => S.tier >= 7 && S.P >= 1e8, t: '坍缩 · 最后的重置层', b: '<p>你越过了 ee8。现在可以<b>坍缩</b>：把新获得的进度压缩成<b>奇点</b>。坍缩只重置点数与因子，各层的累计货币和升级都会保留。</p><p>第一次坍缩会诞生一个<b>黑洞</b>。它的质量随时间指数增长，抬高深空的天花板，并给公式的指数乘上新的 <b>μ</b>。</p>' },
+  { k: 'col1', c: () => bhOn(S), t: '星路', b: '<p>用奇点在<b>星路</b>上前进，提升六种属性：质量、曲率、视界、熵、辐射、引力。</p><p>同一时间只能走一条星路，但可以随时切换：花费的奇点全额退还，只重置点数，<b>属性的最高等级永远保留</b>。轮流走不同的星路，把各种属性一点点推高吧。</p><p>黑洞还会产生<b>霍金辐射</b>，并开始探测<b>引力波</b>。</p>' },
   { k: 't7', c: () => S.tier >= 7, t: '七阶 · 基数（最终阶段）', b: '<p>公式的指数长出了自己的指数：P = [ … ]<sup>(Ω·ψ)<sup>ℵ</sup></sup>。ℵ（阿列夫）是基数，比所有序数都更「大」的无穷。ℵ 每提高一点，整个 Ω·ψ 都会被再放大一次。</p><p><b>无穷之塔</b>：一层层攀登，每 10 层遇见一个传说中的巨大数字。<br><b>质因数分解</b>：点击素数把数除到 1，每解开一个都推动攀登。</p><p>七阶是最后一个阶，此后只会有新的玩法。这次晋升保留了你所有的升级与货币。</p>' },
 ];
 function checkNews() { for (const n of NEWS) if (!S.seen[n.k] && n.c()) { S.seen[n.k] = 1; modal(n.t, typeof n.b === 'function' ? n.b() : n.b); } }
@@ -1703,18 +1832,18 @@ function formulaHTML(T) {
   if (T === 3) return P + `(${a}${d}${b})<sup>${c}</sup>${d}${t}<sup>${c}−1</sup>${d}${r}${d}${th}${d}${al}`;
   const base = P + `(${a}${d}${b}${d}${dd})<sup>${c}</sup>${d}${t}<sup>${c}−1</sup>${d}${r}${d}(${th}${d}${al})<sup>${lm}</sup>`;
   if (T === 4) return base; const t5 = base + `${d}${k}<sup>${c}+${lm}</sup>`; if (T === 5) return t5;
-  return P + `<span class="op" style="font-size:1.25em">[</span>` + t5.slice(P.length) + `<span class="op" style="font-size:1.25em">]</span><sup>${T >= 7 ? '<span class="op">(</span>' : ''}<i class="fl" data-a="tab:promo">Ω</i>${S.chap >= 7 ? '<span class="op">·</span><i class="fl" data-a="tab:sw">ψ</i>' : ''}${T >= 7 ? '<span class="op">)</span><sup><i class="ft" data-a="tab:tw">ℵ</i></sup>' : ''}</sup>`;
+  return P + `<span class="op" style="font-size:1.25em">[</span>` + t5.slice(P.length) + `<span class="op" style="font-size:1.25em">]</span><sup>${T >= 7 ? '<span class="op">(</span>' : ''}<i class="fl" data-a="tab:promo">Ω</i>${S.chap >= 7 ? '<span class="op">·</span><i class="fl" data-a="tab:sw">ψ</i>' : ''}${T >= 7 ? '<span class="op">)</span><sup><i class="ft" data-a="tab:tw">ℵ</i></sup>' : ''}${T >= 7 && bhOn(S) ? '<span class="op">·</span><i class="fp" data-a="tab:col">μ</i>' : ''}</sup>`;
 }
 function fmtBig(x) { return x < 1e9 ? (x < 100 ? fx(x, 2) : Math.floor(x).toLocaleString('en-US')) : fmt(L10(x)); }
 const READS = [
   ['a', () => fmt(G.A), () => true], ['b', () => fmt(G.B), () => true], ['c', () => fx(G.c, 3), () => S.tier >= 2],
   ['d', () => fmt(G.D), () => S.tier >= 4], ['t', () => fmt(G.Tf) + '（指数 ' + fx(G.c - 1 + G.tE, 2) + '）', () => S.tier >= 3],
   ['r', () => fmt(G.Rf), () => true], ['θ', () => fmt(G.THf), () => S.tier >= 2], ['α', () => fmt(G.AXf), () => S.tier >= 3],
-  ['λ', () => fx(G.lam, 3), () => S.tier >= 4], ['κ', () => fmt(G.K), () => S.tier >= 5], ['Ω', () => fx(G.Om, 3), () => S.tier >= 6], ['ψ', () => fx(G.psi || 1, 3), () => S.tier >= 6 && S.chap >= 7], ['ℵ', () => fx(G.al || 1, 4) + '（指数 ' + fx(G.EX || 1, 3) + '）', () => S.tier >= 7], ['ω', () => fmtBig(S.om.w), () => S.tier >= 6],
+  ['λ', () => fx(G.lam, 3), () => S.tier >= 4], ['κ', () => fmt(G.K), () => S.tier >= 5], ['Ω', () => fx(G.Om, 3), () => S.tier >= 6], ['ψ', () => fx(G.psi || 1, 3), () => S.tier >= 6 && S.chap >= 7], ['ℵ', () => fx(G.al || 1, 4), () => S.tier >= 7], ['μ', () => fmt(L10(G.mu || 1)), () => bhOn(S)], ['ω', () => fmtBig(S.om.w), () => S.tier >= 6],
 ];
 function renderHero() {
-  if (heroTier !== S.tier * 100 + (S.chap >= 7 ? 1 : 0)) {
-    heroTier = S.tier * 100 + (S.chap >= 7 ? 1 : 0); $('formula').innerHTML = formulaHTML(S.tier); $('formula').parentElement.classList.toggle('t6', S.tier >= 6); $('tierb').textContent = TIERN[S.tier];
+  if (heroTier !== S.tier * 100 + (S.chap >= 7 ? 1 : 0) + (bhOn(S) ? 2 : 0)) {
+    heroTier = S.tier * 100 + (S.chap >= 7 ? 1 : 0) + (bhOn(S) ? 2 : 0); $('formula').innerHTML = formulaHTML(S.tier); $('formula').parentElement.classList.toggle('t6', S.tier >= 6); $('tierb').textContent = TIERN[S.tier];
     $('reads').innerHTML = READS.filter(x => x[2]()).map((x, i) => `<span class="chip"><i>${x[0]}</i><span data-rd="${READS.indexOf(x)}"></span></span>`).join('');
   }
   $('pts').textContent = fmt(S.P);
@@ -1735,6 +1864,7 @@ function renderBar() {
   if (S.tier >= 2) c.push(['定理', S.TH, `累计 ${fmt(S.THc)} · θ ×${fmt(G.THf)}`]);
   if (S.tier >= 3) c.push(['公理', S.AX, `累计 ${fmt(S.AXc)} · α ×${fmt(G.AXf)}`]);
   if (S.tier >= 6) c.push(['序数', S.OR, `累计 ${fmt(S.ORc)} · Ω = ${fx(G.Om, 3)}`]);
+  if (bhOn(S)) c.push(['奇点', S.bh.SI, `黑洞 10^${fx(S.bh.M, 2)} M☉ · 辐射 ${fmtBig(S.bh.R)}`]);
   if (S.tier >= 6 && S.chap >= 7) c.push(['灵感', lg(S.IN), `累计 ${fmtBig(S.INt)} · ψ = ${fx(G.psi || 1, 3)}`]);
   const html = c.map(x => `<div class="cur"><div class="k">${x[0]}</div><div class="v num">${fmt(x[1])}</div><div class="s">${x[2]}</div></div>`).join('');
   if ($('curs').innerHTML !== html) $('curs').innerHTML = html;
@@ -1742,6 +1872,7 @@ function renderBar() {
   if (S.tier >= 2) items.push(['pf', () => S.chal && S.P >= chalGoal(S, S.chal) ? '证毕猜想' : '证明', () => canProof(S), () => G.pfGain !== NI ? '+' + fmt(G.pfGain) + ' 定理' : S.chal ? '达到猜想目标即可证毕' : '需要 1e25 点数', 'go']);
   if (S.tier >= 3) items.push(['ax', '公理化', () => canAxiom(S), () => S.chal ? '猜想中不可用' : G.axGain !== NI ? '+' + fmt(G.axGain) + ' 公理' : '需要 1e130 点数', 'go']);
   if (S.tier >= 6) items.push(['tr', '超限', () => canTrans(S), () => S.chal ? '猜想中不可用' : canTrans(S) ? '+' + fmt(G.trGain) + ' 序数' : '需要 ' + fmt(trReqOf(S)) + ' 点数', 'go']);
+  if (S.tier >= 7 && (S.P >= 1e8 || bhOn(S))) items.push(['col', '坍缩', () => canCollapse(S), () => S.chal ? '猜想中不可用' : colGain(S) !== NI ? '+' + fmt(colGain(S)) + ' 奇点' : bhOn(S) ? '需要超过上次坍缩时的点数' : '需要 ee8 点数', 'go']);
   if (canPromote(S)) items.push(['promo', '晋升', () => true, () => '升至' + TIERN[S.tier + 1], 'cy']);
   renderActions($('acts'), items);
   const next = items.some(x => x[0] === 'promo') ? [] : [['tab:promo', '查看晋升', () => true, () => Number.isFinite(TIERS[S.tier].req) ? '需要 ' + fmt(TIERS[S.tier].req) + ' 点数' : '当前版本进度', 'cy']];
@@ -1771,6 +1902,10 @@ const TABS = [
   { id: 'sw', n: '星盘', on: () => S.tier >= 6 && S.chap >= 7, dot: () => SW.some(n => swCan(S, n.id)) },
   { id: 'g24', n: '二十四点', on: () => S.tier >= 6 && S.chap >= 8, dot: () => S.g24.ch >= 1 },
   { id: 'ng', n: '数织', on: () => S.tier >= 6 && S.chap >= 9 },
+  { id: 'col', n: '坍缩', on: () => S.tier >= 7 && (S.P >= 1e8 || bhOn(S)), dot: () => canCollapse(S) },
+  { id: 'sp', n: '星路', on: () => bhOn(S), dot: () => spCanBuy(S) },
+  { id: 'rs', n: '辐射', on: () => bhOn(S), dot: () => RSHOP.some(r => !(r.max && rsLv(S, r.id) >= r.max) && S.bh.R >= rsCost(S, r.id)) },
+  { id: 'gw', n: '引力波', on: () => bhOn(S) },
   { id: 'tw', n: '无穷之塔', on: () => S.tier >= 7, dot: () => S.tw.c >= 1 },
   { id: 'fz', n: '分解', on: () => S.tier >= 7, dot: () => S.fz.ch >= 1 },
   { id: 'cj', n: '猜想', on: () => S.u.x3 === 1 || cjTotal(S) > 0 },
@@ -1784,7 +1919,7 @@ const TABS = [
   { id: 'opt', n: '设置', on: () => true },
 ];
 function treeCan(L) { const arr = LAYER[L].tree, have = curGet(S, LAYER[L].cur); return arr.some(x => upgState(S, x) === 'ok' && have >= x.c); }
-const NAV_SYMBOL = { factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', fr: '△', mp: 'M', tw: 'ℵ', fz: '∏', tr: 'Ω', om: 'ω', acad: '∑', lm: '⊕', gc: '◇', ex: '↗', sw: '✧', g24: '24', ng: '▤', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
+const NAV_SYMBOL = { factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', fr: '△', mp: 'M', col: '⊙', sp: '✴', rs: '☀', gw: '∿', tw: 'ℵ', fz: '∏', tr: 'Ω', om: 'ω', acad: '∑', lm: '⊕', gc: '◇', ex: '↗', sw: '✧', g24: '24', ng: '▤', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
 function renderTabs() {
   const tabs = $('tabs');
   const html = TABS.filter(t => t.on()).map(t => `<button class="tab ${view === t.id ? 'on' : ''}"${view === t.id ? ' aria-current="page"' : ''} data-a="tab:${t.id}"><span class="nav-symbol" aria-hidden="true">${NAV_SYMBOL[t.id] || '·'}</span>${t.n}${t.dot && view !== t.id && t.dot() ? '<span class="dot"></span>' : ''}</button>`).join('');
@@ -1799,7 +1934,7 @@ function renderTabs() {
 
 /* ---------------- 视图 ---------------- */
 function sigOf() {
-  return [view === 'lm' ? JSON.stringify(S.lm.g) + lmSel : view === 'gc' ? JSON.stringify(S.gc) + gcSel.c + gcSel.g : view === 'ex' ? JSON.stringify(exPick) + S.ex.act.length + S.ex.n : view === 'sw' ? Object.keys(S.sw).length + swSel : view === 'g24' ? S.g24.h.join() + JSON.stringify(g24ui.cards) + g24ui.sel + g24ui.op + (S.g24.ch >= 1) : view === 'ng' ? ngSel + JSON.stringify(S.ng[ngSel] || []) : view === 'tw' ? Math.floor(S.tw.f / 1) + '' : view === 'fz' ? S.fz.cur + ':' + S.fz.fs.length + ':' + (S.fz.ch >= 1) + fzShake : view === 'fr' ? JSON.stringify(S.fr) + !!S.res.done.s37 : view === 'mp' ? S.mp.n + '/' + S.mp.L : '', S.chap, S.trTot >= 1, S.trTot >= 5, Object.keys(S.ac.got).length, S.ac.seat.join(), acSeats(S), view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
+  return [view === 'lm' ? JSON.stringify(S.lm.g) + lmSel : view === 'gc' ? JSON.stringify(S.gc) + gcSel.c + gcSel.g : view === 'ex' ? JSON.stringify(exPick) + S.ex.act.length + S.ex.n : view === 'sw' ? Object.keys(S.sw).length + swSel : view === 'g24' ? S.g24.h.join() + JSON.stringify(g24ui.cards) + g24ui.sel + g24ui.op + (S.g24.ch >= 1) : view === 'ng' ? ngSel + JSON.stringify(S.ng[ngSel] || []) : view === 'col' ? S.bh.col + ':' + (rsLv(S, 'auto') >= 1) : view === 'sp' ? S.bh.path + S.bh.k + JSON.stringify(S.bh.rec) + spCanBuy(S) : view === 'rs' ? JSON.stringify(S.bh.rs) : view === 'gw' ? S.bh.gw + '' : view === 'tw' ? Math.floor(S.tw.f / 1) + '' : view === 'fz' ? S.fz.cur + ':' + S.fz.fs.length + ':' + (S.fz.ch >= 1) + fzShake : view === 'fr' ? JSON.stringify(S.fr) + !!S.res.done.s37 : view === 'mp' ? S.mp.n + '/' + S.mp.L : '', S.chap, S.trTot >= 1, S.trTot >= 5, Object.keys(S.ac.got).length, S.ac.seat.join(), acSeats(S), view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
 }
 function B(key, fn) { binds.push([key, fn]); return `data-b="${key}"`; }
 function buildView() {
@@ -1807,7 +1942,7 @@ function buildView() {
   const f = VIEWS[view] || VIEWS.factor;
   $('shell').dataset.view = view;
   $('view').innerHTML = f();
-  if (view === 'pr') drawUlam(); if (view === 'fr') FR.forEach(f => drawFractal(f.id));
+  if (view === 'pr') drawUlam(); if (view === 'col') drawBH(); if (view === 'fr') FR.forEach(f => drawFractal(f.id));
   const els = {}; $('view').querySelectorAll('[data-b]').forEach(el => els[el.dataset.b] = el);
   binds = binds.map(([k, fn]) => [els[k], fn]).filter(x => x[0]);
   updBinds();
@@ -1908,7 +2043,7 @@ VIEWS.cj = () => {
   let h = `<div class="sec">猜想<span class="h">在限制下完成证明，奖励永久保留（晋升也不会清空）</span></div>`;
   h += `<p class="note">进入猜想会立即进行一次证明重置（不获得定理）。点数达到目标后点「证毕猜想」或开启自动证毕。猜想中仍可重生与证明，但不能公理化或晋升。</p>`;
   h += `<div class="row"><label class="tgl"><input type="checkbox" data-in="cjauto" ${S.auto.cj ? 'checked' : ''}>达到目标后自动证毕</label>${S.chal ? `<button class="btn sm warn" data-a="cjx">放弃当前猜想</button>` : ''}</div>`;
-  h += `<div class="grid" style="margin-top:10px">${CJ.map(c => {
+  const card = c => {
     const k = S.cc[c.id] || 0, act = S.chal === c.id, av = chalAvail(S, c.id);
     const dots = [0, 1, 2].map(i => `<span class="pill ${i < k ? 'ok' : ''}">${['Ⅰ', 'Ⅱ', 'Ⅲ'][i]}${i < k ? ' ✓' : ''}</span>`).join(' ');
     const need = k >= 3 ? '已全部证毕' : S.tier < c.t[k] ? `第 ${k + 1} 难度需要${TIERN[c.t[k]]}` : '';
@@ -1917,7 +2052,8 @@ VIEWS.cj = () => {
     ${k < 3 ? `<div class="muted">目标：点数达到 <b class="num">${fmt(c.g[k])}</b></div>` : ''}
     ${act ? `<div class="am" ${B('cjp', () => '进行中：' + fmt(S.P) + ' / ' + fmt(chalGoal(S, c.id)))}></div>` : ''}
     <div class="row">${act ? '' : av && !S.chal ? `<button class="btn sm go" data-a="cj:${c.id}">开始</button>` : `<span class="faint">${need || (S.chal ? '已在其他猜想中' : '')}</span>`}</div></div>`;
-  }).join('')}</div>`;
+  };
+  [3, 4, 5, 6, 7].forEach(t => { const list = CJ.filter(c => c.t[0] === t); if (list.length) h += `<div class="sec">${TIERN[t]}猜想<span class="h">${list.length} 个</span></div><div class="grid">${list.map(card).join('')}</div>`; });
   return h;
 };
 VIEWS.res = () => {
@@ -2155,6 +2291,56 @@ VIEWS.mp = () => {
   if (S.mp.n < MERS.length) h += `<div class="card dim"><div class="nm">第 ${S.mp.n + 1} 个 · ？？？</div><div class="muted">继续检验，等待发现</div></div>`;
   return h + `</div><p class="note">年份是人类第一次发现该梅森素数的时间。完全数是等于自身所有真因数之和的数，例如 6 = 1 + 2 + 3、28 = 1 + 2 + 4 + 7 + 14。</p>`;
 };
+/* ---------- 坍缩与黑洞 ---------- */
+function drawBH() {
+  const cv = $('bhc'); if (!cv || !cv.getContext) return; const c = cv.getContext('2d'); if (!c) return;
+  const W = cv.width, H = cv.height, t = Date.now() / 1000, st = getComputedStyle(document.body), am = (st.getPropertyValue('--amber') || '#f4bc4e').trim();
+  c.clearRect(0, 0, W, H); const cx = W / 2, cy = H / 2, r = 22 + Math.min(48, 3 * Math.sqrt(Math.max(0, S.bh.M)));
+  for (let k = 0; k < 90; k++) { const a = (k / 90) * Math.PI * 2 + t * 0.35 * (1 + (k % 3) * 0.2), rr = r * (1.5 + (k % 7) * 0.12); const x = cx + Math.cos(a) * rr * 1.9, y = cy + Math.sin(a) * rr * 0.42; c.globalAlpha = 0.25 + 0.6 * ((Math.sin(a) + 1) / 2); c.fillStyle = k % 2 ? am : '#ff9a6b'; c.beginPath(); c.arc(x, y, 1.6 + (k % 4) * 0.5, 0, 7); c.fill(); }
+  c.globalAlpha = 1; const g = c.createRadialGradient(cx, cy, r * 0.6, cx, cy, r * 1.45); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.7, 'rgba(0,0,0,0.95)'); g.addColorStop(0.85, 'rgba(246,190,79,0.55)'); g.addColorStop(1, 'rgba(246,190,79,0)');
+  c.fillStyle = g; c.beginPath(); c.arc(cx, cy, r * 1.45, 0, 7); c.fill(); c.fillStyle = '#000'; c.beginPath(); c.arc(cx, cy, r, 0, 7); c.fill();
+}
+VIEWS.col = () => {
+  let h = `<div class="sec">坍缩<span class="h">第六个、也是最后一个重置层。把新的进度坍缩成奇点，喂养黑洞</span></div><div class="grid">`;
+  h += `<div class="card"><div class="fm">奇点 = 倍率 × (10^(1.2 × (lg lg 点数 − 8)) − 已收获的部分)</div><div class="ds">只有超过上次坍缩时的点数，才会获得新的奇点。坍缩只重置点数、因子与当前序数，各层的累计货币与所有升级都会保留。</div>
+  <div class="row"><button class="btn" data-a="col" ${B('cb', () => ({ c: 'btn ' + (canCollapse(S) ? 'go' : ''), d: !canCollapse(S) }))}>坍缩<small ${B('cbs', () => colGain(S) !== NI ? '+' + fmt(colGain(S)) + ' 奇点' : bhOn(S) ? '点数需超过 ' + fmt(Math.pow(10, S.bh.xh)) : '需要 ee8')}></small></button></div>
+  <div class="muted" ${B('csi', () => '奇点 ' + fmt(S.bh.SI) + ' · 累计 ' + fmt(S.bh.SIt) + ' · 已坍缩 ' + S.bh.col + ' 次 · 奇点倍率 ×' + fmtBig(siMult(S)))}></div>
+  ${rsLv(S, 'auto') >= 1 ? `<div class="row"><label class="tgl"><input type="checkbox" data-in="colon" ${S.auto.col.on ? 'checked' : ''}>自动坍缩</label><span class="muted">当 lg lg 点数超过上次</span><input type="text" data-in="colv" value="${esc(S.auto.col.v)}" aria-label="自动坍缩阈值"><span class="muted">时</span></div>` : '<div class="faint">辐射工坊的「自动坍缩器」可以解锁自动坍缩。</div>'}</div>`;
+  if (bhOn(S)) h += `<div class="card"><div class="nm">黑洞</div><canvas id="bhc" width="300" height="190" class="bhc"></canvas>
+  <div class="muted" ${B('bhm', () => '质量 10^' + fx(S.bh.M, 3) + ' M☉ · 倍增时间 ' + fx(bhTau(S), 2) + ' 小时')}></div>
+  <div class="fm" ${B('bhf', () => 'μ = 10^(' + fx(K.muG, 3) + ' × ' + fx(bhMeff(S), 2) + ' × ' + fx(1 + 0.04 * rec(S, 'grav'), 2) + ') = ' + fmt(L10(G.mu || 1)))}></div>
+  <div class="fm" ${B('bha', () => '深空天花板 A = ee' + fx(L10(G.scA), 3) + '（β = ' + fx(bhBeta(S), 3) + '），指数 q = ' + fx(bhQ(S), 3))}></div>
+  <p class="note">黑洞质量随时间按指数增长（每个倍增时间增长 e 倍），永不重置。质量越大，μ 越强，深空的天花板也越高。质量超过 10^17 后增长的效果会放缓。</p></div>`;
+  h += `<div class="card"><div class="nm">坍缩里程碑</div><ul class="ms">${CM.map(m => `<li class="${S.bh.col >= m.n ? 'got' : ''}">${m.n} 次：${m.d}</li>`).join('')}</ul></div></div>`;
+  return h;
+};
+VIEWS.sp = () => {
+  const cur = SPM[S.bh.path];
+  let h = `<div class="sec">属性<span class="h">每种属性只记录历史最高等级；切换星路不会降低它</span></div><div class="grid">${CLS.map(c => `<div class="card"><div class="t"><span class="nm">${c.n}</span><span class="pill am">${rec(S, c.id)} 级</span></div><div class="ds">${c.d(rec(S, c.id))}</div></div>`).join('')}</div>`;
+  h += `<div class="sec">星路<span class="h">同一时间只能走一条星路；切换会退还全部奇点，并且只重置点数</span></div>`;
+  h += `<div class="grid">${SPATH.map(p => {
+    const on = p.id === S.bh.path, ok = reqOk(S, p.enter), k = on ? S.bh.k : 0;
+    const enter = p.enter ? Object.entries(p.enter).map(([c, v]) => CLSM[c].n + ' ≥ ' + v).join('，') : '';
+    const chips = p.nodes.map((nd, j) => { const bought = on && j < S.bh.k, next = on && j === S.bh.k, lock = !reqOk(S, nd[2]), useful = nd[1] > rec(S, nd[0]);
+      return `<span class="spn ${bought ? 'own' : next ? 'nx' : ''} ${lock ? 'lk' : ''} ${useful ? '' : 'dull'}" title="${CLSM[nd[0]].n} → ${nd[1]} 级 · ${fmt(spCost(p, j))} 奇点${nd[2] ? ' · 需要 ' + Object.entries(nd[2]).map(([c, v]) => CLSM[c].n + '≥' + v).join(' ') : ''}">${CLSM[nd[0]].n}${nd[1]}</span>`; }).join('');
+    return `<div class="card ${ok ? '' : 'dim'} ${on ? 'spon' : ''}"><div class="t"><span class="nm">${p.n}</span>${on ? '<span class="pill ok">当前</span>' : ''}</div><div class="ds">${p.d}${enter ? '；进入需要 ' + enter : ''}</div>
+    <div class="spc">${chips}</div>
+    ${on ? `<div class="muted" ${B('spk', () => '已走到第 ' + S.bh.k + ' / ' + p.nodes.length + ' 站' + (S.bh.k < p.nodes.length ? ' · 下一站 ' + fmt(spCost(p, S.bh.k)) + ' 奇点' : ' · 已走完'))}></div><div class="row"><button class="btn sm" data-a="spb" ${B('spbb', () => ({ c: 'btn sm ' + (spCanBuy(S) ? 'go' : ''), d: !spCanBuy(S) }))}>前进一站</button><button class="btn sm" data-a="spa">尽量前进</button></div>`
+      : `<div class="row"><button class="btn sm" data-a="sps:${p.id}" ${ok ? '' : 'disabled'}>切换到这条星路</button></div>`}</div>`; }).join('')}</div>`;
+  h += `<div class="sec">回溯<span class="h">属性达到门槛后，旧的玩法会获得新的拓展</span></div><div class="grid">${XP13.map(x => `<div class="card ${xpOn(S, x.id) ? '' : 'dim'}"><div class="t"><span class="nm">${x.n}</span>${xpOn(S, x.id) ? '<span class="pill ok">已解锁</span>' : `<span class="pill">${CLSM[x.c].n} ≥ ${x.L}</span>`}</div><div class="ds">${x.d}</div></div>`).join('')}</div>`;
+  return h + `<p class="note">暗淡的站点不会提升你已有的最高等级；带锁的站点需要先把其他属性推高。可以先在一条星路上推进，再切换到另一条——奇点全额退还，属性的最高等级保留。</p>`;
+};
+VIEWS.rs = () => `<div class="sec">霍金辐射<span class="h">黑洞缓慢地向外辐射能量，速度随质量与「辐射」属性增长</span></div>
+  <div class="grid"><div class="card" style="grid-column:1/-1"><div class="sieve" ${B('rsr', () => fmtBig(S.bh.R))}></div><div class="muted" ${B('rsv', () => '每秒 +' + fmtBig(radRate(S)))}></div></div>
+  ${RSHOP.map(r => `<div class="card"><div class="t"><span class="nm">${r.n}</span><span class="pill" ${B('rsl_' + r.id, () => r.max ? rsLv(S, r.id) + ' / ' + r.max + ' 级' : rsLv(S, r.id) + ' 级')}></span></div><div class="ds">${r.d}</div>
+  <div class="row"><button class="btn sm" data-a="rsb:${r.id}" ${B('rsb_' + r.id, () => { const mx = r.max && rsLv(S, r.id) >= r.max, can = !mx && S.bh.R >= rsCost(S, r.id); return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: mx ? '已满级' : '升级 · ' + fmtBig(rsCost(S, r.id)) + ' 辐射' }; })}></button></div></div>`).join('')}</div>`;
+VIEWS.gw = () => {
+  let h = `<div class="sec">引力波观测站<span class="h">每隔一段时间探测到一次时空涟漪，每个事件都带来永久加成</span></div><div class="grid"><div class="card" style="grid-column:1/-1">
+  <div class="muted" ${B('gwn', () => '已探测 ' + S.bh.gw + ' 个事件 · 下一个约 ' + fmtT((86400 - S.bh.gt) / gwSpeed(S)) + ' 后')}></div><div class="prog"><div ${B('gwp', () => ({ w: 100 * S.bh.gt / 86400 }))}></div></div>
+  <div class="ds">事件的加成按顺序轮换：${GWE.map(x => x[0]).join(' → ')}，前 90 个事件计入加成。当前合计：奇点 ×${fx(Math.pow(1.08, gwCount(S, 0)), 2)}，倍增时间 ×${fx(Math.pow(0.97, gwCount(S, 1)), 3)}，ℵ +${fx(0.002 * gwCount(S, 2), 3)}</div></div>`;
+  for (let i = 0; i < S.bh.gw; i++) { const ev = GWN[i]; h += `<div class="card"><div class="t"><span class="nm">${ev ? ev[0] : '候选事件 S' + (i + 1)}</span><span class="pill">${ev ? ev[1] : '致密双星并合'}</span></div><div class="ds">${ev && ev[2] ? ev[2] + '；' : ''}加成：${GWE[i % 3][0]}</div></div>`; }
+  return h + `</div><p class="note">前面的事件名称来自真实的引力波目录。辐射工坊的「探测器灵敏度」可以加快探测。</p>`;
+};
 /* ---------- 无穷之塔 ---------- */
 VIEWS.tw = () => {
   const f = S.tw.f, rows = [];
@@ -2218,7 +2404,7 @@ VIEWS.ach = () => {
 VIEWS.stat = () => {
   const rows = [['总游戏时间', () => fmtT(S.st.time)], ['当前阶时长', () => fmtT(S.st.tierT[S.tier] || 0)], ['本轮重生时长', () => fmtT(S.rbT)], ['获得点数次数', () => fmtInt(S.ticks)],
   ['本阶最高点数', () => fmt(S.Pbest)], ['历史最高点数', () => fmt(S.Pall)], ['累计重生', () => String(S.rbTot)], ['累计证明', () => String(S.pfTot)], ['累计公理化', () => String(S.axTot)],
-  ['猜想证毕', () => cjTotal(S) + ' / 48'], ['完成研究', () => Object.keys(S.res.done).length + ' / ' + RS.length], ['捕捉灵光', () => String(S.st.sparks || 0)], ['累计超限', () => String(S.trTot)], ['ω', () => fmtBig(S.om.w)], ['引理最高等级', () => String(S.lm.max)], ['数学家', () => Object.keys(S.ac.got).length + ' / ' + MATH.length], ['梅森素数', () => S.mp.n + ' / ' + MERS.length], ['无穷之塔', () => '第 ' + (S.tw.f + 1) + ' 层'], ['质因数分解', () => String(S.fz.n)], ['分形迭代', () => FR.reduce((s, f) => s + (S.fr[f.id] || 0), 0) + ' / ' + FR.reduce((s, f) => s + f.max, 0)], ['图着色', () => gcCount(S) + ' / 8'], ['累计灵感', () => fmtBig(S.INt)], ['远征次数', () => String(S.ex.n)], ['二十四点', () => String(S.g24.n)], ['数织', () => ngCount(S) + ' / 8'], ['星盘', () => Object.keys(S.sw).length + ' / ' + SW.length], ['重置升级树', () => String(S.st.respec || 0)]];
+  ['猜想证毕', () => cjTotal(S) + ' / 48'], ['完成研究', () => Object.keys(S.res.done).length + ' / ' + RS.length], ['捕捉灵光', () => String(S.st.sparks || 0)], ['累计超限', () => String(S.trTot)], ['ω', () => fmtBig(S.om.w)], ['引理最高等级', () => String(S.lm.max)], ['数学家', () => Object.keys(S.ac.got).length + ' / ' + MATH.length], ['梅森素数', () => S.mp.n + ' / ' + MERS.length], ['坍缩次数', () => String(S.bh.col)], ['黑洞质量', () => '10^' + fx(S.bh.M, 2) + ' M☉'], ['引力波事件', () => String(S.bh.gw)], ['无穷之塔', () => '第 ' + (S.tw.f + 1) + ' 层'], ['质因数分解', () => String(S.fz.n)], ['分形迭代', () => FR.reduce((s, f) => s + (S.fr[f.id] || 0), 0) + ' / ' + FR.reduce((s, f) => s + f.max, 0)], ['图着色', () => gcCount(S) + ' / 8'], ['累计灵感', () => fmtBig(S.INt)], ['远征次数', () => String(S.ex.n)], ['二十四点', () => String(S.g24.n)], ['数织', () => ngCount(S) + ' / 8'], ['星盘', () => Object.keys(S.sw).length + ' / ' + SW.length], ['重置升级树', () => String(S.st.respec || 0)]];
   return `<div class="sec">统计</div><div class="grid">${rows.map((r, i) => `<div class="card"><div class="muted">${r[0]}</div><div class="num" style="font-size:20px" ${B('st' + i, r[1])}></div></div>`).join('')}</div>`;
 };
 VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
@@ -2229,13 +2415,18 @@ VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
   <div class="row"><button class="btn sm" data-a="save">立即保存</button><button class="btn sm" data-a="exp">导出存档</button><button class="btn sm" data-a="imp">导入存档</button></div>
   <textarea id="saveBox" placeholder="导出的存档字符串会出现在这里；导入时把存档粘贴进来再点「导入存档」"></textarea></div>
   <div class="card"><div class="nm">危险操作</div><div class="ds">彻底删除进度，从头开始。</div><div class="row"><button class="btn sm warn" data-a="hard">删除存档并重新开始</button></div></div>
-  </div><p class="note">无尽演算 v1.2.2 · 共 7 阶、5 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、无穷之塔、质因数分解、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
+  </div><p class="note">无尽演算 v1.3.0 · 共 7 阶、6 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、无穷之塔、质因数分解、黑洞、6 条星路、霍金辐射、引力波观测站、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
 
 /* ---------------- 操作 ---------------- */
 function act(a) {
   const p = a.split(':');
   switch (p[0]) {
-    case 'tab': view = p[1]; viewSig = ''; $('view').scrollTop = 0; window.scrollTo({ top: document.documentElement.dataset.skin === 'workspace' && window.innerWidth >= 920 ? 0 : Math.min(window.scrollY, $('tabs').offsetTop - 4) }); break;
+    case 'tab': {
+      view = p[1]; viewSig = ''; $('view').scrollTop = 0;
+      if (window.innerWidth <= 640) document.body.scrollTo({ top: Math.min(document.body.scrollTop, $('tabs').offsetTop - 4) });
+      else window.scrollTo({ top: document.documentElement.dataset.skin === 'workspace' && window.innerWidth >= 920 ? 0 : Math.min(window.scrollY, $('tabs').offsetTop - 4) });
+      break;
+    }
     case 'buy': buyFactor(S, p[1], p[2] === 'max'); break;
     case 'upg': if (buyUpg(S, p[1])) viewSig = ''; else { const x = UPG[p[1]], st = upgState(S, x); if (st === 'alt') toast('同一分叉只能选一条路。可以在上方「重置升级树」后改选。'); } break;
     case 'upgall': buyAllUpg(S, p[1]); viewSig = ''; break;
@@ -2282,6 +2473,11 @@ function act(a) {
     case 'sieve': buySieve(S); break;
     case 'frb': if (frBuy(S, p[1])) toast(FRM[p[1]].n + ' 迭代到第 ' + S.fr[p[1]] + ' 次'); viewSig = ''; break;
     case 'mpb': mpBuy(S); break;
+    case 'col': if (doCollapse(S)) { toast('坍缩！黑洞质量 10^' + fx(S.bh.M, 2) + ' M☉'); viewSig = ''; } break;
+    case 'spb': spBuy(S); viewSig = ''; break;
+    case 'spa': { let n = 0; while (spBuy(S)) n++; toast(n ? '前进了 ' + n + ' 站' : '奇点不足或需要先满足属性门槛'); viewSig = ''; break; }
+    case 'sps': confirmDo('切换星路', `<p>当前星路上花费的奇点会全额退还，并只重置点数。属性的最高等级全部保留。</p><p>切换到「${SPM[p[1]].n}」。</p>`, '切换', () => spSwitch(S, p[1])); break;
+    case 'rsb': rsBuy(S, p[1]); viewSig = ''; break;
     case 'tws': if (twSprint(S)) toast('冲刺！到达第 ' + (S.tw.f + 1) + ' 层'); viewSig = ''; break;
     case 'fzt': { const r = fzTap(S, +p[1]); if (r === -1) { fzShake = (fzShake + 1) % 2 + 1; toast(p[1] + ' 不能整除 ' + S.fz.rem); } else if (r === 2) { fzShake = 0; toast('分解完成！'); } else fzShake = 0; viewSig = ''; break; }
     case 'fzs': fzDeal(S); fzShake = 0; viewSig = ''; break;
@@ -2294,7 +2490,7 @@ function act(a) {
     case 'exp': { const b = $('saveBox'); if (b) { b.value = encodeSave(S); b.select(); try { navigator.clipboard.writeText(b.value); toast('存档已复制到剪贴板'); } catch (e) { toast('存档已显示在文本框中'); } } break; }
     case 'imp': { const b = $('saveBox'); if (!b || !b.value.trim()) { toast('请先把存档粘贴到文本框中'); break; } try { const T = decodeSave(b.value); confirmDo('导入存档', '<p>当前进度将被导入的存档覆盖。</p>', '导入', () => { S = T; NOTA = S.opt.nota || 0; applyTheme(); heroTier = 0; recalc(S); save(); toast('导入成功'); }); } catch (e) { toast('存档格式不正确，请检查是否复制完整'); } break; }
     case 'hard': confirmDo('删除存档', '<p>所有进度将永久删除，且无法恢复。</p>', '删除并重新开始', () => { S = newState(); heroTier = 0; recalc(S); save(); pushCloud(); view = 'factor'; }); break;
-    case 'spark': if (spark) { const ks = ['boost', 'sieve']; if (S.res.act.length) ks.push('res'); if (S.tier >= 4) ks.push('cst'); if (S.tier >= 6) ks.push('omega'); if (S.tier >= 6 && S.chap >= 2) ks.push('lemma'); if (S.tier >= 7) ks.push('tower'); toast('灵光一现：' + applySpark(S, ks[Math.floor(Math.random() * ks.length)])); spark.remove(); spark = null; } break;
+    case 'spark': if (spark) { const ks = ['boost', 'sieve']; if (S.res.act.length) ks.push('res'); if (S.tier >= 4) ks.push('cst'); if (S.tier >= 6) ks.push('omega'); if (S.tier >= 6 && S.chap >= 2) ks.push('lemma'); if (S.tier >= 7) ks.push('tower'); if (bhOn(S)) ks.push('bh'); toast('灵光一现：' + applySpark(S, ks[Math.floor(Math.random() * ks.length)])); spark.remove(); spark = null; } break;
   }
   recalc(S);
 }
@@ -2310,6 +2506,8 @@ function inp(k, el) {
     case 'nota': NOTA = S.opt.nota = +el.value; heroTier = 0; viewSig = ''; break;
     case 'theme': S.opt.theme = +el.value; applyTheme(); break;
     case 'conf': S.opt.conf = el.checked ? 1 : 0; break;
+    case 'colon': S.auto.col.on = el.checked ? 1 : 0; break;
+    case 'colv': S.auto.col.v = el.value; break;
   }
 }
 document.addEventListener('click', e => { const el = e.target.closest('[data-a]'); if (el && !el.disabled) act(el.dataset.a); });
@@ -2339,6 +2537,7 @@ function frame() {
     checkNews();
     if (S.tier >= 2 && primeCache.n !== Math.floor(S.pr.n) && now - primeCache.at > 1500) { primeCache.at = now; primeCache.n = Math.floor(S.pr.n); primeCache.p = S.pr.n < 9e15 ? lastPrime(S.pr.n) : 0; }
     if (now - (S._sv || 0) > 10000) { S._sv = now; save(); }
+    if (view === 'col') drawBH();
     if (cloud && now - lastCloud > 60000) { lastCloud = now; pushCloud(); }
     // 灵光一现
     if (!spark && !document.hidden && now > nextSpark && S.rbTot > 0) {
