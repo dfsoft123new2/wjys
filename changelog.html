@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="《无尽演算》的完整版本更新日志。">
+  <title>无尽演算 · 更新日志</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f9fa; --board: #eaf1f6; --rule: #c8d7e0;
+      --ink: #1f3548; --muted: #4f6778; --accent: #075e7b; --point: #946000;
+      --text: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+      --serif: "STIX Two Text", Georgia, "Noto Serif SC", "Songti SC", SimSun, serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --paper: #151e23; --board: #1a252c; --rule: #374c59;
+        --ink: #e4edf1; --muted: #adbec8; --accent: #89d4e9; --point: #f2c47e;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-padding-block: 1.2rem; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 1rem/1.75 var(--text); }
+    a { color: var(--accent); text-underline-offset: .22em; }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .width { width: min(67rem, calc(100% - 3rem)); margin-inline: auto; }
+    .mast {
+      border-bottom: 1px solid var(--rule);
+      background-color: var(--board);
+      background-image: linear-gradient(var(--rule) 1px, transparent 1px), linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+      background-position: center top;
+      background-size: 24px 24px;
+    }
+    .mast .width { padding-block: 2.75rem; }
+    h1, h2, p, figure { margin: 0; }
+    h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.24; }
+    h1 { display: flex; align-items: baseline; flex-wrap: wrap; gap: .3rem 1rem; font-size: 2.875rem; }
+    h1 span { color: var(--muted); font: 1.125rem/1.5 var(--text); }
+    .layout { display: grid; grid-template-columns: 10.5rem minmax(0, 1fr); gap: 3.25rem; padding-block: 2.1rem 3rem; }
+    nav { align-self: start; position: sticky; top: 1.35rem; }
+    .nav-label { margin-bottom: .6rem; font-weight: 700; font-size: .875rem; }
+    nav ol { list-style: none; margin: 0; padding: 0; display: grid; gap: .18rem; }
+    nav a { display: flex; align-items: baseline; gap: .65rem; padding: .33rem .55rem; text-decoration: none; border-radius: 4px; }
+    nav a:hover, nav a:focus-visible { background: var(--board); }
+    .version { font: 600 1.015rem/1.5 var(--serif); font-variant-numeric: tabular-nums; }
+    .nav-title { color: var(--muted); font-size: .79rem; }
+    article { border-top: 1px solid var(--rule); padding-block: 1.5rem 1.85rem; }
+    article:first-child { border-top: 2px solid var(--accent); }
+    article header { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: baseline; margin-bottom: .65rem; }
+    article header .version { color: var(--accent); }
+    article:target header .version { color: var(--point); }
+    h2 { font-size: 1.7rem; }
+    .lead { max-width: 43rem; }
+    .changes { padding-inline-start: 1.23rem; margin-block: .85rem 0; max-width: 43rem; }
+    .changes li + li { margin-top: .38rem; }
+    .changes li::marker { color: var(--point); }
+    .feature { display: grid; grid-template-columns: minmax(0, 1fr) minmax(9rem, 13.5rem); gap: 1.2rem; align-items: start; }
+    figure { margin-top: .3rem; }
+    figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 7px; }
+    figcaption { padding-top: .32rem; font-size: .77rem; color: var(--muted); }
+    .save-note { padding-block: 1.15rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: .9rem; }
+    footer { display: flex; align-items: baseline; justify-content: space-between; padding-block: 1.15rem 1.4rem; border-top: 1px solid var(--rule); }
+    footer a { font-size: .9rem; }
+    .signature { display: inline-flex; gap: .25em; align-items: baseline; font: 1.35rem/1 var(--serif); }
+    .limit { display: inline-flex; flex-direction: column; align-items: center; }
+    .limit small { font-size: .56rem; line-height: 1.2; }
+    @media (max-width: 700px) {
+      .width { width: calc(100% - 2rem); }
+      .mast .width { padding-block: 1.65rem; }
+      h1 { font-size: 2.2rem; }
+      .layout { display: block; padding-block: 1.1rem 2rem; }
+      nav { position: static; margin-bottom: 1.1rem; }
+      nav ol { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      nav a { padding-inline: .32rem; }
+      .nav-title { display: none; }
+      article { padding-block: 1.2rem 1.5rem; }
+      h2 { font-size: 1.4rem; }
+    }
+    @media (max-width: 520px) {
+      .feature { grid-template-columns: minmax(0, 1fr); gap: .7rem; }
+      figure { max-width: 13.5rem; }
+    }
+  </style>
+</head>
+<body id="top">
+  <header class="mast">
+    <div class="width"><h1>无尽演算 <span>更新日志</span></h1></div>
+  </header>
+  <div class="width layout">
+    <nav aria-label="版本索引">
+      <p class="nav-label">版本索引</p>
+      <ol>
+        <li><a href="#v1.3.0"><span class="version">v1.3.0</span><span class="nav-title">深空坍缩</span></a></li>
+        <li><a href="#v1.2.2"><span class="version">v1.2.2</span><span class="nav-title">七阶基数</span></a></li>
+        <li><a href="#v1.2.1"><span class="version">v1.2.1</span><span class="nav-title">常数纪元</span></a></li>
+        <li><a href="#v1.2.0"><span class="version">v1.2.0</span><span class="nav-title">超越之后</span></a></li>
+        <li><a href="#v1.1.0"><span class="version">v1.1.0</span><span class="nav-title">六阶超限</span></a></li>
+        <li><a href="#v1.0.0"><span class="version">v1.0.0</span><span class="nav-title">初始公式</span></a></li>
+      </ol>
+    </nav>
+    <main aria-label="版本更新记录">
+      <article id="v1.3.0" aria-labelledby="title-v1.3.0">
+        <header><span class="version">v1.3.0</span><h2 id="title-v1.3.0">深空坍缩</h2></header>
+        <div class="feature">
+          <div>
+            <p class="lead">七阶后期新增第六个重置层「坍缩」。点数达到 <strong>ee8</strong>（10 的一亿次方）后，可以把新的进度变成奇点，孕育一颗持续成长的黑洞。最高阶仍是七阶。</p>
+            <ul class="changes">
+              <li>坍缩重置点数、用点数购买的因子等级和当前序数。累计货币与升级保留；只有超过上次坍缩的点数，才能再获得奇点。</li>
+              <li>黑洞越重，公式指数里的引力乘数 <strong>μ</strong> 越强，深空软上限的起点也越高。</li>
+              <li>新增六条星路和六种属性。切换路线会退还已花的奇点，保留属性的历史最高等级。</li>
+              <li>黑洞产出霍金辐射，可在工坊购买升级和自动坍缩器；引力波观测站会随时间探测事件，提供永久加成。</li>
+              <li>新增六项奇点研究、坍缩里程碑和五项回溯拓展。星路属性可以反过来加强分形、学院、无穷之塔等旧玩法。</li>
+              <li>猜想卡片会显示尚未满足的章节与点数要求。</li>
+            </ul>
+          </div>
+          <figure>
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQIAAACjCAIAAADuGof4AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAACOHSURBVHhe7Z35UxtZnuANuiWUmZJSUip132fqAAE6EQhJgMQpTiEQp8RlbGMMPjhtV5XL7iqXXWW3213lnqru6u6qrp6+YyamZydiNzp2J3o7NiZit2f+no1UYsAI2xiDoez34vMTSqQUvE++933fd5yR6sx7gKVKNixhcJByJh8AeGtgcBA2LIGlytI6f2aPAKD2A956GBxkjww7GvAEWOkvAABvKzwBtlcD4ADgHWTbBFIDWKosvQIAeBegekekBiAeALyzMDgIqQFoCgDvOLBUeYYNS0pfAADeHdiw5AzoEQHecRgc5EzpTwGAdw2gAQAANAAAgAYAANAAACABGgAAQAMAAGgAAAANAAASoAEAADQAAIAGAADQAAAgARoAAEADAABoAAAADQAAEqABAAA0AACABgAA0AAAIAEaAABAAwAAaAAAAA0AABKgAQAANAAAgAYAANAAACABGgAAQAMAAGgAAAANAAASoAEAADQAAIAGAADQAAAgARoAAEADAABocILQmHwaaxclFwDeGECDNwSdxWdyIDYP5lYgCIJIxEI5hqrkqEYh1ijEKjkqx1CJWIggCLcCYfNgJgeisfa+CeCYABocLzQWxKmAYQSRSURGjcRtwf0uRcSrivvVyZCmtU7bXq9rr9e11mmTIU3cp454VT6X3G3BjRoJJhHBCMKpgGksqPSdAUcI0OC4YLAhGEFwKWo3YAG3IuFXpxv1wyljIW2d77ctZh3Lw8TlHHF5xFGEWM45FrOOc/22Qto6nDKmo/qEXx1wK2wGDMdQGEEYbCDDcQE0OHoYbEggEGiV4moHHver+xKGfJdlMetYHSfWxp1r48TqmOPaqOPqiH152LY8ZF0asl4etl8Zsa+MOlbHHGvjjrVx58o4sZh1FLosfQlD3K+uduBapVggEAAZjgOgwVFCY/J5fFirFNc65amwJtdmWhi0b+Rdm3nXyphjKWud7zXlOwzDLZreRlVnnbI1JE8GSFpD8s6IsrdRNdyinewwzPealrLW1VHHZt65MelaGLTnWk2psKbWKdcqxTw+DOLpowVocGTQWHyZVFRpl7WENKNt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" width="258" height="163" alt="游戏里，发光粒子环绕着坍缩后形成的黑洞">
+            <figcaption>首次坍缩后诞生的黑洞</figcaption>
+          </figure>
+        </div>
+      </article>
+
+      <article id="v1.2.2" aria-labelledby="title-v1.2.2">
+        <header><span class="version">v1.2.2</span><h2 id="title-v1.2.2">七阶基数</h2></header>
+        <p class="lead">六阶达到 10 的两千万次方后可以晋升七阶。此次晋升保留各层货币和升级，公式指数由 Ω·ψ 升级为 (Ω·ψ)<sup>ℵ</sup>。</p>
+        <ul class="changes">
+          <li>无穷之塔随时间攀升，登上新的楼层会增强阿列夫 ℵ。质因数分解完成后也会推进爬塔。</li>
+          <li>增加七阶研究、猜想和超限升级。产量越过 ee8 后进入深空软上限。</li>
+        </ul>
+      </article>
+
+      <article id="v1.2.1" aria-labelledby="title-v1.2.1">
+        <header><span class="version">v1.2.1</span><h2 id="title-v1.2.1">常数纪元</h2></header>
+        <p class="lead">扩充五阶玩法。分形花园和梅森素数搜寻都会提高常数之积 κ 在公式中的指数。</p>
+        <ul class="changes">
+          <li>用公理推进四种分形迭代；梅森测试机自动检验 2<sup>p</sup>−1，可用定理升级。</li>
+          <li>增加与常数玩法相关的研究、升级和猜想。六阶晋升门槛由 1e2000 提高到 1e10000，并重新调整六阶的章节门槛。</li>
+        </ul>
+      </article>
+
+      <article id="v1.2.0" aria-labelledby="title-v1.2.0">
+        <header><span class="version">v1.2.0</span><h2 id="title-v1.2.0">超越之后</h2></header>
+        <p class="lead">延长六阶旅程。在 1e400000 解锁新指数因子 ψ，公式的外层指数变为 Ω·ψ。</p>
+        <ul class="changes">
+          <li>派未入座的数学家远征赚取灵感，用灵感点亮定理星盘，从中心逐步向外扩展。</li>
+          <li>新增二十四点、数织，以及更多数学家、猜想、远征地点和常数。版本进度扩展至 ee7（10 的一千万次方）。</li>
+        </ul>
+      </article>
+
+      <article id="v1.1.0" aria-labelledby="title-v1.1.0">
+        <header><span class="version">v1.1.0</span><h2 id="title-v1.1.0">六阶超限</h2></header>
+        <p class="lead">五阶达到 1e2000 后可晋升六阶。新增超限重置和序数，整个公式获得外层指数 Ω。</p>
+        <ul class="changes">
+          <li>用序数投资超限升级；ω 引擎会随时间增长并强化 Ω。</li>
+          <li>随最高点数推进章节，解锁数学家学院、图着色、引理工坊和更多猜想。</li>
+          <li>本版通关目标为 1e400000，后续挑战延伸至 1e500000。</li>
+        </ul>
+      </article>
+
+      <article id="v1.0.0" aria-labelledby="title-v1.0.0">
+        <header><span class="version">v1.0.0</span><h2 id="title-v1.0.0">初始公式</h2></header>
+        <p class="lead">首版共有五阶、四个重置层。从 <em>P = a·b·r</em> 起步，用点数升级因子；每次晋升都会改变生产公式。</p>
+        <ul class="changes">
+          <li>重生、证明、公理化分别带来新的货币与因子，可购买升级或开启研究。</li>
+          <li>逐步解锁素数筛、猜想挑战、幻方和常数计算。五阶将常数之积 κ 纳入主公式，内容延伸至 1e2000。</li>
+        </ul>
+      </article>
+
+      <p class="save-note"><strong>升级前：</strong>建议在旧版「设置」中导出存档，再到新版导入。</p>
+    </main>
+  </div>
+  <footer class="width">
+    <a href="#top">返回顶部</a>
+    <span class="signature" aria-label="lim，n 趋于无穷，you"><span class="limit" aria-hidden="true">lim<small>n → ∞</small></span><i aria-hidden="true">you</i></span>
+  </footer>
+</body>
+</html>
