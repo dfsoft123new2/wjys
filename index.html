@@ -30,8 +30,8 @@
   --amber:#F4BC4E; --amberBg:rgba(244,188,78,.13); --cyan:#82D4F4; --cyanBg:rgba(130,212,244,.10);
   --coral:#FF9073; --green:#8FDBA6; --greenBg:rgba(143,219,166,.12); --shadow:none; color-scheme:dark;}
 *,*::before,*::after{box-sizing:inherit}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-padding-bottom:calc(44px + env(safe-area-inset-bottom,0px))}
+body{margin:0;padding-inline:env(safe-area-inset-left,0px) env(safe-area-inset-right,0px);background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
   background-size:24px 24px;min-height:100vh}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
@@ -88,19 +88,25 @@ button{font:inherit;color:inherit}
 .btn.sm{min-height:30px;padding:4px 10px;font-size:13px}
 
 /* 页签 */
-.tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line2);margin-bottom:14px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;scrollbar-width:none}
+.nav-dock{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;gap:4px;border-bottom:1px solid var(--line2);margin-bottom:14px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;overflow-anchor:none}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{border:0;background:none;padding:9px 13px;cursor:pointer;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent;position:relative}
+.tab{flex:none;border:0;background:none;padding:9px 13px;cursor:pointer;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent;position:relative}
 .tab.on{color:var(--ink);border-bottom-color:var(--amber);font-weight:500}
 .tab .dot{position:absolute;top:7px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--amber)}
+.tab-picker{position:relative;display:flex;align-items:center;justify-content:center;gap:5px;align-self:center;min-height:36px;padding:0 9px;margin:3px 0;border:1px solid var(--line2);border-radius:7px;background:var(--panel);color:var(--ink);font-size:12px;white-space:nowrap}
+.tab-picker b{font:19px/1 var(--serif);color:var(--cyan)}
+.tab-picker select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.tab-picker:focus-within{outline:2px solid var(--amber);outline-offset:-2px}
+.tabs .tab:focus-visible{outline-offset:-3px}
 
 /* 通用面板 */
 .sec{margin:18px 0 8px;font-family:var(--serif);font-size:18px;font-weight:600;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .sec .h{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
 .card{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
 .card.dim{opacity:.55}
-.card .t{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.card .t{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 8px}
 .card .sym{font-family:var(--serif);font-style:italic;font-size:26px;line-height:1;color:var(--amber)}
 .card .sym.l{color:var(--cyan)}
 .card .nm{font-weight:500}
@@ -129,7 +135,7 @@ ul.ms{padding-left:18px;margin:6px 0;font-size:13.5px}
 .treebox path{stroke:var(--line2);stroke-width:1.5;fill:none;vector-effect:non-scaling-stroke}
 .treebox path.own{stroke:var(--cyan)}
 .node{position:absolute;width:31%;transform:translateX(-50%);height:calc(var(--rh) - 14px);background:var(--panel);border:1px solid var(--line2);border-radius:10px;padding:6px 9px;cursor:pointer;text-align:left;overflow:hidden;display:flex;flex-direction:column;gap:1px}
-.node .nn{font-weight:500;font-size:13.5px;display:flex;justify-content:space-between;gap:4px}
+.node .nn{font-weight:500;font-size:13.5px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 4px}
 .node .nd{font-size:12px;color:var(--muted);line-height:1.35;flex:1;overflow:hidden}
 .node .nc{font-size:11.5px;color:var(--faint)}
 .node.own{background:var(--cyanBg);border-color:var(--cyan)}
@@ -160,10 +166,12 @@ ul.ms{padding-left:18px;margin:6px 0;font-size:13.5px}
 @media (prefers-reduced-motion:reduce){.spark,.tickbar.fast div{animation:none}}
 
 /* 提示与弹窗 */
-.toasts{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;z-index:30;max-width:min(360px,calc(100vw - 24px))}
+.toasts{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;z-index:30;width:max-content;max-width:min(360px,calc(100% - max(12px,env(safe-area-inset-right,0px)) - max(12px,env(safe-area-inset-left,0px))));pointer-events:none}
 .toast{background:var(--panel);border:1px solid var(--line2);border-left:3px solid var(--amber);border-radius:9px;padding:8px 12px;font-size:13.5px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
-.modal{position:fixed;inset:0;background:rgba(6,20,34,.55);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}
-.modal .box{background:var(--panel);border:1px solid var(--line2);border-radius:14px;max-width:520px;width:100%;padding:18px 20px;max-height:85vh;overflow:auto}
+.modal{position:fixed;inset:0;background:rgba(6,20,34,.55);display:flex;align-items:center;justify-content:center;z-index:40;padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.modal .box{background:var(--panel);border:1px solid var(--line2);border-radius:14px;max-width:520px;width:100%;padding:18px 20px;max-height:100%;overflow:auto;overscroll-behavior:contain;overflow-wrap:anywhere}
+html.modal-open{overflow:hidden}
+.modal .box:focus{outline:none}
 .modal h3{font-family:var(--serif);font-size:21px;margin:0 0 8px}
 .modal ul{padding-left:18px;margin:8px 0}
 .modal .row{justify-content:flex-end}
@@ -181,8 +189,9 @@ ul.ms{padding-left:18px;margin:6px 0;font-size:13.5px}
 .gsvg{width:100%;max-width:360px;display:block;margin:0 auto}
 .gsvg line{stroke:var(--line2);stroke-width:2}
 .gsvg line.bad{stroke:var(--coral);stroke-width:3}
-.gsvg circle{stroke:var(--ink);stroke-width:1.5;cursor:pointer}
-.gsvg circle.bad{stroke:var(--coral);stroke-width:3}
+.gsvg .gv{stroke:var(--ink);stroke-width:1.5;cursor:pointer}
+.gsvg .gv.bad{stroke:var(--coral);stroke-width:3}
+.tap-zone{fill:transparent;pointer-events:none}
 .c0{fill:var(--panel)} .c1{fill:#E8A33D} .c2{fill:#3AA6D0} .c3{fill:#D9604A} .c4{fill:#5DB37A}
 .gpal{width:34px;height:34px;border-radius:50%;border:2px solid var(--line2);cursor:pointer}
 .gpal.c1{background:#E8A33D} .gpal.c2{background:#3AA6D0} .gpal.c3{background:#D9604A} .gpal.c4{background:#5DB37A}
@@ -213,19 +222,19 @@ ul.ms{padding-left:18px;margin:6px 0;font-size:13.5px}
 /* 分形 */
 .frc{width:100%;max-width:260px;display:block;margin:6px auto;border:1px solid var(--line2);border-radius:8px;image-rendering:auto}
 /* 星盘 */
-.swgrid{grid-template-columns:minmax(300px,1.5fr) minmax(240px,1fr)}
+.swgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
 @media (max-width:640px){.swgrid{grid-template-columns:1fr}}
 .swsvg{width:100%;max-width:420px;display:block;margin:0 auto}
 .swsvg line{stroke:var(--line2);stroke-width:1.5}
 .swsvg line.own{stroke:var(--cyan);stroke-width:2.5}
 .star{cursor:pointer}
-.star circle{fill:var(--panel);stroke:var(--line2);stroke-width:1.5}
+.star .star-point{fill:var(--panel);stroke:var(--line2);stroke-width:1.5}
 .star text{font-family:var(--serif);font-size:11px;fill:var(--muted);pointer-events:none}
-.star.own circle{fill:var(--cyan);stroke:var(--cyan)} .star.own text{fill:var(--bg)}
-.star.can circle{stroke:var(--amber);stroke-width:2.5;fill:var(--amberBg)} .star.can text{fill:var(--amber)}
-.star.reach circle{stroke:var(--amber);stroke-dasharray:3 3}
+.star.own .star-point{fill:var(--cyan);stroke:var(--cyan)} .star.own text{fill:var(--bg)}
+.star.can .star-point{stroke:var(--amber);stroke-width:2.5;fill:var(--amberBg)} .star.can text{fill:var(--amber)}
+.star.reach .star-point{stroke:var(--amber);stroke-dasharray:3 3}
 .star.lock{opacity:.45}
-.star.sel circle{stroke:var(--coral);stroke-width:3}
+.star.sel .star-point{stroke:var(--coral);stroke-width:3}
 /* 二十四点 */
 .row24{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 10px}
 .card24{width:68px;height:92px;border-radius:10px;border:1px solid var(--line2);background:var(--paper);font-family:var(--serif);font-size:26px;cursor:pointer;color:var(--ink);box-shadow:var(--shadow)}
@@ -280,8 +289,9 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
   --bg:#f4f7f8;--paper:#fff;--panel:#fff;--rail-bg:#f7f9fa;--line:#e0e7ea;--line2:#d5e0e4;
   --ink:#182b33;--muted:#546c77;--faint:#637b87;--amber:#16766f;--amberBg:#e8f3f1;--cyan:#16766f;--cyanBg:#e8f3f1;
   --coral:#ac4947;--green:#147851;--greenBg:#e2f2ec;--shadow:none;color-scheme:light;
-  --u:clamp(.73px,.09765625dvh,1px);--rail:calc(216 * var(--u));--gutter:clamp(16px,2.2vw,36px);
+  --u:clamp(.73px,.09765625vh,1px);--rail:calc(216 * var(--u));--gutter:clamp(16px,2.2vw,36px);
 }
+@supports(height:1dvh){:root[data-skin="workspace"]{--u:clamp(.73px,.09765625dvh,1px)}}
 :root[data-skin="workspace"][data-theme="dark"]{--bg:#11191d;--paper:#172227;--panel:#172227;--rail-bg:#131e23;--line:#2b3b42;--line2:#384c54;--ink:#e2ecef;--muted:#a1b3bb;--faint:#9aafb8;--amber:#7ccfc4;--amberBg:#243e3e;--cyan:#7ccfc4;--cyanBg:#243e3e;--coral:#f09a9e;--green:#8eddb1;--greenBg:#234337;color-scheme:dark}
 @media(prefers-color-scheme:dark){:root[data-skin="workspace"]:not([data-theme="light"]){--bg:#11191d;--paper:#172227;--panel:#172227;--rail-bg:#131e23;--line:#2b3b42;--line2:#384c54;--ink:#e2ecef;--muted:#a1b3bb;--faint:#9aafb8;--amber:#7ccfc4;--amberBg:#243e3e;--cyan:#7ccfc4;--cyanBg:#243e3e;--coral:#f09a9e;--green:#8eddb1;--greenBg:#234337;color-scheme:dark}}
 [data-skin="workspace"] body{background-image:none}
@@ -312,13 +322,13 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 [data-skin="workspace"] .workspace-actions .btn{display:grid;align-content:space-between;gap:12px;min-height:81px;padding:13px 16px;font-weight:600}
 [data-skin="workspace"] .workspace-actions .btn small{font-weight:400}
 [data-skin="workspace"] .workspace-actions .btn:disabled{opacity:1;color:var(--muted);background:var(--paper)}
-[data-skin="workspace"] .tabs{margin-bottom:0}
-[data-skin="workspace"] .wrap[data-view="factor"] #view{border:1px solid var(--line2);border-radius:7px;background:var(--panel);padding:12px 16px;overflow-y:auto}
+[data-skin="workspace"] .nav-dock{margin-bottom:0}
+[data-skin="workspace"] .wrap[data-view="factor"] #view{border:1px solid var(--line2);border-radius:7px;background:var(--panel);padding:12px 16px}
 [data-skin="workspace"] .wrap[data-view="factor"] #view .grid{grid-template-columns:minmax(0,1fr);gap:0}
 [data-skin="workspace"] .wrap[data-view="factor"] #view .sec{margin-top:3px}
 [data-skin="workspace"] .wrap[data-view="factor"] #view .sec:not(:first-child){margin-top:16px}
 [data-skin="workspace"] .wrap[data-view="factor"] #view .card{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:10px 0}
-@media(min-width:920px){
+@media(min-width:920px) and (min-height:540px){
   [data-skin="workspace"] .wrap{margin-inline-start:var(--rail);display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);grid-template-areas:"top top" "bar bar" "hero view" "actions actions";gap:16px;align-items:start}
   [data-skin="workspace"] .wrap:not([data-view="factor"]){grid-template-areas:"top top" "bar bar" "hero hero" "actions actions" "view view"}
   [data-skin="workspace"] .top{grid-area:top;margin-bottom:-16px}
@@ -326,43 +336,103 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
   [data-skin="workspace"] .hero{grid-area:hero}
   [data-skin="workspace"] .workspace-actions{grid-area:actions}
   [data-skin="workspace"] #view{grid-area:view}
-  [data-skin="workspace"] .wrap[data-view="factor"] #view{height:clamp(340px,40.5dvh,470px)}
+  [data-skin="workspace"] .wrap[data-view="factor"] #view{height:clamp(340px,40.5vh,470px);height:clamp(340px,40.5dvh,470px);overflow-y:auto}
   [data-skin="workspace"] .wrap:not([data-view="factor"]) .hero{padding-block:10px;gap:3px}
   [data-skin="workspace"] .wrap:not([data-view="factor"]) .hero .formula{font-size:24px;margin:4px 0}
   [data-skin="workspace"] .wrap:not([data-view="factor"]) .pts .big{font-size:24px}
-  [data-skin="workspace"] .rail-brand{display:grid;justify-items:center;align-content:center;gap:4px;position:fixed;z-index:6;inset:0 auto auto 0;width:var(--rail);height:calc(188 * var(--u));background:var(--rail-bg);border-right:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+  [data-skin="workspace"] .rail-brand{display:grid;justify-items:center;align-content:center;gap:4px;position:fixed;z-index:6;inset:env(safe-area-inset-top,0px) auto auto env(safe-area-inset-left,0px);width:var(--rail);height:calc(188 * var(--u));background:var(--rail-bg);border-right:1px solid var(--line2);border-bottom:1px solid var(--line2)}
   [data-skin="workspace"] .rail-brand b{font:600 56px/1 var(--serif);color:var(--cyan)}
   [data-skin="workspace"] .rail-brand strong{font-size:21px}
   [data-skin="workspace"] .rail-brand em{font:italic 18px/1.2 var(--serif);color:var(--muted)}
-  [data-skin="workspace"] .tabs{position:fixed;inset:calc(188 * var(--u)) auto 0 0;width:var(--rail);flex-direction:column;gap:4px;overflow-y:auto;overflow-x:hidden;padding:14px 10px 38px;background:var(--rail-bg);border:0;border-right:1px solid var(--line2)}
+  [data-skin="workspace"] .nav-dock{position:fixed;inset:calc(188 * var(--u) + env(safe-area-inset-top,0px)) auto env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);width:var(--rail);grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;padding:8px 10px;background:var(--rail-bg);border:0;border-right:1px solid var(--line2)}
+  [data-skin="workspace"] .tabs{flex-direction:column;gap:4px;overflow-y:auto;overflow-x:hidden}
   [data-skin="workspace"] .tab{text-align:start;border:0;border-radius:7px;padding:10px 12px;display:flex;flex:none;align-items:center;gap:10px}
   [data-skin="workspace"] .tab.on{background:var(--cyanBg);color:var(--cyan)}
   [data-skin="workspace"] .tab .dot{top:50%;right:8px;transform:translateY(-50%)}
   [data-skin="workspace"] .nav-symbol{display:inline-block;font:19px/1 var(--serif);width:20px;text-align:center}
-  [data-skin="workspace"] .wrap[data-view="factor"] .hero{min-height:clamp(340px,40.5dvh,470px)}
+  [data-skin="workspace"] .wrap[data-view="factor"] .hero{min-height:clamp(340px,40.5vh,470px);min-height:clamp(340px,40.5dvh,470px)}
 }
-@media(max-width:919px){
+@media(max-width:919px),(max-height:539px){
   [data-skin="workspace"] .wrap{display:flex;flex-direction:column;gap:10px}
   [data-skin="workspace"] .top{order:0}
   [data-skin="workspace"] .bar{order:1}
-  [data-skin="workspace"] .tabs{order:2}
-  [data-skin="workspace"] .hero{order:3}
-  [data-skin="workspace"] .workspace-actions{order:4}
+  [data-skin="workspace"] .hero{order:2}
+  [data-skin="workspace"] .workspace-actions{order:3}
+  [data-skin="workspace"] .nav-dock{order:4}
   [data-skin="workspace"] #view{order:5}
   [data-skin="workspace"] .workspace-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   [data-skin="workspace"] .workspace-actions .btn{min-height:60px;padding:8px 10px;gap:4px}
-  [data-skin="workspace"] .wrap[data-view="factor"] #view{max-height:55dvh}
 }
 @media(max-width:640px){
-  html{overflow:hidden}
-  body{height:calc(100dvh - 54px - env(safe-area-inset-bottom,0px));min-height:0;overflow:auto}
-  .brand{font-size:17px}.brand small{font-size:10px;margin-left:5px}.top{gap:5px}.top-tools{gap:5px}.tierb{font-size:12px;padding:2px 7px}.skin-picker .skin-label{display:none}
+  .brand{font-size:17px}.brand small{font-size:10px;margin-left:5px}.top{flex-wrap:wrap;gap:5px}.top-tools{gap:5px;margin-inline-start:auto}.tierb{font-size:12px;padding:2px 7px}.skin-picker .skin-label{display:none}
   .skin-picker select{font-size:12px;padding-inline:4px}.signature{font-size:21px}.signature-limit small{font-size:9px}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr))}
-  [data-skin="workspace"] .formula{font-size:30px}
+  .hero{padding:12px;margin:6px 0 10px}
+  .pts .big{font-size:32px}
+  .formula{font-size:24px;margin:9px 0 5px}
+  .formula.t6{font-size:20px}
+  .ticknote{flex-wrap:wrap;gap:3px 10px}
+  .tab{padding-inline:10px}
+  .card{padding-inline:10px}
+  [data-skin="workspace"]{--gutter:12px}
+  [data-skin="workspace"] .top{min-height:0}
+  [data-skin="workspace"] .bar{padding-block:4px}
+  [data-skin="workspace"] .stat-scroll .cur{min-width:108px;padding-inline:8px}
+  [data-skin="workspace"] .stat-scroll .cur .v{font-size:19px}
+  [data-skin="workspace"] .hero{padding:12px;gap:5px}
+  [data-skin="workspace"] .formula{font-size:26px}
+  [data-skin="workspace"] .formula.t6{font-size:21px}
+  [data-skin="workspace"] .formula-output b{font-size:24px}
+  [data-skin="workspace"] .wrap[data-view="factor"] #view{padding:10px 12px}
 }
+@media(max-width:640px),(max-height:480px){
+  .signature{inset:auto 0 0;justify-content:flex-end;padding:3px max(12px,env(safe-area-inset-right,0px)) calc(3px + env(safe-area-inset-bottom,0px)) 12px;border-top:1px solid var(--line);border-radius:0;font-size:19px}
+  .signature-limit small{font-size:8px}
+  .toasts{bottom:calc(39px + env(safe-area-inset-bottom,0px))}
+  .toasts .toast:not(:last-child){position:absolute;opacity:0}
+}
+@media(max-height:480px){
+  .modal .box{padding:12px 16px}
+}
+@media(min-width:641px) and (max-height:480px){
+  .hero{padding:10px 14px;margin:5px 0 8px}
+  .pts .big{font-size:29px}
+  .formula{font-size:26px;margin:4px 0}
+  .formula.t6{font-size:21px}
+  .tickbar{margin-top:6px}
+  [data-skin="workspace"] .wrap{gap:6px}
+  [data-skin="workspace"] .nav-dock{order:2}
+  [data-skin="workspace"] .hero{order:3;padding:10px 12px;gap:3px;justify-content:start}
+  [data-skin="workspace"] .workspace-actions{order:4;grid-template-columns:repeat(auto-fit,minmax(min(115px,100%),1fr))}
+  [data-skin="workspace"] .workspace-actions .btn{min-height:44px}
+  [data-skin="workspace"] .bar{padding-block:2px}
+  [data-skin="workspace"] .stat-scroll .cur .v{font-size:18px}
+  [data-skin="workspace"] .hero .pts,[data-skin="workspace"] .hero .rate{display:none}
+  [data-skin="workspace"] .hero-heading{font-size:15px}
+  [data-skin="workspace"] .formula{font-size:28px;margin:1px 0}
+  [data-skin="workspace"] .formula.t6{font-size:21px}
+  [data-skin="workspace"] .formula-output{margin:0}
+  [data-skin="workspace"] .formula-output b{font-size:22px}
+  [data-skin="workspace"] .wrap[data-view="factor"]{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,5fr);grid-template-areas:"top top" "bar bar" "nav nav" "hero view" "actions view";grid-template-rows:auto auto auto auto 1fr;align-items:start;column-gap:10px}
+  [data-skin="workspace"] .wrap[data-view="factor"] .top{grid-area:top}
+  [data-skin="workspace"] .wrap[data-view="factor"] .bar{grid-area:bar}
+  [data-skin="workspace"] .wrap[data-view="factor"] .nav-dock{grid-area:nav}
+  [data-skin="workspace"] .wrap[data-view="factor"] .hero{grid-area:hero}
+  [data-skin="workspace"] .wrap[data-view="factor"] .workspace-actions{grid-area:actions}
+  [data-skin="workspace"] .wrap[data-view="factor"] #view{grid-area:view;padding:8px 12px}
+}
+@media(any-pointer:coarse){
+  .btn,.btn.sm,.tab,.tab-picker,.skin-picker select,.tgl,.gpal,.ujn{min-height:44px}
+  .gpal,.ujn{min-width:44px}
+  select,textarea,input[type=text],.skin-picker select{font-size:16px}
+  .btn,.tab,.gpal,.ngc,.uslot,.ujn,.tab-picker select{touch-action:manipulation}
+  .tap-zone{pointer-events:all}
+}
+@media(pointer:coarse){[data-skin="workspace"] .wrap[data-view="factor"] #view{height:auto;overflow:visible}}
+@media(prefers-reduced-motion:reduce){.tickbar.fast div,.fzn.shake{animation:none}}
 /* 构造台 */
-.uslots{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0 10px}
+.uslots{display:flex;align-items:center;gap:6px;margin:3px 0 7px;padding:4px;overflow-x:auto;overscroll-behavior-x:contain}
+.uslots > *{flex:none}
+.uslots:focus-visible{outline-offset:-2px}
 .uslot{min-width:68px;height:68px;padding:0 8px;border:1.5px dashed var(--line2);border-radius:12px;background:var(--paper);font:30px/1 var(--serif);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .uslot.fill{border-style:solid;border-color:var(--cyan)}
 .uslot.sel{border:2px solid var(--amber);box-shadow:0 0 0 3px var(--amberBg)}
@@ -392,7 +462,10 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
     <div class="ticknote"><span id="ticknote"></span><span id="boostnote" class="boost"></span></div>
   </section>
   <div class="bar"><div class="stat-scroll" tabindex="0" aria-label="属性"><div class="workspace-stats"><div class="cur"><div class="k">点数</div><div class="v num" id="statPoints"></div></div><div class="cur"><div class="k">每秒产量</div><div class="v num" id="statRate"></div></div><div class="cur"><div class="k">生产间隔</div><div class="v num" id="statInterval"></div></div></div><div id="curs"></div></div><div class="acts" id="acts"></div></div>
-  <nav class="tabs" id="tabs" aria-label="游戏导航"></nav>
+  <div class="nav-dock" id="navDock">
+    <nav class="tabs" id="tabs" aria-label="游戏导航"></nav>
+    <label class="tab-picker"><b aria-hidden="true">≡</b><span aria-hidden="true">目录</span><select id="tabPicker" aria-label="跳转到游戏页面"></select></label>
+  </div>
   <section class="workspace-actions" id="workspaceActions" aria-label="重置与晋升"></section>
   <main id="view" tabindex="0"></main>
 </div>
@@ -2106,10 +2179,17 @@ function modal(title, html, btns) { modalQ.push({ title, html, btns }); showModa
 function showModal() {
   if (modalOpen || !modalQ.length) return; modalOpen = true;
   const m = modalQ.shift(), btns = m.btns || [{ t: '知道了', c: 'go' }];
-  const root = $('modalRoot');
-  root.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><div class="box"><h3>${m.title}</h3>${m.html}<div class="row">${btns.map((b, i) => `<button class="btn ${b.c || ''}" data-mb="${i}">${b.t}</button>`).join('')}</div></div></div>`;
-  root.querySelectorAll('[data-mb]').forEach(el => el.onclick = () => { const b = btns[+el.dataset.mb]; root.innerHTML = ''; modalOpen = false; if (b.fn) b.fn(); viewSig = ''; showModal(); });
-  const f = root.querySelector('[data-mb]'); if (f) f.focus();
+  const root = $('modalRoot'), shell = $('shell'), previous = document.activeElement;
+  root.innerHTML = `<div class="modal"><div class="box" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1"><h3 id="modalTitle">${m.title}</h3>${m.html}<div class="row">${btns.map((b, i) => `<button class="btn ${b.c || ''}" data-mb="${i}">${b.t}</button>`).join('')}</div></div></div>`;
+  document.documentElement.classList.add('modal-open');
+  shell.inert = true;
+  root.querySelector('.box').focus({ preventScroll: true });
+  root.querySelectorAll('[data-mb]').forEach(el => el.onclick = () => {
+    const b = btns[+el.dataset.mb]; root.innerHTML = ''; modalOpen = false;
+    document.documentElement.classList.remove('modal-open'); shell.inert = false;
+    if (previous.isConnected) previous.focus({ preventScroll: true });
+    if (b.fn) b.fn(); viewSig = ''; showModal();
+  });
 }
 function confirmDo(title, html, okText, fn) { modal(title, html, [{ t: '取消' }, { t: okText, c: 'go', fn }]); }
 function applyTheme() { const t = (S && S.opt.theme) || 0; if (t === 1) document.documentElement.dataset.theme = 'light'; else if (t === 2) document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme; }
@@ -2122,6 +2202,7 @@ function applySkin(value, remember = false) {
   if (view === 'pr') drawUlam();
   if (view === 'col') drawBH();
   if (view === 'fr') FR.forEach(f => drawFractal(f.id));
+  revealTab();
 }
 function loadSkin() {
   let skin;
@@ -2303,16 +2384,43 @@ const TABS = [
 function treeCan(L) { const arr = LAYER[L].tree, have = curGet(S, LAYER[L].cur); return arr.some(x => upgState(S, x) === 'ok' && have >= x.c); }
 const ULT_TABS = new Set(['ub', 'ush', 'ucx', 'ach', 'stat', 'opt']);
 const NAV_SYMBOL = { ub: '∮', ush: '⊞', ucx: '❖', factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', fr: '△', mp: 'M', col: '⊙', inf: '∞', sp: '✴', rs: '☀', gw: '∿', tw: 'ℵ', fz: '∏', tr: 'Ω', om: 'ω', acad: '∑', lm: '⊕', gc: '◇', ex: '↗', sw: '✧', g24: '24', ng: '▤', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
+let navKey = '', shownTab = '', pendingNav = false;
+function revealTab() {
+  const tabs = $('tabs'), selected = tabs.querySelector('.on');
+  if (!selected) return;
+  const a = selected.getBoundingClientRect(), b = tabs.getBoundingClientRect();
+  if (a.left < b.left) tabs.scrollLeft += a.left - b.left;
+  else if (a.right > b.right) tabs.scrollLeft += a.right - b.right;
+  if (a.top < b.top) tabs.scrollTop += a.top - b.top;
+  else if (a.bottom > b.bottom) tabs.scrollTop += a.bottom - b.bottom;
+}
 function renderTabs() {
-  const tabs = $('tabs');
+  const tabs = $('tabs'), picker = $('tabPicker');
   if (S.ult && S.ult.on && !ULT_TABS.has(view)) view = 'ub';
-  const html = TABS.filter(t => S.ult && S.ult.on ? ULT_TABS.has(t.id) : t.on()).map(t => `<button class="tab ${view === t.id ? 'on' : ''}"${view === t.id ? ' aria-current="page"' : ''} data-a="tab:${t.id}"><span class="nav-symbol" aria-hidden="true">${NAV_SYMBOL[t.id] || '·'}</span>${t.n}${t.dot && view !== t.id && t.dot() ? '<span class="dot"></span>' : ''}</button>`).join('');
+  const visible = TABS.filter(t => S.ult && S.ult.on ? ULT_TABS.has(t.id) : t.on());
+  const key = visible.map(t => t.id).join(' ');
+  if (key !== navKey) {
+    picker.replaceChildren(...visible.map(t => new Option(t.n, t.id)));
+    navKey = key;
+  }
+  if (picker.value !== view) picker.value = view;
+  const html = visible.map(t => `<button class="tab ${view === t.id ? 'on' : ''}"${view === t.id ? ' aria-current="page"' : ''} data-a="tab:${t.id}"><span class="nav-symbol" aria-hidden="true">${NAV_SYMBOL[t.id] || '·'}</span>${t.n}${t.dot && view !== t.id && t.dot() ? '<span class="dot"></span>' : ''}</button>`).join('');
   if (tabs.innerHTML !== html) {
     const active = tabs.contains(document.activeElement) ? document.activeElement.dataset.a : '';
     const x = tabs.scrollLeft, y = tabs.scrollTop;
     tabs.innerHTML = html;
     if (active) tabs.querySelector(`[data-a="${active}"]`)?.focus({ preventScroll: true });
     tabs.scrollLeft = x; tabs.scrollTop = y;
+  }
+  if (view !== shownTab) { shownTab = view; revealTab(); }
+}
+function scrollToView() {
+  const dock = $('navDock'), main = $('view'), style = getComputedStyle(dock);
+  if (style.position === 'fixed') { window.scrollTo(0, 0); return; }
+  const top = parseFloat(style.top) || 0;
+  const nav = dock.getBoundingClientRect(), contentTop = main.getBoundingClientRect().top;
+  if (nav.top <= top + 1 || contentTop >= window.innerHeight - 64) {
+    window.scrollTo(0, window.scrollY + contentTop - nav.height - top - 8);
   }
 }
 
@@ -2323,9 +2431,20 @@ function sigOf() {
 function B(key, fn) { binds.push([key, fn]); return `data-b="${key}"`; }
 function buildView() {
   binds = [];
-  const f = VIEWS[view] || VIEWS.factor;
+  const f = VIEWS[view] || VIEWS.factor, main = $('view');
+  const sameView = $('shell').dataset.view === view;
+  const slotScroll = sameView ? Array.from(main.querySelectorAll('.uslots'), el => el.scrollLeft) : [];
+  const focused = document.activeElement;
+  const action = sameView && main.contains(focused) && focused.closest('.uslots,svg [role="button"]') ? focused.dataset.a : '';
+  if (!sameView) main.scrollTop = 0;
   $('shell').dataset.view = view;
-  $('view').innerHTML = f();
+  main.innerHTML = f();
+  main.querySelectorAll('.uslots').forEach((el, i) => {
+    el.scrollLeft = slotScroll[i] || 0;
+    el.addEventListener('wheel', scrollHorizontally, { passive: false });
+  });
+  if (action) main.querySelector(`[data-a="${action}"]`)?.focus({ preventScroll: true });
+  if (pendingNav) { pendingNav = false; scrollToView(); }
   if (view === 'pr') drawUlam(); if (view === 'col') drawBH(); if (view === 'fr') FR.forEach(f => drawFractal(f.id));
   const els = {}; $('view').querySelectorAll('[data-b]').forEach(el => els[el.dataset.b] = el);
   binds = binds.map(([k, fn]) => [els[k], fn]).filter(x => x[0]);
@@ -2563,9 +2682,9 @@ VIEWS.gc = () => {
   const i = gcSel.g, g = GRAPHS[i], P = GL[i], col = S.gc[i] || [], solved = gcSolved(S, i), used = new Set(col.filter(Boolean));
   const bad = new Set(); g.e.forEach(([a, b]) => { if (col[a] && col[a] === col[b]) { bad.add(a); bad.add(b); } });
   const W = 340;
-  let svg = `<svg viewBox="0 0 ${W} ${W}" class="gsvg" role="img" aria-label="${g.nm}">`;
+  let svg = `<svg viewBox="0 0 ${W} ${W}" class="gsvg" role="group" aria-label="${g.nm}">`;
   g.e.forEach(([a, b]) => { const c = col[a] && col[a] === col[b]; svg += `<line x1="${P[a][0] * W}" y1="${P[a][1] * W}" x2="${P[b][0] * W}" y2="${P[b][1] * W}" class="${c ? 'bad' : ''}"/>`; });
-  P.forEach((p, v) => { svg += `<circle cx="${p[0] * W}" cy="${p[1] * W}" r="15" class="gv c${col[v] || 0} ${bad.has(v) ? 'bad' : ''}" data-a="gcv:${i}:${v}"/>`; });
+  P.forEach((p, v) => { const center = `cx="${p[0] * W}" cy="${p[1] * W}"`; svg += `<g role="button" tabindex="0" aria-label="顶点 ${v + 1}" data-a="gcv:${i}:${v}"><circle ${center} r="22" class="tap-zone"/><circle ${center} r="15" class="gv c${col[v] || 0} ${bad.has(v) ? 'bad' : ''}"/></g>`; });
   svg += `</svg>`;
   return `<div class="sec">图着色<span class="h">给每个顶点上色，相邻顶点颜色不同，且颜色种数不超过要求</span></div>
   <div class="row">${avail.map(k => `<button class="btn sm ${k === i ? 'go' : ''}" data-a="gcg:${k}">${GRAPHS[k].nm}${gcSolved(S, k) ? ' ✓' : ''}</button>`).join('')}${avail.length < 8 ? '<span class="faint">第五章解锁更多</span>' : ''}</div>
@@ -2598,10 +2717,10 @@ function swPos(n) { const RR = [0, 62, 122, 182]; let a; if (n.r === 0) return [
 VIEWS.sw = () => {
   let lines = '', dots = '';
   SW.forEach(n => swAdj(n).forEach(id => { if (id <= n.id) return; const m = SWM[id], p = swPos(n), q = swPos(m); lines += `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" class="${swHas(S, n.id) && swHas(S, id) ? 'own' : ''}"/>`; }));
-  SW.forEach(n => { const p = swPos(n), st = swHas(S, n.id) ? 'own' : swReach(S, n) ? (S.IN >= n.c ? 'can' : 'reach') : 'lock'; dots += `<g class="star ${st} ${swSel === n.id ? 'sel' : ''}" data-a="sws:${n.id}"><circle cx="${p[0]}" cy="${p[1]}" r="${n.r === 0 ? 17 : 14}"/><text x="${p[0]}" y="${p[1] + 4}" text-anchor="middle">${SWI[n.k]}</text></g>`; });
+  SW.forEach(n => { const p = swPos(n), st = swHas(S, n.id) ? 'own' : swReach(S, n) ? (S.IN >= n.c ? 'can' : 'reach') : 'lock'; const center = `cx="${p[0]}" cy="${p[1]}"`; dots += `<g class="star ${st} ${swSel === n.id ? 'sel' : ''}" role="button" tabindex="0" aria-label="${n.r === 0 ? '中心之星' : '第 ' + n.r + ' 环第 ' + (n.i + 1) + ' 颗星'}" data-a="sws:${n.id}"><circle ${center} r="23" class="tap-zone"/><circle ${center} r="${n.r === 0 ? 17 : 14}" class="star-point"/><text x="${p[0]}" y="${p[1] + 4}" text-anchor="middle">${SWI[n.k]}</text></g>`; });
   const n = SWM[swSel];
   return `<div class="sec">定理星盘<span class="h">已点亮 ${Object.keys(S.sw).length} / ${SW.length} · 从中心开始，只能点亮与已亮星相邻的星</span></div><div class="grid swgrid">
-  <div class="card"><svg viewBox="0 0 400 400" class="swsvg" role="img" aria-label="定理星盘">${lines}${dots}</svg></div>
+  <div class="card"><svg viewBox="0 0 400 400" class="swsvg" role="group" aria-label="定理星盘">${lines}${dots}</svg></div>
   <div class="card"><div class="nm">${n.r === 0 ? '中心' : '第 ' + n.r + ' 环'}之星</div><div class="fm">${n.d}</div><div class="muted">费用 ${fmtBig(n.c)} 灵感 · 当前 <b ${B('swin', () => fmtBig(S.IN))}></b></div>
   <div class="row"><button class="btn" data-a="swb:${n.id}" ${B('swbb', () => { const own = swHas(S, n.id), can = swCan(S, n.id); return { c: 'btn ' + (can ? 'go' : ''), d: !can, t: own ? '已点亮' : !swReach(S, n) ? '需先点亮相邻的星' : can ? '点亮' : '灵感不足' }; })}></button></div>
   <p class="note">点击星星查看效果。星盘没有互斥的分支，所有星最终都能点亮，先点哪颗由你决定。灵感来自远征与二十四点。</p></div></div>`;
@@ -2712,7 +2831,7 @@ VIEWS.ub = () => {
   const pal = UVK.filter(v => u.unl[v]).map(v => `<button class="btn upb" data-a="uput:${v}"><i>${UV[v].n}</i></button>`).join('') + Object.keys(u.cn).map(c => `<button class="btn upb" data-a="uput:${c}">${UCN[c].n}</button>`).join('');
   const pw = `<button class="btn sm" data-a="upow:1">无指数</button>` + (u.p2 ? `<button class="btn sm" data-a="upow:2">²（${u.p2}）</button>` : '') + (u.p3 ? `<button class="btn sm" data-a="upow:3">³（${u.p3}）</button>` : '') + `<button class="btn sm warn" data-a="uclr">清空此槽</button>`;
   let h = `<div class="sec">构造台<span class="h">点选一个槽位，再点下方的积木放进去；点击槽位之间的符号切换 + 与 ×</span></div><div class="grid">
-  <div class="card" style="grid-column:1/-1"><div class="uslots">${row}</div>
+  <div class="card" style="grid-column:1/-1"><div class="uslots" tabindex="0" aria-label="内层公式槽位">${row}</div>
   <div class="row upal">${pal}</div><div class="row">${pw}</div>
   <div class="fm" ${B('uval', () => G.uA && G.uA.err ? '⚠ ' + G.uA.err : '公式的值 ' + fmt(G.uF) + ' · 加成 ×' + fmt(G.uM) + ' → 每秒 ' + fmt(G.uR) + ' 终极点')}></div>
   <div class="muted" ${B('uinv', () => '积木：× ' + u.mul + ' 个 · ² ' + u.p2 + ' 个 · ³ ' + u.p3 + ' 个 · 槽位 ' + u.slots + ' 个' + (u.up.tow ? ' · 幂之塔生效' : ''))}></div>
@@ -2731,7 +2850,7 @@ VIEWS.ub = () => {
       row += `<button class="uslot oslot ${s.v ? 'fill' : ''} ${i === os ? 'sel' : ''}" data-a="osel:${i}">${s.v ? (s.v === 'U' ? '<i class="fu">𝑈</i>' + (oPow(S, s.p) > 1 ? '<sup>' + oPow(S, s.p) + '</sup>' : '') : oTokHTML(s, '')) : '<span class="faint">空</span>'}</button>`; }
     const pal = `<button class="btn upb" data-a="oput:U"><i class="fu">𝑈</i></button>` + OVK.filter(v => o.unl[v]).map(v => `<button class="btn upb" data-a="oput:${v}"><i>${OV[v].n}</i></button>`).join('');
     const pw = `<button class="btn sm" data-a="opow:1">无指数</button>` + [2, 3, 4, 5].filter(p => o['e' + p]).map(p => `<button class="btn sm" data-a="opow:${p}">${['', '', '²', '³', '⁴', '⁵'][p]}（${o['e' + p]}）</button>`).join('') + `<button class="btn sm warn" data-a="oclr">清空此槽</button>`;
-    h += `<div class="sec">外层公式<span class="h">𝑈 是整个内层公式的值；给 𝑈 加上的指数会放大整个内层</span></div><div class="grid"><div class="card" style="grid-column:1/-1"><div class="uslots">${row}</div><div class="row upal">${pal}</div><div class="row">${pw}</div>
+    h += `<div class="sec">外层公式<span class="h">𝑈 是整个内层公式的值；给 𝑈 加上的指数会放大整个内层</span></div><div class="grid"><div class="card" style="grid-column:1/-1"><div class="uslots" tabindex="0" aria-label="外层公式槽位">${row}</div><div class="row upal">${pal}</div><div class="row">${pw}</div>
     <div class="fm" ${B('oval', () => G.oA && G.oA.err ? '⚠ ' + G.oA.err : '内层 ' + fmt(G.uFin) + ' → 外层 ' + fmt(G.uF))}></div>
     <div class="muted" ${B('oinv', () => '外层积木：× ' + o.mul + ' · ² ' + o.e2 + ' · ³ ' + o.e3 + ' · ⁴ ' + o.e4 + ' · ⁵ ' + o.e5 + ' · 槽位 ' + o.slots + (u.up.tow2 ? ' · 幂之塔 II 生效' : ''))}></div></div></div>`;
     h += `<div class="sec">外层变量<span class="h">外层的演算阻力更小：÷(1 + 终极点数量级 ÷ ${K.oD})</span></div><div class="grid">`;
@@ -2914,9 +3033,7 @@ function act(a) {
   const p = a.split(':');
   switch (p[0]) {
     case 'tab': {
-      view = p[1]; viewSig = ''; $('view').scrollTop = 0;
-      if (window.innerWidth <= 640) document.body.scrollTo({ top: Math.min(document.body.scrollTop, $('tabs').offsetTop - 4) });
-      else window.scrollTo({ top: document.documentElement.dataset.skin === 'workspace' && window.innerWidth >= 920 ? 0 : Math.min(window.scrollY, $('tabs').offsetTop - 4) });
+      if (view !== p[1]) { view = p[1]; viewSig = ''; pendingNav = true; }
       break;
     }
     case 'buy': buyFactor(S, p[1], p[2] === 'max'); break;
@@ -3032,21 +3149,29 @@ function inp(k, el) {
   }
 }
 document.addEventListener('click', e => { const el = e.target.closest('[data-a]'); if (el && !el.disabled) act(el.dataset.a); });
+document.addEventListener('keydown', e => {
+  if (!e.repeat && (e.key === 'Enter' || e.key === ' ') && e.target.matches('svg [role="button"][data-a]')) {
+    e.preventDefault(); act(e.target.dataset.a);
+  }
+});
 document.addEventListener('change', e => { const el = e.target.closest('[data-in]'); if (el) inp(el.dataset.in, el); });
 document.addEventListener('input', e => { const el = e.target; if (el.dataset && el.dataset.in && el.type === 'range') inp(el.dataset.in, el); });
 $('skin').addEventListener('change', e => applySkin(e.target.value, true));
+$('tabPicker').addEventListener('change', e => act('tab:' + e.target.value));
+function scrollHorizontally(e) {
+  const el = e.currentTarget;
+  if (e.ctrlKey || e.shiftKey || e.deltaX || el.scrollWidth <= el.clientWidth + 1) return;
+  const delta = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? el.clientWidth : 1);
+  const left = Math.max(0, Math.min(el.scrollWidth - el.clientWidth, el.scrollLeft + delta));
+  if (Math.abs(left - el.scrollLeft) < 1) return;
+  e.preventDefault(); el.scrollLeft = left;
+}
 for (const el of document.querySelectorAll('.formula,.reads,.stat-scroll,.tabs')) {
-  el.addEventListener('wheel', e => {
-    if (e.ctrlKey || e.shiftKey || e.deltaX || el.scrollWidth <= el.clientWidth + 1) return;
-    const delta = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? el.clientWidth : 1);
-    const left = Math.max(0, Math.min(el.scrollWidth - el.clientWidth, el.scrollLeft + delta));
-    if (Math.abs(left - el.scrollLeft) < 1) return;
-    e.preventDefault(); el.scrollLeft = left;
-  }, { passive: false });
+  el.addEventListener('wheel', scrollHorizontally, { passive: false });
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden) { save(); pushCloud(); } });
 window.addEventListener('beforeunload', save);
-let rsT = 0; window.addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => { viewSig = ''; }, 200); });
+let rsT = 0; window.addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => { revealTab(); }, 200); });
 
 /* ---------------- 主循环 ---------------- */
 function frame() {
