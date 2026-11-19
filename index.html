@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>无尽演算 v1.4.3</title>
+<title>无尽演算 v1.4.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -450,11 +450,12 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 .rfn{border-top:1px solid var(--line);padding:8px 0}
 .rfn.own .nm{color:var(--green)}
 .rfn.can .nm{color:var(--amber)}
+.arsig{font-family:var(--serif);overflow-wrap:anywhere;word-break:break-all}
 </style>
 </head>
 <body>
 <div class="wrap" id="shell" data-view="factor">
-  <header class="top"><div class="brand">无尽演算<small>v1.4.3</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
+  <header class="top"><div class="brand">无尽演算<small>v1.4.4</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
   <div class="rail-brand" aria-hidden="true"><b>Σ</b><strong>无尽演算</strong><em>Axiom</em></div>
   <section class="hero" id="hero">
     <div class="pts"><span class="big num" id="pts">0</span><span class="lbl">点数</span></div>
@@ -480,7 +481,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 <script>
 /* ===================== 公式晋升 v1.0.0 · 核心引擎（后端） ===================== */
 'use strict';
-const VERSION = '1.4.3';
+const VERSION = '1.4.4';
 const NI = -Infinity, L10 = Math.log10;
 /* 所有大数一律以 log10 存储：la=对数加，ls=对数减 */
 function la(a, b) { if (a === NI) return b; if (b === NI) return a; if (a < b) { const t = a; a = b; b = t; } const d = b - a; return d < -17 ? a : a + L10(1 + Math.pow(10, d)); }
@@ -491,7 +492,7 @@ const pz = l => l > 0 ? l : 0;
 const sq = (L, s, h) => L > s ? (L - s) * (L - s) * h : 0;
 const K = { // 主要平衡常数：获取量 = 10^(k·(lgP−需求)^q)
   rbReq: 4, rbK: 0.5, rbQ: 0.75, pfReq: 25, pfK: 0.25, pfQ: 0.6, axReq: 130, axK: 0.22, axQ: 0.55,
-  promo: { 1: 25, 2: 120, 3: 500, 4: 1500, 5: 10000, 6: 2e7 }, endGoal: 2e7, extGoal: 1e8, alS: 0.2, bsS: 90, bsV: 1.0, rcB: 0.11, uG: 0.06, uQ: 1.22, uD: 15, oG: 0.8, oD: 250, scAt: 1e8, scQ: 0.5, muG: 0.245, psS: 0.45, trReq: 10000, trK: 1, trQ: 0.4, omS: 0.40,
+  promo: { 1: 25, 2: 120, 3: 500, 4: 1500, 5: 10000, 6: 2e7 }, endGoal: 2e7, extGoal: 1e8, alS: 0.2, bsS: 90, bsV: 1.0, rcB: 0.11, uG: 0.06, uQ: 1.22, uD: 15, oG: 0.8, oD: 250, dpK: 0.65, scAt: 1e8, scQ: 0.5, muG: 0.245, psS: 0.45, trReq: 10000, trK: 1, trQ: 0.4, omS: 0.40,
 };
 
 /* ---------------- 数字格式化 ---------------- */
@@ -967,7 +968,14 @@ const ACH = [
   ['1e50000 终极点', '终极点达到 1e50000', S => S.ult.on && S.ult.Ub >= 50000],
   ['1e100000 终极点', '终极点达到 1e100000', S => S.ult.on && S.ult.Ub >= 100000],
   ['范式', '累计获得 100 范式点', S => S.ult.on && S.ult.rf.PPt >= 100],
-  ['范式转移', '买齐全部 16 个范式升级', S => S.ult.on && RFUP.every(x => S.ult.rf.up[x.id])],
+  ['范式转移', '买齐全部 18 个范式升级', S => S.ult.on && RFUP.every(x => S.ult.rf.up[x.id])],
+  ['ee6 终极点', '终极点达到 ee6（1e1000000）', S => S.ult.on && S.ult.Ub >= 1e6],
+  ['ee7 终极点', '终极点达到 ee7', S => S.ult.on && S.ult.Ub >= 1e7],
+  ['档案员', '公式档案馆收录 5 种形状', S => S.ult.on && Object.keys(S.ult.rf.ar).filter(k => S.ult.rf.ar[k] >= 1e5).length >= 5],
+  ['馆长', '公式档案馆收录 15 种形状', S => S.ult.on && Object.keys(S.ult.rf.ar).filter(k => S.ult.rf.ar[k] >= 1e5).length >= 15],
+  ['晶体', '累计获得 100 时间晶体', S => S.ult.on && S.ult.rf.cr.t >= 100],
+  ['第五个变量', '解锁外层变量 𝜀', S => S.ult.on && !!S.ult.o.unl.e],
+  ['百次重构', '完成 100 次重构', S => S.ult.on && S.ult.rf.n >= 100],
   ['阿列夫', 'ℵ 达到 1.1', S => (G.al || 1) >= 1.1],
   ['基数之谜', '完成猜想 19–20 的全部难度', S => (S.cc[19] || 0) >= 3 && (S.cc[20] || 0) >= 3],
 ];
@@ -1388,6 +1396,34 @@ function cstStep(S, dt) {
   CS.forEach(c => { if (!(S.cst.D[c.id] <= 1e300)) S.cst.D[c.id] = 1e300; });
 }
 
+/* ===================== v1.4.4 · 重构扩展、公式档案馆、时间晶体 ===================== */
+const RFREP = [
+  { id: 'rg', n: '无尽增长', d: '所有变量的增长 ×1.35 / 级', c0: 3e4, g: 10, m: 1.35 },
+  { id: 'rd', n: '无尽低阻', d: '外层演算阻力 ÷1.3 / 级', c0: 4e4, g: 10, m: 1.3 },
+  { id: 'rp', n: '范式回响', d: '范式点获取 ×1.25 / 级', c0: 6e4, g: 10, m: 1.25 },
+];
+const CRUP = [
+  { id: 'g', n: '晶格 · 增长', d: '所有变量的增长 ×1.15 / 级', c0: 5, g: 2.2, m: 1.15 },
+  { id: 'd', n: '晶格 · 低阻', d: '外层演算阻力 ÷1.12 / 级', c0: 8, g: 2.2, m: 1.12 },
+  { id: 'p', n: '晶格 · 范式', d: '范式点获取 ×1.15 / 级', c0: 10, g: 2.4, m: 1.15 },
+  { id: 's', n: '晶格 · 加速', d: '时间晶体获取 ×1.4 / 级', c0: 15, g: 2.6, m: 1.4 },
+  { id: 'r', n: '晶格 · 共振', d: '公式档案馆的加成 ×1.15 / 级', c0: 20, g: 2.6, m: 1.15 },
+];
+function x5On(S) { return !!(S.ult && S.ult.on && S.ult.Ub >= 100000); } // ee5 之后的非重置内容
+function rfRepCost(x, L) { return x.c0 * Math.pow(x.g, L); }
+function rfRepLv(S, id) { return (S.ult.rf.rep && S.ult.rf.rep[id]) || 0; }
+function rfRepBuy(S, id) { const r = S.ult.rf, x = RFREP.find(q => q.id === id); if (!x || !r.up.omega) return false; const c = rfRepCost(x, rfRepLv(S, id)); if (r.PP < c) return false; r.PP -= c; r.rep = r.rep || {}; r.rep[id] = rfRepLv(S, id) + 1; return true; }
+function crLv(S, id) { return (S.ult.rf.cr && S.ult.rf.cr.lv[id]) || 0; }
+function crCost(x, L) { return x.c0 * Math.pow(x.g, L); }
+function crBuy(S, id) { const cr = S.ult.rf.cr, x = CRUP.find(q => q.id === id); if (!x || !x5On(S)) return false; const c = crCost(x, crLv(S, id)); if (cr.n < c) return false; cr.n -= c; cr.lv[id] = crLv(S, id) + 1; return true; }
+function crRate(S) { return x5On(S) ? (1 + L10(1 + S.ult.rf.PPt)) * Math.pow(1.4, crLv(S, 's')) / 3600 : 0; } // 每秒
+function shapeSig(S) { const u = S.ult, part = (f, n, pw) => { const t = []; for (let i = 0; i < n; i++) { const s = f.s[i]; if (!s || !s.v) continue; if (t.length) t.push(f.j[i - 1] === '×' ? '·' : '+'); t.push(s.v + (pw(s.p) > 1 ? '^' + pw(s.p) : '')); } return t.join(''); };
+  return part(u.f, u.slots, p => uPow(S, p)) + (oOn(S) ? ' ‖ ' + part(u.o.f, u.o.slots, p => oPow(S, p)) : ''); }
+function arArchive(S, best) { if (!x5On(S) && best < 100000) return; const ar = S.ult.rf.ar; const k = shapeSig(S); if (!(ar[k] >= best)) ar[k] = best;
+  const ks = Object.keys(ar); if (ks.length > 30) { ks.sort((a, b) => ar[a] - ar[b]); delete ar[ks[0]]; } }
+function arSum(S) { const ar = S.ult.rf.ar; let s = 0; for (const k in ar) if (ar[k] >= 100000) s += L10(ar[k]); return s; }
+function arMult(S) { return 1 + 0.03 * arSum(S) * Math.pow(1.15, crLv(S, 'r')); }
+
 /* ===================== v1.4.3 · 重构（终极阶段的第一个重置层） ===================== */
 const RFUP = [
   { id: 'g1', c: 1, n: '增长 I', d: '所有变量的增长 ×3', br: '增长' },
@@ -1405,38 +1441,43 @@ const RFUP = [
   { id: 'st3', c: 300, n: '高处起笔', d: '重构后从 1e5000 终极点开始', br: '结构', pre: 'st2' },
   { id: 'd4', c: 450, n: '低阻 IV', d: '外层演算阻力再 ÷2', br: '低阻', pre: 'd3' },
   { id: 'g4', c: 700, n: '增长 IV', d: '所有变量的增长 ×6', br: '增长', pre: 'g3' },
-  { id: 'omega', c: 1200, n: '终式', d: '外层变量增长再 ×3，外层演算阻力再 ÷2', br: '自动', pre: 'res' },
+  { id: 'omega', c: 1200, n: '终式', d: '外层变量增长再 ×3，外层演算阻力再 ÷2；解锁无尽范式升级', br: '自动', pre: 'res' },
+  { id: 'st4', c: 15000, n: '超越起笔', d: '重构后从 1e20000 终极点开始', br: '结构', pre: 'st3' },
+  { id: 'ep', c: 40000, n: '第五个外层变量', d: '解锁外层变量 𝜀', br: '结构', pre: 'e6' },
 ];
 const RFM = {}; RFUP.forEach(x => RFM[x.id] = x);
-const RFMS = [[1, '解锁范式树；重构时保留 20% 的变量等级'], [5, '重构时保留 35% 的变量等级；自动购买外层积木'], [10, '范式点获取 ×2'], [20, '重构时保留 50% 的变量等级'], [40, '范式点获取再 ×2']];
-function rfNew() { return { n: 0, PP: 0, PPt: 0, up: {}, Ur: NI, auto: 0, am: '2', last: 0 }; }
+const RFMS = [[1, '解锁范式树；重构时保留 20% 的变量等级'], [5, '重构时保留 35% 的变量等级；自动购买外层积木'], [10, '范式点获取 ×2'], [20, '重构时保留 50% 的变量等级'], [40, '范式点获取再 ×2'], [60, '重构时保留 70% 的变量等级'], [100, '范式点获取再 ×3'], [150, '自动购买无尽范式升级']];
+function rfNew() { return { n: 0, PP: 0, PPt: 0, up: {}, Ur: NI, auto: 0, am: '2', last: 0, rep: {}, ar: {}, cr: { n: 0, t: 0, lv: {} } }; }
 function rfu(S, id) { return !!(S.ult && S.ult.rf && S.ult.rf.up[id]); }
 function rfOn(S) { return !!(S.ult && S.ult.on && (S.ult.Ub >= 4000 || S.ult.rf.n > 0)); }
-function rfGrowMult(S) { return (rfu(S, 'g1') ? 3 : 1) * (rfu(S, 'g2') ? 4 : 1) * (rfu(S, 'g3') ? 5 : 1) * (rfu(S, 'g4') ? 6 : 1); }
-function rfDragMult(S) { return (rfu(S, 'd1') ? 3 : 1) * (rfu(S, 'd2') ? 3 : 1) * (rfu(S, 'd3') ? 3 : 1) * (rfu(S, 'd4') ? 2 : 1) * (rfu(S, 'omega') ? 2 : 1); }
-function rfOuterMult(S) { return (rfu(S, 'res') ? 1 + 0.5 * L10(1 + S.ult.rf.PPt) : 1) * (rfu(S, 'omega') ? 3 : 1); }
-function rfStart(S) { return rfu(S, 'st3') ? 5000 : rfu(S, 'st2') ? 2500 : rfu(S, 'st1') ? 1000 : 100; }
-function ppMult(S) { const n = S.ult.rf.n; return (n >= 10 ? 2 : 1) * (n >= 40 ? 2 : 1); }
+function rfGrowMult(S) { if (!(S.ult && S.ult.rf)) return 1; return (rfu(S, 'g1') ? 3 : 1) * (rfu(S, 'g2') ? 4 : 1) * (rfu(S, 'g3') ? 5 : 1) * (rfu(S, 'g4') ? 6 : 1) * Math.pow(1.35, rfRepLv(S, 'rg')) * Math.pow(1.15, crLv(S, 'g')); }
+function rfDragMult(S) { return (rfu(S, 'd1') ? 3 : 1) * (rfu(S, 'd2') ? 3 : 1) * (rfu(S, 'd3') ? 3 : 1) * (rfu(S, 'd4') ? 2 : 1) * (rfu(S, 'omega') ? 2 : 1) * Math.pow(1.3, rfRepLv(S, 'rd')) * Math.pow(1.12, crLv(S, 'd')); }
+function rfOuterMult(S) { return (rfu(S, 'res') ? 1 + 0.5 * L10(1 + S.ult.rf.PPt) : 1) * (rfu(S, 'omega') ? 3 : 1) * arMult(S); }
+function rfStart(S) { return rfu(S, 'st4') ? 20000 : rfu(S, 'st3') ? 5000 : rfu(S, 'st2') ? 2500 : rfu(S, 'st1') ? 1000 : 100; }
+function ppMult(S) { const n = S.ult.rf.n; return (n >= 10 ? 2 : 1) * (n >= 40 ? 2 : 1) * (n >= 100 ? 3 : 1) * Math.pow(1.25, rfRepLv(S, 'rp')) * Math.pow(1.15, crLv(S, 'p')); }
 function ppGain(S) { const r = S.ult.rf, U = Math.max(r.Ur, S.ult.U); if (!(U >= 4000)) return 0; return Math.floor(3 * Math.pow(U / 4000, 1.5) * ppMult(S)); }
 function canRefactor(S) { return rfOn(S) && ppGain(S) >= 1; }
 function doRefactor(S) {
   if (!canRefactor(S)) return 0; const u = S.ult, r = u.rf, g = ppGain(S); r.PP += g; r.PPt += g; r.n++; r.last = u.t;
-  const keep = r.n >= 20 ? 0.5 : r.n >= 5 ? 0.35 : 0.2;
+  arArchive(S, Math.max(r.Ur, u.U));
+  const keep = r.n >= 60 ? 0.7 : r.n >= 20 ? 0.5 : r.n >= 5 ? 0.35 : 0.2;
   UVK.forEach(v => { u.V[v] = 0; u.lv[v] = u.unl[v] ? Math.max(v === 'x' ? 1 : 0, Math.floor(u.lv[v] * keep)) : 0; });
   OVK.forEach(v => { u.o.V[v] = 0; u.o.lv[v] = u.o.unl[v] ? Math.max(v === 'a' ? 1 : 0, Math.floor(u.o.lv[v] * keep)) : 0; });
   u.U = rfStart(S); r.Ur = u.U; recalcUlt(S); return g;
 }
 function rfCan(S, id) { const x = RFM[id], r = S.ult.rf; return !!x && rfOn(S) && r.n >= 1 && !r.up[id] && r.PP >= x.c && (!x.pre || r.up[x.pre]); }
-function rfBuy(S, id) { if (!rfCan(S, id)) return false; S.ult.rf.PP -= RFM[id].c; S.ult.rf.up[id] = 1; if (id === 'dl') S.ult.o.unl.d = 1; return true; }
-function rfStep(S) { const u = S.ult, r = u.rf; if (u.U > r.Ur) r.Ur = u.U;
+function rfBuy(S, id) { if (!rfCan(S, id)) return false; S.ult.rf.PP -= RFM[id].c; S.ult.rf.up[id] = 1; if (id === 'dl') S.ult.o.unl.d = 1; if (id === 'ep') S.ult.o.unl.e = 1; return true; }
+function rfStep(S, dt) { const u = S.ult, r = u.rf; if (u.U > r.Ur) r.Ur = u.U;
+  if (x5On(S) && dt) { const g = crRate(S) * dt; r.cr.n += g; r.cr.t += g; }
+  if (r.n >= 150 && r.up.omega) for (let k = 0; k < 10; k++) { let b = null; RFREP.forEach(x => { if (!b || rfRepCost(x, rfRepLv(S, x.id)) < rfRepCost(b, rfRepLv(S, b.id))) b = x; }); if (!b || !rfRepBuy(S, b.id)) break; }
   if (r.n >= 5 && oOn(S)) for (let k = 0; k < 4; k++) { let best = null, bc = Infinity; Object.keys(OTMAX).forEach(t => { if (t === 'e6' && !rfu(S, 'e6')) return; const c = oTokCost(S, t); if (c < bc && (t === 'slots' ? u.o.slots : u.o[t]) < OTMAX[t]) { bc = c; best = t; } }); if (!best || bc > u.U - 0.5) break; oBuyTok(S, best); }
   if (rfu(S, 'au') && r.auto && canRefactor(S)) { const m = parseFloat(r.am) || 2; if (ppGain(S) >= Math.max(1, r.PP * m) || (r.PPt === 0 && ppGain(S) >= 1)) doRefactor(S); }
 }
 
 /* ===================== v1.4.1 · 嵌套（外层公式） ===================== */
-const OV = { a: { n: '𝛼', g: 1.0, c0: 100, a: 6, un: 0 }, b: { n: '𝛽', g: 1.7, c0: 260, a: 16, un: 240 }, g: { n: '𝛾', g: 2.8, c0: 900, a: 50, un: 850 }, d: { n: '𝛿', g: 4.6, c0: 3000, a: 150, un: Infinity } };
-const OVK = ['a', 'b', 'g', 'd'];
-const OTMAX = { mul: 4, e2: 2, e3: 2, e4: 2, e5: 2, e6: 2, slots: 6 };
+const OV = { a: { n: '𝛼', g: 1.0, c0: 100, a: 6, un: 0 }, b: { n: '𝛽', g: 1.7, c0: 260, a: 16, un: 240 }, g: { n: '𝛾', g: 2.8, c0: 900, a: 50, un: 850 }, d: { n: '𝛿', g: 4.6, c0: 3000, a: 150, un: Infinity }, e: { n: '𝜀', g: 7.5, c0: 1.2e6, a: 4e4, un: Infinity } };
+const OVK = ['a', 'b', 'g', 'd', 'e'];
+const OTMAX = { mul: 5, e2: 2, e3: 2, e4: 2, e5: 2, e6: 2, slots: 7 };
 const UMS2 = [[150, '一又二分之一古戈尔'], [200, '两百'], [300, '三百'], [500, '五百'], [750, '七百五十'], [1000, '一千个数量级'], [1500, '一千五'], [2000, '两千'], [3000, '三千'], [4000, '四千']];
 const UCX2 = [
   ['套娃', '外层公式里使用 𝑈', A => A.hasU],
@@ -1448,11 +1489,11 @@ const UCX2 = [
   ['双层平方', '内层与外层都使用了 ²', (A, S) => A.p2 >= 1 && G.uA && G.uA.p2 >= 1],
   ['无根之式', '外层公式里没有 𝑈，但仍然有效', A => A.items >= 2 && !A.hasU],
 ];
-function oNew() { return { slots: 2, mul: 0, e2: 0, e3: 0, e4: 0, e5: 0, e6: 0, lv: { a: 1, b: 0, g: 0, d: 0 }, V: { a: 0, b: 0, g: 0, d: 0 }, unl: { a: 1 }, f: { s: [{ v: 'U', p: 1 }, { v: '', p: 1 }], j: ['+'] }, cx: {}, auto: 1 }; }
+function oNew() { return { slots: 2, mul: 0, e2: 0, e3: 0, e4: 0, e5: 0, e6: 0, lv: { a: 1, b: 0, g: 0, d: 0, e: 0 }, V: { a: 0, b: 0, g: 0, d: 0, e: 0 }, unl: { a: 1 }, f: { s: [{ v: 'U', p: 1 }, { v: '', p: 1 }], j: ['+'] }, cx: {}, auto: 1 }; }
 function oOn(S) { return !!(S.ult && S.ult.on && S.ult.up.nest); }
 function oPow(S, p) { return S.ult.up.tow2 ? (p === 4 ? 5 : p === 5 ? 6 : p) : p; }
 function oVarCost(v, L) { const q = OV[v]; return q.c0 + q.a * (Math.pow(1.2, L) - 1); }
-const OTC = { mul: [120, 450, 1600, 6000], e2: [110, 900], e3: [250, 1300], e4: [550, 2200], e5: [1200, 3200], e6: [5000, 12000], slots: [130, 500, 1400, 6000] };
+const OTC = { mul: [120, 450, 1600, 6000, 160000], e2: [110, 900], e3: [250, 1300], e4: [550, 2200], e5: [1200, 3200], e6: [5000, 12000], slots: [130, 500, 1400, 6000, 160000] };
 function oTokCost(S, k) { const o = S.ult.o, n = k === 'slots' ? o.slots - 2 : o[k], L = OTC[k]; return L && n < L.length ? L[n] : Infinity; }
 function oBuyTok(S, k) { const o = S.ult.o; if (!oOn(S) || OTMAX[k] === undefined || (k === 'slots' ? o.slots : o[k]) >= OTMAX[k] || (k === 'e6' && !rfu(S, 'e6'))) return false; const c = oTokCost(S, k); if (S.ult.U < c) return false; S.ult.U = ls(S.ult.U, c); o[k]++; if (k === 'slots') { o.f.s.push({ v: '', p: 1 }); o.f.j.push('+'); } return true; }
 function oBuyVar(S, v) { const o = S.ult.o; if (!oOn(S) || !o.unl[v]) return false; const c = oVarCost(v, o.lv[v]); if (S.ult.U < c) return false; S.ult.U = ls(S.ult.U, c); o.lv[v]++; return true; }
@@ -1461,7 +1502,8 @@ function oSetSlot(S, i, v, p) { const o = S.ult.o; if (i < 0 || i >= o.slots) re
 function oSetJoint(S, i, j) { const o = S.ult.o; if (i < 0 || i >= o.slots - 1) return; o.f.j[i] = j === '×' ? '×' : '+'; }
 function oMsN(S) { return UMS2.filter(m => S.ult.Ub >= m[0]).length; }
 function oGrow(S, v) { const o = S.ult.o, u = S.ult; if (!o.unl[v]) return 0; return K.oG * OV[v].g * o.lv[v] * rfGrowMult(S) * rfOuterMult(S) * (u.up.ores ? 1.25 : 1) * (u.up.ores2 ? 1.25 : 1) * (u.up.axiom ? 2 : 1) * Math.pow(1.1, oMsN(S)) * Math.pow(1.15, Object.keys(o.cx).length); }
-function oDrag(S) { return 1 + Math.max(0, S.ult.U) / (K.oD * rfDragMult(S)); }
+function deepDrag(S) { const U = Math.max(0, S.ult.U); return U > 1e5 ? Math.pow(U / 1e5, K.dpK) : 1; } // v1.4.4：ee5 之后的深层阻力
+function oDrag(S) { return 1 + Math.max(0, S.ult.U) / (K.oD * rfDragMult(S)) * deepDrag(S); }
 function oAnalyze(S) {
   const o = S.ult.o, f = o.f, A = { items: 0, groups: 0, muls: 0, p2: 0, hasU: false, uPow: 0, maxN: 0, err: '', groupsArr: [] }, cnt = { 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 }; let cur = null;
   for (let i = 0; i < o.slots; i++) { const s = f.s[i]; if (!s || !s.v) continue; const joint = A.items ? (f.j[i - 1] || '+') : null; A.items++;
@@ -1477,7 +1519,7 @@ function oAnalyze(S) {
 function oCheckCodex(S) { const A = G.oA; if (!A || A.err || !A.items) return []; const got = []; UCX2.forEach((c, i) => { if (!S.ult.o.cx[i] && c[2](A, S)) { S.ult.o.cx[i] = 1; got.push(c[0]); } }); return got; }
 
 /* ===================== v1.4.0 · 递归（无限续章） ===================== */
-const ULT_ACH = new Set(['重构', '十次重构', '第四个变量', '1e10000 终极点', '1e20000 终极点', '1e50000 终极点', '1e100000 终极点', '范式', '范式转移', '终极', '第一块积木', '收藏家', '形状大全', '1e10 终极点', '1e50 终极点', '终极古戈尔', '嵌套', '套娃', '指数之上', '1e200 终极点', '1e500 终极点', '1e1000 终极点', '1e2000 终极点', '1e4000 终极点', '双层收藏家', '双层大全', '终极灵光']);
+const ULT_ACH = new Set(['ee6 终极点', 'ee7 终极点', '档案员', '馆长', '晶体', '第五个变量', '百次重构', '重构', '十次重构', '第四个变量', '1e10000 终极点', '1e20000 终极点', '1e50000 终极点', '1e100000 终极点', '范式', '范式转移', '终极', '第一块积木', '收藏家', '形状大全', '1e10 终极点', '1e50 终极点', '终极古戈尔', '嵌套', '套娃', '指数之上', '1e200 终极点', '1e500 终极点', '1e1000 终极点', '1e2000 终极点', '1e4000 终极点', '双层收藏家', '双层大全', '终极灵光']);
 const RCMAX = 10;
 function rcOn(S) { return !!(S.inf && S.inf.brk && (S.inf.best || 0) >= 1000); }
 function rcCost(L) { return 1e8 * Math.pow(30, L); }
@@ -1534,7 +1576,7 @@ function uNew() { return { on: 0, U: NI, Ut: NI, Ub: NI, t: 0, at: 0, V: { x: 0,
 function uVarLog(S, v) { return S.ult.V[v] || 0; }
 function uGrow(S, v) { const u = S.ult; if (!u.unl[v]) return 0; return K.uG * UV[v].g * u.lv[v] * rfGrowMult(S) * (u.up.r1 ? 1.15 : 1) * (u.up.r2 ? 1.15 : 1); } // 每天增长的数量级
 function uBoost(S) { return 1 + 4 * Math.max(0, 1 - Math.max(0, S.ult.U) / 20); } // 起步加速：随终极点增长而消失
-function uDrag(S) { const U = Math.max(0, S.ult.U); return (1 + (S.ult.up.deep ? Math.min(U, 100) : U) / K.uD) / uBoost(S); }
+function uDrag(S) { const U = Math.max(0, S.ult.U); return (1 + (S.ult.up.deep ? Math.min(U, 100) : U) / K.uD) / uBoost(S) * (U > 1e5 ? (1 + (U - 1e5) / (K.oD * rfDragMult(S))) * deepDrag(S) : 1); }
 function uConLog(S, c) { return L10(UCN[c].v) * (S.ult.up.cres ? 1 + Math.min(100, Math.max(0, S.ult.U)) / 25 : 1); }
 function uVarCost(v, L) { const q = UV[v]; return q.c0 + q.a * (Math.pow(K.uQ, L) - 1); }
 const UTMAX = { mul: 6, p2: 4, p3: 4 };
@@ -1582,13 +1624,20 @@ function uBuyUp(S, id) { const u = S.ult, x = UUM[id]; if (!x || u.up[id] || u.U
 function uSetSlot(S, i, v, p) { const f = S.ult.f; if (i < 0 || i >= S.ult.slots) return; f.s[i] = { v: v || '', p: p || 1 }; }
 function uSetJoint(S, i, j) { const f = S.ult.f; if (i < 0 || i >= S.ult.slots - 1) return; f.j[i] = j === '×' ? '×' : '+'; }
 function stepUlt(S, dt) {
-  const u = S.ult; u.t += dt; const dr = uDrag(S); UVK.forEach(v => { if (u.unl[v]) u.V[v] += uGrow(S, v) * dt / 86400 / dr; });
-  if (oOn(S)) { const od = oDrag(S); OVK.forEach(v => { if (u.o.unl[v]) u.o.V[v] += oGrow(S, v) * dt / 86400 / od; });
+  const u = S.ult; u.t += dt;
+  // 自适应子步：变量一步内的增长超过当前数量级的 5% 时拆分，保证离线与大步长的精度
+  const growth = () => { let g = 0; const dr = uDrag(S); UVK.forEach(v => { if (u.unl[v]) g += uGrow(S, v) / dr; }); if (oOn(S)) { const od = oDrag(S); OVK.forEach(v => { if (u.o.unl[v]) g += 6 * oGrow(S, v) / od; }); } return g / 86400; };
+  let rest = dt, guard = 0;
+  while (rest > 1e-9 && guard++ < 400) { const g = growth(), lim = 0.05 * Math.max(100, u.U), h = g * rest > lim ? Math.max(rest / (400 - guard + 1), lim / g) : rest;
+    const dr = uDrag(S); UVK.forEach(v => { if (u.unl[v]) u.V[v] += uGrow(S, v) * h / 86400 / dr; });
+    if (oOn(S)) { const od = oDrag(S); OVK.forEach(v => { if (u.o.unl[v]) u.o.V[v] += oGrow(S, v) * h / 86400 / od; }); }
+    recalcUlt(S); if (G.uR !== NI && rest > h) { const gg = G.uR + L10(h); u.U = la(u.U, gg); u.Ut = la(u.Ut, gg); if (u.U > u.Ub) u.Ub = u.U; } rest -= h; if (rest <= h * 1e-9) break; }
+  if (oOn(S)) {
     if (u.up.oauto && u.o.auto) for (let k = 0; k < 40; k++) { let best = null; OVK.forEach(v => { if (u.o.unl[v] && (!best || oVarCost(v, u.o.lv[v]) < oVarCost(best, u.o.lv[best]))) best = v; }); if (!best || oVarCost(best, u.o.lv[best]) > u.U - 0.3) break; oBuyVar(S, best); } }
   recalcUlt(S);
   if (G.uR !== NI) { const g = G.uR + L10(dt); u.U = la(u.U, g); u.Ut = la(u.Ut, g); if (u.U > u.Ub) u.Ub = u.U; }
   if (u.up.auto && u.auto) { for (let k = 0; k < 40; k++) { let best = null; UVK.forEach(v => { if (u.unl[v] && (!best || uVarCost(v, u.lv[v]) < uVarCost(best, u.lv[best]))) best = v; }); if (!best || uVarCost(best, u.lv[best]) > u.U - 0.3) break; uBuyVar(S, best); } }
-  rfStep(S); recalcUlt(S);
+  rfStep(S, dt); recalcUlt(S);
   const got = uCheckCodex(S).concat(oOn(S) ? oCheckCodex(S).map(n => '外层·' + n) : []); if (got.length) { u.nw = (u.nw || []).concat(got); } return got;
 }
 
@@ -2142,7 +2191,7 @@ function deserialize(str) {
 function encodeSave(S) { const s = serialize(S); return typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(s))) : Buffer.from(s).toString('base64'); }
 function decodeSave(b) { const s = typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(b.trim()))) : Buffer.from(b, 'base64').toString(); return deserialize(s); }
 
-if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, CAPP, XCAP, XMAX, IUP, IUM, iu, infAt, infCharge, infNeed, ipMult, ipGain, canInf, doInf, iuCan, iuBuy, beCost, beBuy, beSpeed, ptsX, fmtX, ptsFmt, RCMAX, rcOn, rcCost, rcBuy, rcRate, canUlt, doUlt, UV, UVK, UCN, UUP, UUM, UMS, UCX, uNew, RFUP, RFM, RFMS, rfNew, rfu, rfOn, rfGrowMult, rfDragMult, rfOuterMult, rfStart, ppMult, ppGain, canRefactor, doRefactor, rfCan, rfBuy, rfStep, ULT_ACH, OV, OVK, OTMAX, OTC, UMS2, UCX2, oNew, oOn, oPow, oVarCost, oTokCost, oBuyTok, oBuyVar, oUnlockVar, oSetSlot, oSetJoint, oMsN, oGrow, oDrag, oAnalyze, oCheckCodex, uVarLog, uGrow, uDrag, uBoost, uConLog, uVarCost, UTMAX, uMulCost, uSlotCost, uP2Cost, uP3Cost, uPow, uAnalyze, recalcUlt, uCheckCodex, uBuyVar, uUnlockVar, uBuyTok, uBuyUp, uSetSlot, uSetJoint, stepUlt, GEN, IMS, BUP, BUM, bu, im, genOn, genCost, genMult, genBuy, powEff, buCan, buBuy, repCost, repBuy, beyS, beyV, sanitize, spCostS, CLS, CLSM, SPATH, SPM, RSHOP, RSHM, GWN, GWE, XP13, CM, bhOn, rec, xpOn, reqOk, spCost, spSpent, spCanBuy, spBuy, spSwitch, rsLv, rsCost, rsBuy, gwCount, bhTau, siMult, radRate, gwSpeed, bhBeta, bhQ, bhMu, bhAl, colX, colGain, canCollapse, doCollapse, bhMeff, frMax, TWN, TWD, twSpeed, twFloorTime, twAdvance, twSprint, twClimb, FZP, fzDeal, fzTap, aleph7, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
+if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, CAPP, XCAP, XMAX, IUP, IUM, iu, infAt, infCharge, infNeed, ipMult, ipGain, canInf, doInf, iuCan, iuBuy, beCost, beBuy, beSpeed, ptsX, fmtX, ptsFmt, RCMAX, rcOn, rcCost, rcBuy, rcRate, canUlt, doUlt, UV, UVK, UCN, UUP, UUM, UMS, UCX, uNew, deepDrag, RFREP, CRUP, x5On, rfRepCost, rfRepLv, rfRepBuy, crLv, crCost, crBuy, crRate, shapeSig, arArchive, arSum, arMult, RFUP, RFM, RFMS, rfNew, rfu, rfOn, rfGrowMult, rfDragMult, rfOuterMult, rfStart, ppMult, ppGain, canRefactor, doRefactor, rfCan, rfBuy, rfStep, ULT_ACH, OV, OVK, OTMAX, OTC, UMS2, UCX2, oNew, oOn, oPow, oVarCost, oTokCost, oBuyTok, oBuyVar, oUnlockVar, oSetSlot, oSetJoint, oMsN, oGrow, oDrag, oAnalyze, oCheckCodex, uVarLog, uGrow, uDrag, uBoost, uConLog, uVarCost, UTMAX, uMulCost, uSlotCost, uP2Cost, uP3Cost, uPow, uAnalyze, recalcUlt, uCheckCodex, uBuyVar, uUnlockVar, uBuyTok, uBuyUp, uSetSlot, uSetJoint, stepUlt, GEN, IMS, BUP, BUM, bu, im, genOn, genCost, genMult, genBuy, powEff, buCan, buBuy, repCost, repBuy, beyS, beyV, sanitize, spCostS, CLS, CLSM, SPATH, SPM, RSHOP, RSHM, GWN, GWE, XP13, CM, bhOn, rec, xpOn, reqOk, spCost, spSpent, spCanBuy, spBuy, spSwitch, rsLv, rsCost, rsBuy, gwCount, bhTau, siMult, radRate, gwSpeed, bhBeta, bhQ, bhMu, bhAl, colX, colGain, canCollapse, doCollapse, bhMeff, frMax, TWN, TWD, twSpeed, twFloorTime, twAdvance, twSprint, twClimb, FZP, fzDeal, fzTap, aleph7, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
 
 /* ===================== 公式晋升 v1.0.0 · 界面（前端） ===================== */
 const SAVE_KEY = 'formula-ascend-save-v1';
@@ -2298,6 +2347,7 @@ const NEWS = [
   { k: 'deep', c: () => S.tier >= 7 && G.sc, t: '深空', b: '<p>你的产量越过了 <b>ee8</b>。在这片深空里，数量级的增长会被稀释：超过 ee8 的部分按平方根计算。</p><p>进度不会停下，只是每一步都更费力。未来版本的新玩法，会带你走得更远。</p>' },
   { k: 'rc1', c: () => rcOn(S), t: '递归', b: '<p>你越过了 <b>ee1000</b>。从现在起，超越会像复利一样<b>按比例</b>增长——无论点数是否停在上限。</p><p>用无限点提升<b>递归层级</b>。抵达 <b>ee10000</b> 时，最后的重置层将会开启。</p>' },
   { k: 'ult0', c: () => canUlt(S), t: 'ee10000', b: '<p>点数达到了 <b>ee10000</b>。在「无限」页或下方的按钮中，可以进行<b>终极</b>。</p><p>终极之后，之前的一切都会被隐藏。你将只剩下 100 终极点——和一张空白的构造台。</p>' },
+  { k: 'x5', c: () => x5On(S), t: 'ee5', b: '<p>终极点达到了 <b>ee5</b>——1 后面跟着十万个零。从这里开始，<b>深层阻力</b>会让每一个新的数量级更难到达。</p><p>两样新东西永远不会被重构清空：<b>公式档案馆</b>收录你每一轮用过的公式形状，形状越多、成绩越好，外层增长越快；<b>时间晶体</b>随真实时间慢慢凝结，可以在晶格中强化一切。</p><p>买下「终式」后，范式树还会出现没有上限的<b>无尽范式</b>。</p>' },
   { k: 'rf1', c: () => rfOn(S), t: '重构', b: '<p>终极点达到了 <b>1e4000</b>。现在可以<b>重构</b>：重置终极点与变量，换取永久的<b>范式点</b>。</p><p>积木、升级、图鉴和公式的结构都会保留，重构后的每一轮都会比上一轮快得多。用范式点在<b>范式树</b>里强化增长、削减阻力，解锁第四个外层变量 𝛿 与 ⁶ 积木。</p>' },
   { k: 'nest1', c: () => oOn(S), t: '嵌套', b: '<p>公式里，可以再放一个公式。</p><p><b>外层公式</b>里有一块特别的积木 <b>𝑈</b>：它的值就是你整个内层公式的值。给 𝑈 加上 ⁴、⁵ 这样的指数，整个内层都会被放大；外层还有自己的变量 𝛼、𝛽、𝛾，它们受到的演算阻力更小。</p><p>两层一起搭：内层负责喂养 𝑈，外层决定把它放大多少。</p>' },
   { k: 'ult1', c: () => !!S.ult.on, t: '终极 · 构造', b: '<p>这里没有旧的公式了。<b>你来写公式。</b></p><p>在<b>构造台</b>上，把变量、常数放进槽位，用 + 或 × 连接，再给它们加上指数。变量的值会随时间增长，公式把它们变成<b>终极点</b>。</p><p>在<b>积木商店</b>购买新的运算符号与槽位；在<b>图鉴</b>里收集不同形状的公式。</p>' },
@@ -2366,7 +2416,7 @@ function renderBarUlt() {
   $('statPoints').textContent = fmt(S.ult.U); $('statRate').textContent = fmt(G.uR); $('statInterval').textContent = '1 秒';
   const ks = document.querySelectorAll('.workspace-stats .k'); if (ks[0]) ks[0].textContent = '终极点'; if (ks[1]) ks[1].textContent = '每秒终极点'; if (ks[2]) ks[2].textContent = '结算间隔';
   const html = `<div class="cur"><div class="k">终极点</div><div class="v num">${fmt(S.ult.U)}</div><div class="s">累计 ${fmt(S.ult.Ut)} · 图鉴 ${Object.keys(S.ult.cx).length} / ${UCX.length}</div></div>`;
-  const html2 = html + (rfOn(S) ? `<div class="cur"><div class="k">范式点</div><div class="v num">${fmtBig(S.ult.rf.PP)}</div><div class="s">累计 ${fmtBig(S.ult.rf.PPt)} · 重构 ${S.ult.rf.n} 次</div></div>` : '');
+  const html2 = html + (x5On(S) ? `<div class="cur"><div class="k">时间晶体</div><div class="v num">${fmtBig(S.ult.rf.cr.n)}</div><div class="s">每小时 +${fx(crRate(S) * 3600, 2)} · 档案馆 ×${fx(arMult(S), 3)}</div></div>` : '') + (rfOn(S) ? `<div class="cur"><div class="k">范式点</div><div class="v num">${fmtBig(S.ult.rf.PP)}</div><div class="s">累计 ${fmtBig(S.ult.rf.PPt)} · 重构 ${S.ult.rf.n} 次</div></div>` : '');
   if ($('curs').innerHTML !== html2) $('curs').innerHTML = html2;
   renderActions($('acts'), rfOn(S) ? [['urf', '重构', () => canRefactor(S), () => canRefactor(S) ? '+' + fmtBig(ppGain(S)) + ' 范式点' : '需要 1e4000 终极点', 'cy']] : []);
   renderActions($('workspaceActions'), [['tab:ub', '构造台', () => true, () => G.uA && G.uA.err ? '公式无效' : '每秒 ' + fmt(G.uR) + ' 终极点', 'cy'], ['tab:ush', '积木商店', () => true, () => '拥有 ' + fmt(S.ult.U) + ' 终极点', 'go']].concat(rfOn(S) ? [['urf', '重构', () => canRefactor(S), () => canRefactor(S) ? '+' + fmtBig(ppGain(S)) + ' 范式点' : '需要 1e4000 终极点', 'cy']] : []));
@@ -2427,6 +2477,7 @@ const TABS = [
   { id: 'ush', n: '积木商店', on: () => !!S.ult.on, dot: () => uShopCan() },
   { id: 'ucx', n: '图鉴', on: () => !!S.ult.on },
   { id: 'urf', n: '重构', on: () => rfOn(S), dot: () => canRefactor(S) || RFUP.some(x => rfCan(S, x.id)) },
+  { id: 'uar', n: '档案馆', on: () => x5On(S), dot: () => CRUP.some(x => S.ult.rf.cr.n >= crCost(x, crLv(S, x.id))) },
   { id: 'inf', n: '无限', on: infShown, dot: () => canInf(S) || IUP.some(x => iuCan(S, x.id)) || BUP.some(x => buCan(S, x.id)) },
   { id: 'col', n: '坍缩', on: () => S.tier >= 7 && (S.P >= 1e8 || bhOn(S)), dot: () => canCollapse(S) },
   { id: 'sp', n: '星路', on: () => bhOn(S), dot: () => spCanBuy(S) },
@@ -2445,8 +2496,8 @@ const TABS = [
   { id: 'opt', n: '设置', on: () => true },
 ];
 function treeCan(L) { const arr = LAYER[L].tree, have = curGet(S, LAYER[L].cur); return arr.some(x => upgState(S, x) === 'ok' && have >= x.c); }
-const ULT_TABS = new Set(['ub', 'ush', 'ucx', 'urf', 'ach', 'stat', 'opt']);
-const NAV_SYMBOL = { urf: '↺', ub: '∮', ush: '⊞', ucx: '❖', factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', fr: '△', mp: 'M', col: '⊙', inf: '∞', sp: '✴', rs: '☀', gw: '∿', tw: 'ℵ', fz: '∏', tr: 'Ω', om: 'ω', acad: '∑', lm: '⊕', gc: '◇', ex: '↗', sw: '✧', g24: '24', ng: '▤', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
+const ULT_TABS = new Set(['ub', 'ush', 'ucx', 'urf', 'uar', 'ach', 'stat', 'opt']);
+const NAV_SYMBOL = { uar: '✦', urf: '↺', ub: '∮', ush: '⊞', ucx: '❖', factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', fr: '△', mp: 'M', col: '⊙', inf: '∞', sp: '✴', rs: '☀', gw: '∿', tw: 'ℵ', fz: '∏', tr: 'Ω', om: 'ω', acad: '∑', lm: '⊕', gc: '◇', ex: '↗', sw: '✧', g24: '24', ng: '▤', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
 let navKey = '', shownTab = '', pendingNav = false;
 function revealTab() {
   const tabs = $('tabs'), selected = tabs.querySelector('.on');
@@ -2489,7 +2540,7 @@ function scrollToView() {
 
 /* ---------------- 视图 ---------------- */
 function sigOf() {
-  return [view === 'lm' ? JSON.stringify(S.lm.g) + lmSel : view === 'gc' ? JSON.stringify(S.gc) + gcSel.c + gcSel.g : view === 'ex' ? JSON.stringify(exPick) + S.ex.act.length + S.ex.n : view === 'sw' ? Object.keys(S.sw).length + swSel : view === 'g24' ? S.g24.h.join() + JSON.stringify(g24ui.cards) + g24ui.sel + g24ui.op + (S.g24.ch >= 1) : view === 'ng' ? ngSel + JSON.stringify(S.ng[ngSel] || []) : view === 'ub' ? JSON.stringify(S.ult.f) + JSON.stringify(S.ult.o.f) + (S.ult.o.sel || 0) + oOn(S) + OVK.map(v => S.ult.o.unl[v] ? 1 : 0).join('') + [S.ult.o.mul, S.ult.o.e2, S.ult.o.e3, S.ult.o.e4, S.ult.o.e5, S.ult.o.e6, S.ult.o.slots].join() + !!S.ult.up.oauto + JSON.stringify(S.ult.f) + S.ult.slots + (S.ult.sel || 0) + UVK.map(v => (S.ult.unl[v] ? 1 : 0)).join('') + S.ult.mul + S.ult.p2 + S.ult.p3 + Object.keys(S.ult.cn).join() + !!S.ult.up.auto : view === 'urf' ? [S.ult.rf.n, Object.keys(S.ult.rf.up).join(''), RFUP.map(x => rfCan(S, x.id) ? 1 : 0).join(''), rfu(S, 'au'), canRefactor(S)].join() : view === 'ush' ? [S.ult.o.mul, S.ult.o.e2, S.ult.o.e3, S.ult.o.e4, S.ult.o.e5, S.ult.o.e6, rfu(S, 'e6'), S.ult.o.slots, oMsN(S), oOn(S)].join() + [S.ult.mul, S.ult.p2, S.ult.p3, S.ult.slots].join() + Object.keys(S.ult.cn).join() + Object.keys(S.ult.up).join() + UMS.filter(m => S.ult.Ub >= m[0]).length : view === 'ucx' ? Object.keys(S.ult.cx).join() + '|' + Object.keys(S.ult.o.cx).join() + oOn(S) : view === 'inf' ? rcOn(S) + '' + canUlt(S) + Object.keys(S.inf.u).join() + S.inf.brk + IUP.map(x => iuCan(S, x.id) ? 1 : 0).join('') + Object.keys(S.inf.bu).join() + BUP.map(x => buCan(S, x.id) ? 1 : 0).join('') + genOn(S) + im(S, 25) + IMS.filter(m => S.inf.n >= m[0]).length : view === 'col' ? S.bh.col + ':' + (rsLv(S, 'auto') >= 1) : view === 'sp' ? S.bh.path + S.bh.k + JSON.stringify(S.bh.rec) + spCanBuy(S) : view === 'rs' ? JSON.stringify(S.bh.rs) : view === 'gw' ? S.bh.gw + '' : view === 'tw' ? Math.floor(S.tw.f / 1) + '' : view === 'fz' ? S.fz.cur + ':' + S.fz.fs.length + ':' + (S.fz.ch >= 1) + fzShake : view === 'fr' ? JSON.stringify(S.fr) + !!S.res.done.s37 : view === 'mp' ? S.mp.n + '/' + S.mp.L : '', S.chap, S.trTot >= 1, S.trTot >= 5, Object.keys(S.ac.got).length, S.ac.seat.join(), acSeats(S), view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
+  return [view === 'lm' ? JSON.stringify(S.lm.g) + lmSel : view === 'gc' ? JSON.stringify(S.gc) + gcSel.c + gcSel.g : view === 'ex' ? JSON.stringify(exPick) + S.ex.act.length + S.ex.n : view === 'sw' ? Object.keys(S.sw).length + swSel : view === 'g24' ? S.g24.h.join() + JSON.stringify(g24ui.cards) + g24ui.sel + g24ui.op + (S.g24.ch >= 1) : view === 'ng' ? ngSel + JSON.stringify(S.ng[ngSel] || []) : view === 'ub' ? JSON.stringify(S.ult.f) + JSON.stringify(S.ult.o.f) + (S.ult.o.sel || 0) + oOn(S) + OVK.map(v => S.ult.o.unl[v] ? 1 : 0).join('') + [S.ult.o.mul, S.ult.o.e2, S.ult.o.e3, S.ult.o.e4, S.ult.o.e5, S.ult.o.e6, S.ult.o.slots].join() + !!S.ult.up.oauto + JSON.stringify(S.ult.f) + S.ult.slots + (S.ult.sel || 0) + UVK.map(v => (S.ult.unl[v] ? 1 : 0)).join('') + S.ult.mul + S.ult.p2 + S.ult.p3 + Object.keys(S.ult.cn).join() + !!S.ult.up.auto : view === 'uar' ? Object.keys(S.ult.rf.ar).length + shapeSig(S) : view === 'urf' ? [S.ult.rf.n, !!S.ult.rf.up.omega, x5On(S), Object.keys(S.ult.rf.up).join(''), RFUP.map(x => rfCan(S, x.id) ? 1 : 0).join(''), rfu(S, 'au'), canRefactor(S)].join() : view === 'ush' ? [S.ult.o.mul, S.ult.o.e2, S.ult.o.e3, S.ult.o.e4, S.ult.o.e5, S.ult.o.e6, rfu(S, 'e6'), S.ult.o.slots, oMsN(S), oOn(S)].join() + [S.ult.mul, S.ult.p2, S.ult.p3, S.ult.slots].join() + Object.keys(S.ult.cn).join() + Object.keys(S.ult.up).join() + UMS.filter(m => S.ult.Ub >= m[0]).length : view === 'ucx' ? Object.keys(S.ult.cx).join() + '|' + Object.keys(S.ult.o.cx).join() + oOn(S) : view === 'inf' ? rcOn(S) + '' + canUlt(S) + Object.keys(S.inf.u).join() + S.inf.brk + IUP.map(x => iuCan(S, x.id) ? 1 : 0).join('') + Object.keys(S.inf.bu).join() + BUP.map(x => buCan(S, x.id) ? 1 : 0).join('') + genOn(S) + im(S, 25) + IMS.filter(m => S.inf.n >= m[0]).length : view === 'col' ? S.bh.col + ':' + (rsLv(S, 'auto') >= 1) : view === 'sp' ? S.bh.path + S.bh.k + JSON.stringify(S.bh.rec) + spCanBuy(S) : view === 'rs' ? JSON.stringify(S.bh.rs) : view === 'gw' ? S.bh.gw + '' : view === 'tw' ? Math.floor(S.tw.f / 1) + '' : view === 'fz' ? S.fz.cur + ':' + S.fz.fs.length + ':' + (S.fz.ch >= 1) + fzShake : view === 'fr' ? JSON.stringify(S.fr) + !!S.res.done.s37 : view === 'mp' ? S.mp.n + '/' + S.mp.L : '', S.chap, S.trTot >= 1, S.trTot >= 5, Object.keys(S.ac.got).length, S.ac.seat.join(), acSeats(S), view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
 }
 function B(key, fn) { binds.push([key, fn]); return `data-b="${key}"`; }
 function buildView() {
@@ -2918,7 +2969,7 @@ VIEWS.ub = () => {
     <div class="muted" ${B('oinv', () => '外层积木：× ' + o.mul + ' · ² ' + o.e2 + ' · ³ ' + o.e3 + ' · ⁴ ' + o.e4 + ' · ⁵ ' + o.e5 + (o.e6 ? ' · ⁶ ' + o.e6 : '') + ' · 槽位 ' + o.slots + (u.up.tow2 ? ' · 幂之塔 II 生效' : ''))}></div></div></div>`;
     h += `<div class="sec">外层变量<span class="h">外层的演算阻力更小：÷(1 + 终极点数量级 ÷ ${K.oD})</span></div><div class="grid">`;
     OVK.forEach(v => { const q = OV[v];
-      if (!o.unl[v] && !isFinite(q.un)) { h += `<div class="card dim"><div class="t"><span class="nm"><i>${q.n}</i></span><span class="pill">未解锁</span></div><div class="faint">需要范式升级「第四个外层变量」</div></div>`; return; }
+      if (!o.unl[v] && !isFinite(q.un)) { h += `<div class="card dim"><div class="t"><span class="nm"><i>${q.n}</i></span><span class="pill">未解锁</span></div><div class="faint">需要范式升级「${v === 'e' ? '第五个外层变量' : '第四个外层变量'}」</div></div>`; return; }
       if (!o.unl[v]) { h += `<div class="card dim"><div class="t"><span class="nm"><i>${q.n}</i></span><span class="pill">未解锁</span></div><div class="row"><button class="btn sm" data-a="ovu:${v}" ${B('ovu_' + v, () => { const can = u.U >= q.un; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '解锁 · ' + fmt(q.un) + ' 终极点' }; })}></button></div></div>`; return; }
       h += `<div class="card"><div class="t"><span class="nm"><i>${q.n}</i></span><span class="pill" ${B('ovl_' + v, () => '等级 ' + o.lv[v])}></span></div><div class="fm" ${B('ovv_' + v, () => '值 ' + fmt(o.V[v]))}></div><div class="muted" ${B('ovg_' + v, () => '每天增长 ' + fx(oGrow(S, v) / oDrag(S), 3) + ' 个数量级')}></div>
       <div class="row"><button class="btn sm" data-a="ovb:${v}" ${B('ovb_' + v, () => { const c = oVarCost(v, o.lv[v]), can = u.U >= c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '升级 · ' + fmt(c) + ' 终极点' }; })}></button></div></div>`; });
@@ -2955,6 +3006,22 @@ VIEWS.urf = () => {
     h += `<div class="sec">范式树<span class="h">四条分支；带「需要」的升级要先买下前一个</span></div><div class="grid rfgrid">${br.map(b => `<div class="card"><div class="nm">${b}</div>${RFUP.filter(x => x.br === b).map(x => { const got = !!r.up[x.id], can = rfCan(S, x.id);
       return `<div class="rfn ${got ? 'own' : can ? 'can' : ''}"><div class="t"><span class="nm">${x.n}</span>${got ? '<span class="pill ok">已获得</span>' : `<span class="pill">${fmtBig(x.c)} 范式点</span>`}</div><div class="ds">${x.d}${x.pre && !got ? '；需要「' + RFM[x.pre].n + '」' : ''}</div>${got ? '' : `<div class="row"><button class="btn sm ${can ? 'go' : ''}" data-a="rfu:${x.id}" ${can ? '' : 'disabled'}>获得</button></div>`}</div>`; }).join('')}</div>`).join('')}</div>`; }
   else h += `<p class="note">完成第一次重构后解锁范式树。</p>`;
+  if (r.up.omega) h += `<div class="sec">无尽范式<span class="h">买下「终式」后解锁，没有上限</span></div><div class="grid">${RFREP.map(x => `<div class="card"><div class="t"><span class="nm">${x.n}</span><span class="pill" ${B('rpl_' + x.id, () => rfRepLv(S, x.id) + ' 级')}></span></div><div class="ds">${x.d}</div><div class="row"><button class="btn sm" data-a="rfr:${x.id}" ${B('rpb_' + x.id, () => { const c = rfRepCost(x, rfRepLv(S, x.id)), can = r.PP >= c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '升级 · ' + fmtBig(c) + ' 范式点' }; })}></button></div></div>`).join('')}</div>`;
+  if (x5On(S)) h += `<p class="note" ${B('rfdeep', () => '深层阻力：终极点超过 ee5 后，所有变量的演算阻力额外 ×(终极点数量级 ÷ 100000)^' + K.dpK + '，当前 ×' + fx(deepDrag(S), 3))}></p>`;
+  return h;
+};
+function prettySig(k) { const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹', IN = { x: '𝑥', y: '𝑦', z: '𝑧', w: '𝑤', pi: 'π', e: '𝑒', phi: 'φ' }, OUT = { U: '𝑈', a: '𝛼', b: '𝛽', g: '𝛾', d: '𝛿', e: '𝜀' };
+  return k.split(' ‖ ').map((part, li) => part.replace(/([A-Za-z]+)(\^(\d+))?/g, (m, nm, _, p) => ((li ? OUT : IN)[nm] || nm) + (p ? p.split('').map(c => SUP[+c]).join('') : ''))).join('  ‖  '); }
+VIEWS.uar = () => {
+  const r = S.ult.rf, ar = r.ar, cur = shapeSig(S), keys = Object.keys(ar).filter(k => ar[k] >= 1e5).sort((a, b) => ar[b] - ar[a]);
+  let h = `<div class="sec">公式档案馆<span class="h">每次重构，当前公式的「形状」与本轮最高终极点会被收录；每种形状只保留最好的一次</span></div><div class="grid">
+  <div class="card" style="grid-column:1/-1"><div class="muted">当前形状</div><div class="fm arsig">${esc(prettySig(cur))}</div>
+  <div class="muted" ${B('arcur', () => ar[cur] >= 1e5 ? '已收录，最好成绩 ' + fmt(ar[cur]) + ' 终极点' + (Math.max(r.Ur, S.ult.U) > ar[cur] ? ' · 本轮已超过，重构后会更新' : '') : '新形状！重构时会被收录')}></div>
+  <div class="fm" ${B('arm', () => '档案馆加成：外层变量增长 ×' + fx(arMult(S), 3) + '（' + keys.length + ' 种形状，数量级之和 ' + fx(arSum(S), 1) + '）')}></div>
+  <p class="note">加成 = 1 + 0.03 × 所有收录形状的最好终极点数量级之和${crLv(S, 'r') ? ' × 晶格共振' : ''}。换一种形状的公式跑一轮，会让档案馆更丰富；只收录达到 ee5 的成绩，最多保留 30 种。</p></div></div>`;
+  if (keys.length) h += `<div class="grid">${keys.map((k, i) => `<div class="card"><div class="t"><span class="nm">第 ${i + 1} 名</span><span class="pill">${fmt(ar[k])}</span></div><div class="ds arsig">${esc(prettySig(k))}</div></div>`).join('')}</div>`;
+  h += `<div class="sec">时间晶体<span class="h">随真实时间缓慢凝结，从不重置</span></div><div class="grid"><div class="card" style="grid-column:1/-1"><div class="sieve" ${B('crn', () => fmtBig(r.cr.n))}></div><div class="muted" ${B('crr', () => '每小时 +' + fx(crRate(S) * 3600, 3) + '（基础 1 + lg 累计范式点）· 累计 ' + fmtBig(r.cr.t))}></div></div>
+  ${CRUP.map(x => `<div class="card"><div class="t"><span class="nm">${x.n}</span><span class="pill" ${B('crl_' + x.id, () => crLv(S, x.id) + ' 级')}></span></div><div class="ds">${x.d}</div><div class="row"><button class="btn sm" data-a="crb:${x.id}" ${B('crb_' + x.id, () => { const c = crCost(x, crLv(S, x.id)), can = r.cr.n >= c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '升级 · ' + fmtBig(c) + ' 晶体' }; })}></button></div></div>`).join('')}</div>`;
   return h;
 };
 VIEWS.ucx = () => `<div class="sec">公式图鉴<span class="h">构造出新的「形状」就会被记录下来，每一种都让终极点永久 ×2</span></div><div class="grid">${UCX.map((c, i) => `<div class="card ${S.ult.cx[i] ? '' : 'dim'}"><div class="t"><span class="nm">${c[0]}</span>${S.ult.cx[i] ? '<span class="pill ok">已发现</span>' : '<span class="pill">未发现</span>'}</div><div class="ds">${c[1]}</div></div>`).join('')}</div><p class="note">已发现 ${Object.keys(S.ult.cx).length} / ${UCX.length} 种，合计终极点 ×${fmtBig(Math.pow(2, Object.keys(S.ult.cx).length))}。</p>` + (oOn(S) ? `<div class="sec">外层图鉴<span class="h">每一种让外层变量增长 ×1.15</span></div><div class="grid">${UCX2.map((c, i) => `<div class="card ${S.ult.o.cx[i] ? '' : 'dim'}"><div class="t"><span class="nm">${c[0]}</span>${S.ult.o.cx[i] ? '<span class="pill ok">已发现</span>' : '<span class="pill">未发现</span>'}</div><div class="ds">${c[1]}</div></div>`).join('')}</div>` : '');
@@ -3091,6 +3158,7 @@ function ultStatRows() { const u = S.ult, o = u.o; const r = [['终极用时', (
   r.push(['内层积木', () => '× ' + u.mul + ' · ² ' + u.p2 + ' · ³ ' + u.p3 + ' · 槽位 ' + u.slots], ['公式图鉴', () => Object.keys(u.cx).length + ' / ' + UCX.length]);
   if (oOn(S)) r.push(['外层积木', () => '× ' + o.mul + ' · ² ' + o.e2 + ' · ³ ' + o.e3 + ' · ⁴ ' + o.e4 + ' · ⁵ ' + o.e5 + ' · ⁶ ' + (o.e6 || 0) + ' · 槽位 ' + o.slots], ['外层图鉴', () => Object.keys(o.cx).length + ' / ' + UCX2.length]);
   r.push(['终极升级', () => Object.keys(u.up).length + ' / ' + UUP.length], ['灵光一现', () => String(u.sp || 0)]);
+  if (x5On(S)) r.push(['时间晶体 / 累计', () => fmtBig(u.rf.cr.n) + ' / ' + fmtBig(u.rf.cr.t)], ['档案馆形状', () => String(Object.keys(u.rf.ar).filter(k => u.rf.ar[k] >= 1e5).length)], ['档案馆加成', () => '×' + fx(arMult(S), 3)], ['深层阻力', () => '×' + fx(deepDrag(S), 3)], ['无尽范式等级', () => RFREP.map(x => rfRepLv(S, x.id)).join(' / ')]);
   if (rfOn(S)) r.push(['重构次数', () => String(u.rf.n)], ['范式点 / 累计', () => fmtBig(u.rf.PP) + ' / ' + fmtBig(u.rf.PPt)], ['本轮最高终极点', () => fmt(Math.max(u.rf.Ur, u.U))], ['范式升级', () => Object.keys(u.rf.up).length + ' / ' + RFUP.length]);
   return r; }
 VIEWS.stat = () => {
@@ -3108,7 +3176,7 @@ VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
   <div class="row"><button class="btn sm" data-a="save">立即保存</button><button class="btn sm" data-a="exp">导出存档</button><button class="btn sm" data-a="imp">导入存档</button></div>
   <textarea id="saveBox" placeholder="导出的存档字符串会出现在这里；导入时把存档粘贴进来再点「导入存档」"></textarea></div>
   <div class="card"><div class="nm">危险操作</div><div class="ds">彻底删除进度，从头开始。</div><div class="row"><button class="btn sm warn" data-a="hard">删除存档并重新开始</button></div></div>
-  </div><p class="note">无尽演算 v1.4.3 · 共 7 阶、8 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、无穷之塔、质因数分解、黑洞、6 条星路、霍金辐射、引力波观测站、4 个无限发生器、24 个无限与破限升级、递归、构造台（4 个变量、3 个常数、15 个终极升级、15 种公式图鉴）、嵌套（外层公式、4 个外层变量、8 种外层图鉴）、重构（16 个范式升级）、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
+  </div><p class="note">无尽演算 v1.4.4 · 共 7 阶、8 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、无穷之塔、质因数分解、黑洞、6 条星路、霍金辐射、引力波观测站、4 个无限发生器、24 个无限与破限升级、递归、构造台（4 个变量、3 个常数、15 个终极升级、15 种公式图鉴）、嵌套（外层公式、4 个外层变量、8 种外层图鉴）、重构（18 个范式升级、3 个无尽范式）、公式档案馆、时间晶体、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
 
 /* ---------------- 操作 ---------------- */
 function act(a) {
@@ -3179,6 +3247,8 @@ function act(a) {
     case 'uvu': if (uUnlockVar(S, p[1])) { toast('解锁变量 ' + UV[p[1]].n); viewSig = ''; heroTier = 0; } break;
     case 'utk': if (uBuyTok(S, p[1])) { viewSig = ''; heroTier = 0; } break;
     case 'urf': if (canRefactor(S)) confirmDo('重构', `<p>重构会重置<b>终极点</b>以及所有变量的<b>等级与值</b>；积木、槽位、常数、终极升级、图鉴与公式的结构都会保留。</p><p>本次获得 <b>${fmtBig(ppGain(S))} 范式点</b>，重构后从 ${fmt(rfStart(S))} 终极点开始。</p>`, '重构', () => { const g = doRefactor(S); if (g) { toast('重构！+' + fmtBig(g) + ' 范式点'); viewSig = ''; heroTier = 0; } }); break;
+    case 'rfr': rfRepBuy(S, p[1]); break;
+    case 'crb': crBuy(S, p[1]); break;
     case 'rfu': if (rfBuy(S, p[1])) { toast(RFM[p[1]].n + ' 已获得'); viewSig = ''; heroTier = 0; } break;
     case 'osel': S.ult.o.sel = +p[1]; viewSig = ''; break;
     case 'oput': { const i = S.ult.o.sel || 0, s = S.ult.o.f.s[i] || {}; oSetSlot(S, i, p[1], s.v ? s.p : 1); uAfterEdit(); break; }
