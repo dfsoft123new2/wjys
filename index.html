@@ -2046,12 +2046,16 @@ VIEWS.cj = () => {
   const card = c => {
     const k = S.cc[c.id] || 0, act = S.chal === c.id, av = chalAvail(S, c.id);
     const dots = [0, 1, 2].map(i => `<span class="pill ${i < k ? 'ok' : ''}">${['Ⅰ', 'Ⅱ', 'Ⅲ'][i]}${i < k ? ' ✓' : ''}</span>`).join(' ');
-    const need = k >= 3 ? '已全部证毕' : S.tier < c.t[k] ? `第 ${k + 1} 难度需要${TIERN[c.t[k]]}` : '';
+    const chapter = S.chap < c.chp ? CH6[c.chp] : null;
+    const need = k >= 3 ? '已全部证毕'
+      : S.tier < c.t[k] ? `第 ${k + 1} 难度需要${TIERN[c.t[k]]}`
+      : chapter ? `解锁于${chapter.n}（历史最高点数 ${fmt(chapter.k)}）`
+      : S.u.x3 !== 1 ? '需要公理升级「' + UPG.x3.n + '」' : '';
     return `<div class="card ${S.tier < c.t[0] ? 'dim' : ''}"><div class="t"><span class="nm">${c.n}</span><span>${dots}</span></div>
     <div class="ds">限制：${c.d}</div><div class="ds">奖励（每次）：${c.rw}</div>
     ${k < 3 ? `<div class="muted">目标：点数达到 <b class="num">${fmt(c.g[k])}</b></div>` : ''}
     ${act ? `<div class="am" ${B('cjp', () => '进行中：' + fmt(S.P) + ' / ' + fmt(chalGoal(S, c.id)))}></div>` : ''}
-    <div class="row">${act ? '' : av && !S.chal ? `<button class="btn sm go" data-a="cj:${c.id}">开始</button>` : `<span class="faint">${need || (S.chal ? '已在其他猜想中' : '')}</span>`}</div></div>`;
+    <div class="row">${act ? '' : av && !S.chal ? `<button class="btn sm go" data-a="cj:${c.id}">开始</button>` : `<span class="muted">${need || (S.chal ? '已在其他猜想中' : '')}</span>`}</div></div>`;
   };
   [3, 4, 5, 6, 7].forEach(t => { const list = CJ.filter(c => c.t[0] === t); if (list.length) h += `<div class="sec">${TIERN[t]}猜想<span class="h">${list.length} 个</span></div><div class="grid">${list.map(card).join('')}</div>`; });
   return h;
