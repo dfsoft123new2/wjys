@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="《无尽演算》的完整版本更新日志。">
   <title>无尽演算 · 更新日志</title>
@@ -22,8 +22,8 @@
       }
     }
     * { box-sizing: border-box; }
-    html { scroll-padding-block: 1.2rem; }
-    body { margin: 0; color: var(--ink); background: var(--paper); font: 1rem/1.75 var(--text); }
+    html { scroll-padding-top: max(1.2rem, env(safe-area-inset-top, 0px)); }
+    body { margin: 0; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); color: var(--ink); background: var(--paper); font: 1rem/1.75 var(--text); }
     a { color: var(--accent); text-underline-offset: .22em; }
     a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
     .width { width: min(67rem, calc(100% - 3rem)); margin-inline: auto; }
@@ -40,7 +40,7 @@
     h1 { display: flex; align-items: baseline; flex-wrap: wrap; gap: .3rem 1rem; font-size: 2.875rem; }
     h1 span { color: var(--muted); font: 1.125rem/1.5 var(--text); }
     .layout { display: grid; grid-template-columns: 10.5rem minmax(0, 1fr); gap: 3.25rem; padding-block: 2.1rem 3rem; }
-    nav { align-self: start; position: sticky; top: 1.35rem; }
+    nav { align-self: start; position: sticky; top: max(1.35rem, env(safe-area-inset-top, 0px)); }
     .nav-label { margin-bottom: .6rem; font-weight: 700; font-size: .875rem; }
     nav ol { list-style: none; margin: 0; padding: 0; display: grid; gap: .18rem; }
     nav a { display: flex; align-items: baseline; gap: .65rem; padding: .33rem .55rem; text-decoration: none; border-radius: 4px; }
@@ -54,6 +54,7 @@
     article:target header .version { color: var(--point); }
     h2 { font-size: 1.7rem; }
     .lead { max-width: 43rem; }
+    .edition-note { padding-block: .75rem; border-top: 1px dashed var(--rule); color: var(--muted); font-size: .9rem; }
     .changes { padding-inline-start: 1.23rem; margin-block: .85rem 0; max-width: 43rem; }
     .changes li + li { margin-top: .38rem; }
     .changes li::marker { color: var(--point); }
@@ -62,12 +63,12 @@
     figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 7px; }
     figcaption { padding-top: .32rem; font-size: .77rem; color: var(--muted); }
     .save-note { padding-block: 1.15rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: .9rem; }
-    footer { display: flex; align-items: baseline; justify-content: space-between; padding-block: 1.15rem 1.4rem; border-top: 1px solid var(--rule); }
+    footer { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: baseline; justify-content: space-between; padding-block: 1.15rem 1.4rem; border-top: 1px solid var(--rule); }
     footer a { font-size: .9rem; }
     .signature { display: inline-flex; gap: .25em; align-items: baseline; font: 1.35rem/1 var(--serif); }
     .limit { display: inline-flex; flex-direction: column; align-items: center; }
     .limit small { font-size: .56rem; line-height: 1.2; }
-    @media (max-width: 700px) {
+    @media (max-width: 700px), (max-height: 600px) {
       .width { width: calc(100% - 2rem); }
       .mast .width { padding-block: 1.65rem; }
       h1 { font-size: 2.2rem; }
@@ -78,6 +79,9 @@
       .nav-title { display: none; }
       article { padding-block: 1.2rem 1.5rem; }
       h2 { font-size: 1.4rem; }
+    }
+    @media (pointer: coarse) {
+      nav a, footer a { display: flex; min-height: 44px; align-items: center; }
     }
     @media (max-width: 520px) {
       .feature { grid-template-columns: minmax(0, 1fr); gap: .7rem; }
@@ -93,7 +97,11 @@
     <nav aria-label="版本索引">
       <p class="nav-label">版本索引</p>
       <ol>
-        <li><a href="#v1.4.2"><span class="version">v1.4.2</span><span class="nav-title">双层构造</span></a></li>
+        <li><a href="#v1.4.5"><span class="version">v1.4.5</span><span class="nav-title">晶格矩阵</span></a></li>
+        <li><a href="#v1.4.4"><span class="version">v1.4.4</span><span class="nav-title">公式档案馆</span></a></li>
+        <li><a href="#v1.4.3"><span class="version">v1.4.3</span><span class="nav-title">终极重构</span></a></li>
+        <li><a href="#v1.4.2"><span class="version">v1.4.2</span><span class="nav-title">研究耗时</span></a></li>
+        <li><a href="#v1.4.1"><span class="version">v1.4.1</span><span class="nav-title">双层构造</span></a></li>
         <li><a href="#v1.4.0"><span class="version">v1.4.0</span><span class="nav-title">终极构造</span></a></li>
         <li><a href="#v1.3.2"><span class="version">v1.3.2</span><span class="nav-title">无限之力</span></a></li>
         <li><a href="#v1.3.1"><span class="version">v1.3.1</span><span class="nav-title">打破无限</span></a></li>
@@ -106,15 +114,57 @@
       </ol>
     </nav>
     <main aria-label="版本更新记录">
+      <article id="v1.4.5" aria-labelledby="title-v1.4.5">
+        <header><span class="version">v1.4.5</span><h2 id="title-v1.4.5">晶格矩阵</h2></header>
+        <p class="lead">买下「终式」后，可花 <strong>1000 万范式点</strong>购买「重构矩阵」，解锁 <strong>2×2</strong> 的晶格矩阵。用范式点购买因子与积木，用时间晶体扩建矩阵，最大可扩至 <strong>5×5</strong>。摆好的矩阵会在重构后保留。</p>
+        <ul class="changes">
+          <li>四种因子分别加快变量增长、降低外层演算阻力、提高范式点收益和时间晶体产量。乘法块增强上下左右的因子，幂块增强斜向相邻的因子，和块增强同一行、同一列的因子。</li>
+          <li>范式树从 18 项增至 21 项。「矩阵共鸣」提高所有矩阵因子的效果，「深渊起笔」让重构从 <strong>1e100000 终极点</strong>开始。时间晶体新增「矩阵」和「保留」两项晶格升级，分别强化矩阵加成和重构时保留的变量等级。</li>
+          <li>新增三项终极升级：变量精炼 III 加快所有变量增长，图鉴共鸣按内外层已发现的形状数提高外层增长，幂之塔 III 让外层六次幂按七次幂计算。</li>
+          <li>终极统计新增矩阵大小和四类加成。新增 4 项成就，涵盖解锁矩阵、扩至 5×5、单个因子强度达到 ×6，以及终极点达到 <strong>ee8</strong>。</li>
+        </ul>
+      </article>
+
+      <article id="v1.4.4" aria-labelledby="title-v1.4.4">
+        <header><span class="version">v1.4.4</span><h2 id="title-v1.4.4">公式档案馆</h2></header>
+        <p class="lead">终极点达到 <strong>ee5（1e100000）</strong> 后解锁公式档案馆和时间晶体，两者都会在重构后保留。超过该门槛后，内外层变量还会受到随终极点升高而增强的「深层阻力」。</p>
+        <ul class="changes">
+          <li>每次重构时，档案馆记录当前公式形状与本轮最高终极点。只计入达到 ee5 的成绩，同一形状保留最好的一次，最多保留 30 种；收录的成绩越好，外层变量增长越快。</li>
+          <li>时间晶体随时间积累，累计范式点越多，产量越高。晶体可用于五项可重复升级，分别提高变量增长、降低外层阻力、提高范式点收益、加快晶体产出或强化档案馆加成。</li>
+          <li>范式树增至 18 项升级，可解锁第五个外层变量 <strong>𝜀</strong>，也可让重构从 <strong>1e20000 终极点</strong>开始。外层公式增至 7 个槽位，乘号积木上限增至 5 个。</li>
+          <li>购买「终式」后解锁三项可持续购买的无尽范式。第 60 次重构起保留 70% 的变量等级，第 100 次让范式点收益再 ×3，第 150 次解锁无尽范式自动购买。</li>
+          <li>终极统计新增晶体、档案馆、深层阻力和无尽范式数据；新增 7 项成就，包含最高 <strong>ee7 终极点</strong>的成就门槛。终极阶段会按变量增长速度把较长的结算时间拆成小步计算。</li>
+        </ul>
+      </article>
+
+      <article id="v1.4.3" aria-labelledby="title-v1.4.3">
+        <header><span class="version">v1.4.3</span><h2 id="title-v1.4.3">终极重构</h2></header>
+        <p class="lead">终极阶段新增「重构」。本轮终极点达到 <strong>1e4000</strong> 后，可以重置终极点和变量的值，换取<strong>范式点</strong>。公式结构、积木、槽位、常数、终极升级和图鉴都会保留。</p>
+        <ul class="changes">
+          <li>首次重构后解锁范式树。增长、低阻、结构、自动四条分支共有 16 项升级，可以加快变量增长、降低外层演算阻力、提高重构后的起始点数，也能按设定的收益倍数自动重构。</li>
+          <li>第 1、5、20 次重构起，分别保留 20%、35%、50% 的变量等级。第 5 次解锁外层积木自动购买，第 10、40 次各让范式点收益翻倍。</li>
+          <li>外层公式的槽位上限增至 6 个。范式树可解锁第四个外层变量 <strong>𝛿</strong>，以及最多 2 个六次幂积木。</li>
+          <li>终极统计页新增重构次数、当前和累计范式点、本轮最高终极点与范式升级进度。新增 9 项成就，涵盖重构、范式升级、变量 𝛿，以及最高 <strong>1e100000 终极点</strong>的成就门槛。</li>
+        </ul>
+      </article>
+
       <article id="v1.4.2" aria-labelledby="title-v1.4.2">
-        <header><span class="version">v1.4.2</span><h2 id="title-v1.4.2">双层构造</h2></header>
+        <header><span class="version">v1.4.2</span><h2 id="title-v1.4.2">研究耗时</h2></header>
+        <p class="lead">研究耗时按列表顺序改为 5、10、15 分钟依次递增。旧存档中正在进行的研究，剩余时间若超过新版耗时，会自动缩短到新版耗时。</p>
+      </article>
+
+      <aside class="edition-note" aria-label="设备适配版说明">
+        <p><strong>设备适配版：</strong>基于 v1.4.2 单独调整两套皮肤，适配手机竖屏、横屏、平板和桌面。触屏按钮加大，页签可滑动，也可从「目录」直达已解锁玩法。属性、公式和构造槽位支持隐藏滚动条后继续滑动；数织、星盘和长弹窗也可在窄屏操作。</p>
+      </aside>
+
+      <article id="v1.4.1" aria-labelledby="title-v1.4.1">
+        <header><span class="version">v1.4.1</span><h2 id="title-v1.4.1">双层构造</h2></header>
         <p class="lead">相比 v1.4.0，终极阶段新增「嵌套」。用 <strong>1e100 终极点</strong>购买升级后，整条内层公式的结果会成为外层积木 <strong>𝑈</strong>，可以和外层变量一起运算，也可以给它加上指数。</p>
         <ul class="changes">
           <li>外层公式可使用 α、β、γ 三种新变量，槽位可从 2 个扩至 5 个，并可购买四次方、五次方积木。新增 7 项终极升级，包括嵌套、外层自动演算和幂之塔 II；常数共鸣的指数上限调整为 5。</li>
           <li>新增 8 种外层图鉴形状和 10 个外层里程碑。每种形状使外层变量增长 ×1.15，每个里程碑使其增长 ×1.1；最高里程碑为 <strong>1e4000 终极点</strong>。</li>
           <li>终极阶段有独立的成就与统计页，可查看内外层公式值、变量等级和图鉴进度。捕捉「灵光一现」可获得 10 分钟的终极点产量，或让已解锁的变量立即生长 1 小时。</li>
           <li>终极离线结算会显示终极点、变量增长、自动购买的等级和新发现的公式形状。</li>
-          <li>研究耗时按列表顺序改为 5、10、15 分钟依次递增。旧存档中正在进行的研究，剩余时间若超过新版耗时，会自动缩短到新版耗时。</li>
         </ul>
       </article>
 
