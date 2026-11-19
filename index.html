@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>无尽演算 v1.2.1</title>
+<title>无尽演算 v1.2.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -55,6 +55,7 @@ button{font:inherit;color:inherit}
 .rate b{color:var(--ink);font-weight:500}
 .formula{font-family:var(--serif);font-size:clamp(22px,4.6vw,38px);text-align:center;margin:16px 0 8px;line-height:1.5;word-spacing:.05em;overflow-x:auto;white-space:nowrap;padding-bottom:4px}
 .formula.t6{font-size:clamp(14px,3.4vw,34px)}
+.formula sup sup{font-size:.7em;vertical-align:.8em}
 .formula sup{font-size:.58em;vertical-align:.95em;margin-left:1px}
 .formula i{font-style:italic;cursor:pointer;padding:0 1px;border-radius:4px}
 .formula i:hover{background:var(--cyanBg)}
@@ -186,6 +187,19 @@ ul.ms{padding-left:18px;margin:6px 0;font-size:13.5px}
 .gpal{width:34px;height:34px;border-radius:50%;border:2px solid var(--line2);cursor:pointer}
 .gpal.c1{background:#E8A33D} .gpal.c2{background:#3AA6D0} .gpal.c3{background:#D9604A} .gpal.c4{background:#5DB37A}
 .gpal.sel{border-color:var(--ink);box-shadow:0 0 0 2px var(--amber)}
+/* 无穷之塔 */
+.tower{display:flex;flex-direction:column;gap:6px;max-width:340px;margin:0 auto}
+.twf{border:1px solid var(--line2);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--paper);font-size:14px}
+.twf.done{opacity:.45}
+.twf.cur{border-color:var(--amber);background:var(--amberBg)}
+.twf.ms b{color:var(--coral)}
+.twp{flex-basis:100%;height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.twp div{height:100%;background:var(--amber)}
+/* 质因数分解 */
+.fzn{font-family:var(--serif);font-size:clamp(40px,9vw,72px);text-align:center;font-weight:600;letter-spacing:.02em}
+.fzn.shake{animation:shk .35s}
+@keyframes shk{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.fzp{font-family:var(--serif);font-size:20px;min-width:54px;text-align:center}
 /* 分形 */
 .frc{width:100%;max-width:260px;display:block;margin:6px auto;border:1px solid var(--line2);border-radius:8px;image-rendering:auto}
 /* 星盘 */
@@ -246,6 +260,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 .signature{position:fixed;z-index:6;right:max(16px,env(safe-area-inset-right));bottom:max(9px,env(safe-area-inset-bottom));padding:4px 8px;color:var(--ink);display:flex;align-items:baseline;gap:6px;font:25px/1 var(--serif);pointer-events:none;background:var(--bg);border-radius:5px}
 .signature-limit{display:inline-flex;flex-direction:column;align-items:center}
 .signature-limit small{font-size:10px;line-height:1.15;white-space:nowrap}
+.toasts{bottom:calc(max(9px,env(safe-area-inset-bottom,0px)) + 52px)}
 
 /* 演算工作台皮肤 */
 :root[data-skin="workspace"]{
@@ -274,11 +289,11 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 [data-skin="workspace"] .bar{margin:0 calc(-1 * var(--gutter));padding:8px var(--gutter);background:var(--panel);border-bottom:1px solid var(--line2);gap:0}
 [data-skin="workspace"] .workspace-stats,[data-skin="workspace"] #curs{display:contents}
 [data-skin="workspace"] .stat-scroll{display:flex;align-items:stretch;overflow-x:auto;width:100%;padding:3px 0;gap:0}
-[data-skin="workspace"] .cur{min-width:132px;border:0;border-right:1px solid var(--line2);border-radius:0;padding:4px 14px;white-space:nowrap}
+[data-skin="workspace"] .stat-scroll .cur{min-width:132px;border:0;border-right:1px solid var(--line2);border-radius:0;padding:4px 14px;white-space:nowrap}
 [data-skin="workspace"] .stat-scroll .cur{flex:1 0 auto}
 [data-skin="workspace"] .stat-scroll .cur:last-child{border-right:0}
 [data-skin="workspace"] .workspace-stats .cur:first-child{padding-inline-start:2px}
-[data-skin="workspace"] .cur .v{font-size:22px;line-height:1.2}
+[data-skin="workspace"] .stat-scroll .cur .v{font-size:22px;line-height:1.2}
 [data-skin="workspace"] .bar .acts{display:none}
 [data-skin="workspace"] .workspace-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(224px,100%),1fr));gap:12px}
 [data-skin="workspace"] .workspace-actions .btn{display:grid;align-content:space-between;gap:12px;min-height:81px;padding:13px 16px;font-weight:600}
@@ -335,7 +350,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 </head>
 <body>
 <div class="wrap" id="shell" data-view="factor">
-  <header class="top"><div class="brand">无尽演算<small>v1.2.1</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
+  <header class="top"><div class="brand">无尽演算<small>v1.2.2</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
   <div class="rail-brand" aria-hidden="true"><b>Σ</b><strong>无尽演算</strong><em>Axiom</em></div>
   <section class="hero" id="hero">
     <div class="pts"><span class="big num" id="pts">0</span><span class="lbl">点数</span></div>
@@ -358,7 +373,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 <script>
 /* ===================== 公式晋升 v1.0.0 · 核心引擎（后端） ===================== */
 'use strict';
-const VERSION = '1.2.1';
+const VERSION = '1.2.2';
 const NI = -Infinity, L10 = Math.log10;
 /* 所有大数一律以 log10 存储：la=对数加，ls=对数减 */
 function la(a, b) { if (a === NI) return b; if (b === NI) return a; if (a < b) { const t = a; a = b; b = t; } const d = b - a; return d < -17 ? a : a + L10(1 + Math.pow(10, d)); }
@@ -369,7 +384,7 @@ const pz = l => l > 0 ? l : 0;
 const sq = (L, s, h) => L > s ? (L - s) * (L - s) * h : 0;
 const K = { // 主要平衡常数：获取量 = 10^(k·(lgP−需求)^q)
   rbReq: 4, rbK: 0.5, rbQ: 0.75, pfReq: 25, pfK: 0.25, pfQ: 0.6, axReq: 130, axK: 0.22, axQ: 0.55,
-  promo: { 1: 25, 2: 120, 3: 500, 4: 1500, 5: 10000 }, endGoal: 1e7, extGoal: 1e7, psS: 0.45, trReq: 10000, trK: 1, trQ: 0.4, omS: 0.40,
+  promo: { 1: 25, 2: 120, 3: 500, 4: 1500, 5: 10000, 6: 2e7 }, endGoal: 2e7, extGoal: 1e8, alS: 0.2, scAt: 1e8, scQ: 0.5, psS: 0.45, trReq: 10000, trK: 1, trQ: 0.4, omS: 0.40,
 };
 
 /* ---------------- 数字格式化 ---------------- */
@@ -407,15 +422,17 @@ const TIERS = {
   3: { name: '三阶', req: K.promo[3] },
   4: { name: '四阶', req: K.promo[4] },
   5: { name: '五阶', req: K.promo[5] },
-  6: { name: '六阶', req: Infinity },
+  6: { name: '六阶', req: K.promo[6] },
+  7: { name: '七阶', req: Infinity },
 };
-const TB = { rb: [0, 0, 2, 8, 3, 3, 3], pf: [0, 0, 0, 2, 1, 1, 1], ax: [0, 0, 0, 0, 1, 1, 1] }; // 阶加成（log10）
+const TB = { rb: [0, 0, 2, 8, 3, 3, 3, 3], pf: [0, 0, 0, 2, 1, 1, 1, 1], ax: [0, 0, 0, 0, 1, 1, 1, 1] }; // 阶加成（log10）
 const PROMO_TEXT = {
   2: ['公式升级为 (a·b)^c · r · θ', '新因子 c（指数），作用于 a·b 整体', '新重置层「证明」，产出定理与定理因子 θ', '重生升级扩展第二行'],
   3: ['公式升级为 (a·b)^c · t^(c−1) · r · θ · α', '时间因子 t：本次重生经过的时间，指数随 c 增长', '新重置层「公理化」，产出公理与公理因子 α', '新功能「研究所」：消耗定理/公理进行限时研究', '「猜想」挑战（由公理升级解锁）', '重生、证明升级各扩展一行'],
   4: ['公式升级为 (a·b·d)^c · t^(c−1) · r · (θ·α)^λ', '新因子 d（用定理购买）与 λ（用公理购买）', '新功能「常数」：分配算力计算 π 等常数的位数', '猜想开放第三难度与两个新猜想', '所有重置层扩展新升级，研究所扩展新课题'],
   5: ['公式升级为 … · κ^(c+λ)：常数之积 κ 直接进入公式', '算力 ×2，研究槽位 +1，常数 γ 解锁', '分形花园与梅森素数搜寻：让 κ 的指数成长数十倍', '达到 e10000 晋升六阶'],
-  6: ['整个公式获得指数 Ω：P = [ … ]^Ω，所有旧内容都被 Ω 放大', '新重置层「超限」，产出序数', 'ω 序数引擎：随时间与技能增长，持续提升 Ω', '七个章节逐步解锁：数学家学院、引理合成、图着色、新猜想与新常数', 'v1.1.0 通关目标 e400000，极限 e500000'],
+  6: ['整个公式获得指数 Ω：P = [ … ]^Ω，所有旧内容都被 Ω 放大', '新重置层「超限」，产出序数', 'ω 序数引擎：随时间与技能增长，持续提升 Ω', '七个章节逐步解锁：数学家学院、引理合成、图着色、新猜想与新常数', '章节一路延伸到 ee7 与更远处'],
+  7: ['最终阶段：公式的指数变成三层指数塔 [ … ]^((Ω·ψ)^ℵ)', '晋升七阶不会清空升级与各层货币，只重置点数与因子', '新因子 ℵ（阿列夫）：基数，指数之上的指数', '无穷之塔：一层层攀登，与历史上最大的数相遇', '质因数分解：轻松的小游戏，每解开一个数都推动攀登', '新的研究、猜想与超限升级；此后不再有新的阶，只有新的玩法'],
 };
 
 /* ---------------- 因子 ---------------- */
@@ -545,6 +562,9 @@ const OU = [ // 超限升级树（六阶）
   { id: 'o19', t: 6, c: 110, x: 1, y: 14, pre: ['o18'], n: '绝对无穷', d: 'Ω +0.06' },
   { id: 'o20', t: 6, c: 110, x: 3, y: 14, pre: ['o18'], n: '康托尔的乐园', d: 'Ω +0.06' },
   { id: 'o21', t: 6, c: 135, x: 2, y: 15, pre: ['o19', 'o20'], n: 'Ω', d: 'Ω +0.1' },
+  { id: 'o22', t: 7, c: 950, x: 1, y: 16, pre: ['o21'], n: '阿列夫零', d: 'ℵ +0.01' },
+  { id: 'o23', t: 7, c: 1050, x: 3, y: 16, pre: ['o21'], n: '攀登者', d: '无穷之塔攀登速度 ×1.5' },
+  { id: 'o24', t: 7, c: 1250, x: 2, y: 17, pre: ['o22', 'o23'], n: '绝对无限', d: 'ℵ +0.02' },
 ];
 const LARR = { r: RU, p: PU, x: AU, o: OU }, LCUR = { r: 'RP', p: 'TH', x: 'AX', o: 'OR' };
 const UPG = {}; RU.forEach(x => { x.L = 'r'; UPG[x.id] = x; }); PU.forEach(x => { x.L = 'p'; UPG[x.id] = x; }); AU.forEach(x => { x.L = 'x'; UPG[x.id] = x; }); OU.forEach(x => { x.L = 'o'; UPG[x.id] = x; });
@@ -590,7 +610,9 @@ const CJ = [
   { id: 15, n: '纳维–斯托克斯', d: 'λ 恒为 1，且 c 超出 1 的部分减半', g: [19000, 38000, 76000], t: [6, 6, 6], chp: 11, rw: 'c +0.3' },
   { id: 16, n: '霍奇猜想', d: 'ψ 恒为 1', g: [150000, 300000, 600000], t: [6, 6, 6], chp: 11, rw: 'ψ +0.02' },
   { id: 17, n: '考拉兹猜想', d: 'κ 恒为 1', g: [1500, 2600, 3600], t: [5, 5, 5], rw: 'κ 的指数 ×1.06' },
-  { id: 18, n: 'P 与 NP', d: 'κ 的指数减半，且 t 恒为 1', g: [2200, 3500, 5200], t: [5, 5, 5], rw: 'κ 的指数 ×1.04，梅森测试速度 ×2' }
+  { id: 18, n: 'P 与 NP', d: 'κ 的指数减半，且 t 恒为 1', g: [2200, 3500, 5200], t: [5, 5, 5], rw: 'κ 的指数 ×1.04，梅森测试速度 ×2' },
+  { id: 19, n: '杨–米尔斯存在性', d: 'ℵ 恒为 1', g: [1.2e+06, 1.6e+06, 1.9e+06], t: [7, 7, 7], rw: 'ℵ +0.01' },
+  { id: 20, n: '大基数一致性', d: 'Ω 中 ω 引擎与数学家的部分失效', g: [500000, 750000, 1e+06], t: [7, 7, 7], rw: 'ℵ +0.01' }
 ];
 
 /* ---------------- 研究（永久，限时） ---------------- */
@@ -633,6 +655,10 @@ const RS = [
   { id: 's32', t: 6, cur: 'OR', c: 480, h: 60, n: '镜像对称', d: '数学家经验 ×2；ψ +0.03', ch: 11 },
   { id: 's33', t: 6, cur: 'OR', c: 560, h: 48, n: '几何朗兰兹', d: 'ψ +0.06', ch: 12 },
   { id: 's34', t: 6, cur: 'OR', c: 650, h: 48, n: '万物之数', d: 'ψ +0.08', ch: 12 },
+  { id: 's39', t: 7, cur: 'OR', c: 900, h: 48, n: '大基数公理', d: 'ℵ +0.02；无穷之塔攀登速度 ×1.5' },
+  { id: 's40', t: 7, cur: 'OR', c: 1000, h: 48, n: '内模型理论', d: 'ℵ +0.02' },
+  { id: 's41', t: 7, cur: 'OR', c: 1150, h: 72, n: '马丁极大', d: 'ℵ +0.03' },
+  { id: 's42', t: 7, cur: 'OR', c: 1300, h: 96, n: '绝对无限', d: 'ℵ +0.04' },
 ];
 const RSM = {}; RS.forEach(x => { RSM[x.id] = x; (x.un || []).forEach(u => { UPG[u].rq = x.id; }); });
 
@@ -748,7 +774,7 @@ const ACH = [
   ['ee6', '点数达到 ee6', S => S.P >= 1e6],
   ['三百万', '点数达到 e3e6', S => S.P >= 3e6],
   ['奇点', '点数达到 e6e6', S => S.P >= 6e6],
-  ['ee7 · 通关', '点数达到 ee7（v1.2.0 通关）', S => S.P >= 1e7],
+  ['ee7', '点数达到 ee7', S => S.P >= 1e7],
   ['千禧难题', '完成猜想 13–16 的全部难度', S => [13, 14, 15, 16].every(i => (S.cc[i] || 0) >= 3)],
   ['ψ', 'ψ 达到 1.3', S => (G.psi || 1) >= 1.3],
   ['分形', '让任意分形迭代 1 次', S => frSum(S) > 0],
@@ -757,6 +783,17 @@ const ACH = [
   ['GIMPS', '发现第 24 个梅森素数 2^19937−1', S => S.mp.n >= 24],
   ['五阶一万', '在五阶点数达到 1e10000', S => S.tier >= 5 && S.P >= 10000],
   ['未竟之问', '完成猜想 17–18 的全部难度', S => (S.cc[17] || 0) >= 3 && (S.cc[18] || 0) >= 3],
+  ['七阶', '晋升至七阶（最终阶段）', S => S.tier >= 7],
+  ['登塔', '无穷之塔到达第 10 层', S => S.tw.f >= 10],
+  ['葛立恒', '无穷之塔到达第 40 层', S => S.tw.f >= 40],
+  ['阿列夫零', '无穷之塔到达第 90 层', S => S.tw.f >= 90],
+  ['分解者', '完成 100 次质因数分解', S => S.fz.n >= 100],
+  ['算术基本定理', '完成 1000 次质因数分解', S => S.fz.n >= 1000],
+  ['五千万', '点数达到 e5e7', S => S.P >= 5e7],
+  ['ee8', '点数达到 ee8', S => S.P >= 1e8],
+  ['深空', '在深空中让点数达到 e2e8', S => S.P >= 2e8],
+  ['阿列夫', 'ℵ 达到 1.1', S => (G.al || 1) >= 1.1],
+  ['基数之谜', '完成猜想 19–20 的全部难度', S => (S.cc[19] || 0) >= 3 && (S.cc[20] || 0) >= 3],
 ];
 
 /* ---------------- 状态 ---------------- */
@@ -775,6 +812,7 @@ function newState() {
     pr: { n: 1, L: 0 }, ms: { 3: [], 4: [], 5: [] }, boostT: 0,
     OR: NI, ORc: NI, trN: 0, trT: 0, trTot: 0, chap: 0,
     om: { w: 0, c1: 1, t1: 0, c2: 1, t2: 0 }, ac: { got: {}, seat: [], xp: {} }, lm: { g: [], q: 0, t: 0, max: 1 }, gc: {},
+    tw: { f: 0, p: 0, c: 2, t: 0 }, fz: { n: 0, ch: 5, t: 0, cur: 0, rem: 0, fs: [] },
     fr: { cantor: 0, koch: 0, sier: 0, hilb: 0 }, mp: { p: 2, w: 0, L: 0, n: 0 },
     IN: 0, INt: 0, ex: { act: [], n: 0 }, sw: {}, g24: { h: [], ch: 3, t: 0, n: 0 }, ng: {},
     ach: {}, st: { time: 0, tierT: { 1: 0 }, promoAt: {}, sparks: 0, respec: 0 }, seen: {}, opt: { nota: 0, conf: 1 },
@@ -864,7 +902,8 @@ function recalc(S) {
   else if (T === 2) p = c * (G.A + G.B) + G.Rf + G.THf;
   else if (T === 3) p = c * (G.A + G.B) + (c - 1 + G.tE) * G.Tf + G.Rf + G.THf + G.AXf;
   else { p = c * (G.A + G.B + G.D) + (c - 1 + G.tE) * G.Tf + G.Rf + G.lam * (G.THf + G.AXf); if (T >= 5) p += (c + G.lam) * G.K; }
-  G.Om = T >= 6 ? omega6(S) : 1; G.psi = T >= 6 ? psi6(S) : 1; G.F = p; if (T >= 6) p *= G.Om * G.psi;
+  G.Om = T >= 6 ? omega6(S) : 1; G.psi = T >= 6 ? psi6(S) : 1; G.al = T >= 7 ? aleph7(S) : 1; G.F = p; G.EX = Math.pow(G.Om * G.psi, G.al); if (T >= 6) p *= G.EX;
+  G.scRaw = p; G.sc = false; if (T >= 7 && p > K.scAt) { p = K.scAt * Math.pow(p / K.scAt, K.scQ); G.sc = true; }
   if (ch === 4) p *= 0.5; if (ch === 5) p *= 0.75;
   if (S.boostT > 0) p += 3 * T;
   G.prod = p; G.pps = p - L10(G.dt);
@@ -1014,12 +1053,16 @@ function doAxiom(S) {
   const g = G.axGain; S.AX = la(S.AX, g); S.AXc = la(S.AXc, g); S.axN++; S.axTot++; S.axT = 0;
   resetProofLayer(S); recalc(S); return true;
 }
-function canPromote(S) { return S.tier < 6 && S.P >= TIERS[S.tier].req && !S.chal; }
+function canPromote(S) { return S.tier < 7 && S.P >= TIERS[S.tier].req && !S.chal; }
 function doPromote(S) {
   if (!canPromote(S)) return false;
+  if (S.tier === 6) { // 最终阶段：保留所有升级与各层货币，只重置点数与因子
+    S.st.promoAt[7] = S.st.time; S.tier = 7; S.st.tierT[7] = 0; S.chal = 0; S.Pbest = NI;
+    resetPoints(S, false); recalc(S); return true;
+  }
   S.st.promoAt[S.tier + 1] = S.st.time;
   S.tier++; S.st.tierT[S.tier] = 0;
-  S.AX = NI; S.AXc = NI; S.axN = 0; S.axT = 0; S.lv.l = 0; S.OR = NI; S.ORc = NI; S.trN = 0; S.trT = 0; S.chap = 0;
+  S.AX = NI; S.AXc = NI; S.axN = 0; S.axT = 0; S.lv.l = 0; S.OR = NI; S.ORc = NI; S.trN = 0; S.trT = 0; if (S.tier < 6) S.chap = 0;
   S.u = {}; S.chal = 0; S.Pbest = NI;
   S.TH = NI; S.THc = NI; S.pfN = 0; S.pfT = 0; S.lv.d = 0;
   S.RP = NI; S.RPc = NI; S.rbN = 0;
@@ -1078,6 +1121,7 @@ function step(S, dt) {
   if (S.tier >= 4 && G.cpu > 0) cstStep(S, dt);
   if (S.tier >= 2) { S.pr.n += G.sieveV * dt; }
   if (S.tier >= 5) mpStep(S, dt);
+  if (S.tier >= 7) step7(S, dt);
   if (S.tier >= 6) step6(S, dt);
   if (S.boostT > 0) S.boostT = Math.max(0, S.boostT - dt);
   recalc(S);
@@ -1140,6 +1184,7 @@ function applySpark(S, kind) {
   if (kind === 'res') { S.res.act.forEach(a => a.t = Math.max(1, a.t - 1200)); return '所有进行中的研究提前 20 分钟'; }
   if (kind === 'sieve') { S.pr.n += G.sieveV * 3600; return '素数筛推进 1 小时'; }
   if (kind === 'cst' && S.tier >= 4) { recalc(S); for (let i = 0; i < 6; i++) cstStep(S, 300); return '常数计算推进 30 分钟'; }
+  if (kind === 'tower' && S.tier >= 7) { twClimb(S, 3600); return '无穷之塔攀登 1 小时'; }
   if (kind === 'omega' && S.tier >= 6) { S.om.w += G.omR * 3600; return 'ω 引擎推进 1 小时'; }
   if (kind === 'lemma' && S.tier >= 6) { for (let i = 0; i < 3; i++) lmSpawn(S); return '获得 3 个引理'; }
   S.boostT = 60; return '60 秒内每次获得的点数 ×' + fmt(3 * S.tier);
@@ -1149,6 +1194,36 @@ function cstStep(S, dt) {
   if (wsum > 0) CS.forEach(c => { if (!cstUnl(S, c.id)) return; S.cst.got[c.id] = true;
     const r = G.cpu * S.cst.w[c.id] / wsum * ((c.id === 'pi' || c.id === 'de') && S.tier >= 6 ? 1 + acL(S, 'arc') : 1), D0 = S.cst.D[c.id]; S.cst.D[c.id] = Math.pow(Math.pow(1 + D0, 1.5) + 1.5 * r * dt, 2 / 3) - 1; });
 }
+
+/* ===================== v1.2.2 · 七阶「基数」（最终阶段） ===================== */
+/* ---------- 无穷之塔 ---------- */
+const TWN = { 10: '古戈尔', 20: '古戈尔普勒克斯', 30: '斯丘斯数', 40: '葛立恒数', 50: 'TREE(3)', 60: '忙碌海狸', 70: '拉约数', 80: 'ε₀', 90: 'ℵ₀', 100: 'ℵ_ω', 110: '不可达基数', 120: '可测基数', 130: '伍丁基数', 140: '超紧致基数', 150: '莱茵哈特基数' };
+const TWD = { 10: '10 的 100 次方', 20: '10 的古戈尔次方', 30: '曾用于素数计数函数的上界', 40: '曾被吉尼斯纪录收录为数学证明中出现过的最大数', 50: '源自树的嵌入问题，远超葛立恒数', 60: '图灵机能写出的最多个 1，不可计算', 70: '用一阶集合论语言描述的最大数', 80: '第一个无法用 ω 的有限次加、乘、幂到达的序数', 90: '最小的无穷基数，自然数的个数', 100: '第 ω 个无穷基数', 110: '无法从更小的基数「构造」出来', 120: '存在非平凡的超滤', 130: '与决定性公理密切相关', 140: '一致性强度极高的大基数', 150: '与选择公理矛盾的基数' };
+function twSpeed(S) { return (0.6 + 0.01 * L10(1 + S.om.w)) * (S.res.done.s39 ? 2 : 1) * (S.u.o23 === 1 ? 1.5 : 1); }
+function twFloorTime(n) { return 3600 * (1 + n / 15); }
+function twAdvance(S, floors) { let f = floors; while (f > 0) { const need = 1 - S.tw.p; if (f >= need) { f -= need; S.tw.p = 0; S.tw.f++; } else { S.tw.p += f; f = 0; } } }
+function twClimb(S, sec) { let left = sec * twSpeed(S), guard = 0; while (left > 0 && guard++ < 1000) { const T = twFloorTime(S.tw.f), need = (1 - S.tw.p) * T; if (left >= need) { left -= need; S.tw.p = 0; S.tw.f++; } else { S.tw.p += left / T; left = 0; } } }
+function twStep(S, dt) {
+  let left = dt * twSpeed(S), guard = 0;
+  while (left > 0 && guard++ < 1000) { const T = twFloorTime(S.tw.f), need = (1 - S.tw.p) * T; if (left >= need) { left -= need; S.tw.p = 0; S.tw.f++; } else { S.tw.p += left / T; left = 0; } }
+  if (S.tw.c < 3) { S.tw.t += dt; while (S.tw.t >= 14400 && S.tw.c < 3) { S.tw.t -= 14400; S.tw.c++; } } if (S.tw.c >= 3) S.tw.t = 0;
+}
+function twSprint(S) { if (S.tier < 7 || S.tw.c < 1) return false; S.tw.c--; twAdvance(S, 2); return true; }
+/* ---------- 质因数分解 ---------- */
+const FZP = [2, 3, 5, 7, 11, 13, 17, 19, 23];
+function fzDeal(S) { let n; for (let k = 0; k < 200; k++) { const cnt = 3 + Math.floor(Math.random() * 4); n = 1; for (let i = 0; i < cnt; i++) n *= FZP[Math.floor(Math.random() * (i < 2 ? 4 : FZP.length))]; if (n >= 60 && n <= 99999) break; } S.fz.cur = n; S.fz.rem = n; S.fz.fs = []; }
+function fzTap(S, p) { if (S.tier < 7 || S.fz.ch < 1 || !S.fz.rem) return 0; if (S.fz.rem % p !== 0) return -1; S.fz.rem /= p; S.fz.fs.push(p); if (S.fz.rem === 1) { S.fz.n++; S.fz.ch--; twClimb(S, 600); fzDeal(S); return 2; } return 1; }
+function fzStep(S, dt) { if (!S.fz.cur) fzDeal(S); if (S.fz.ch < 8) { S.fz.t += dt; while (S.fz.t >= 1200 && S.fz.ch < 8) { S.fz.t -= 1200; S.fz.ch++; } } if (S.fz.ch >= 8) S.fz.t = 0; }
+/* ---------- ℵ ---------- */
+function aleph7(S) {
+  if (S.tier < 7) { G.alB = []; return 1; }
+  const R = id => !!S.res.done[id], C = id => S.cc[id] || 0, h = id => S.u[id] === 1;
+  const B = [['无穷之塔', 0.06 * Math.log(1 + S.tw.f / 10)], ['质因数分解', 0.025 * L10(1 + S.fz.n)],
+  ['研究', (R('s39') ? 0.02 : 0) + (R('s40') ? 0.02 : 0) + (R('s41') ? 0.03 : 0) + (R('s42') ? 0.04 : 0)], ['猜想', 0.01 * C(19) + 0.01 * C(20)],
+  ['超限升级', (h('o22') ? 0.01 : 0) + (h('o24') ? 0.02 : 0)]];
+  G.alB = B; if (S.chal === 19) return 1; let s = 0; B.forEach(x => s += x[1]); return 1 + K.alS * s;
+}
+function step7(S, dt) { if (S.tier < 7) return; twStep(S, dt); fzStep(S, dt); }
 
 /* ===================== v1.2.1 · 五阶「常数纪元」 ===================== */
 function trReqOf(S) { return S.legacyTr ? 2500 : K.trReq; }
@@ -1232,7 +1307,7 @@ const CH6 = [ // 六阶章节（按六阶最高点数）
   { k: 1.8e6, n: '第十一章 · 群星', d: '新数学家 3 位；数织 5–8；远征地点「组合花园」' },
   { k: 3.2e6, n: '第十二章 · 极点', d: '猜想 15–16；常数 e^π' },
   { k: 6e6, n: '第十三章 · 奇点', d: 'ψ 额外加成；远征地点「混沌之海」' },
-  { k: 1e7, n: '终章 · ee7', d: '通关 v1.2.0' },
+  { k: 1e7, n: '第十四章 · ee7', d: '10 的 1000 万次方；继续前进，e2e7 晋升七阶' },
 ];
 /* ---------- 图着色 ---------- */
 const GRAPHS = (() => {
@@ -1303,9 +1378,9 @@ const OMT = { o1: 0.03, o5: 0.05, o5b: 0.02, o9: 0.06, o10: 0.05, o13: 0.07, o15
 function omega6(S) {
 
   const B = [], C = id => S.cc[id] || 0, R = id => !!S.res.done[id];
-  B.push(['ω 引擎', S.chal === 12 ? 0 : 0.02 * L10(1 + S.om.w)]);
+  B.push(['ω 引擎', (S.chal === 12 || S.chal === 20) ? 0 : 0.02 * L10(1 + S.om.w)]);
   let t = 0; for (const k in OMT) if (S.u[k] === 1) t += OMT[k]; B.push(['超限升级', t]);
-  B.push(['数学家', acOmega(S)]);
+  B.push(['数学家', S.chal === 20 ? 0 : acOmega(S)]);
   const c13 = S.chal === 13 ? 0 : 1;
   B.push(['引理工坊', c13 * 0.025 * Math.max(0, S.lm.max - 1) * (S.u.o16 === 1 ? 1.5 : 1)]);
   B.push(['图着色', c13 * 0.03 * gcCount(S)]);
@@ -1485,13 +1560,13 @@ function deserialize(str) {
 function encodeSave(S) { const s = serialize(S); return typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(s))) : Buffer.from(s).toString('base64'); }
 function decodeSave(b) { const s = typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(b.trim()))) : Buffer.from(b, 'base64').toString(); return deserialize(s); }
 
-if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
+if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, TWN, TWD, twSpeed, twFloorTime, twAdvance, twSprint, twClimb, FZP, fzDeal, fzTap, aleph7, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
 
-/* ===================== 无尽演算 v1.2.1 · 界面 ===================== */
+/* ===================== 公式晋升 v1.0.0 · 界面（前端） ===================== */
 const SAVE_KEY = 'formula-ascend-save-v1';
 const SKIN_KEY = 'formula-ascend-skin';
 const CURN = { P: '点数', RP: '重生点', TH: '定理', AX: '公理', OR: '序数', IN: '灵感' };
-const TIERN = ['', '一阶', '二阶', '三阶', '四阶', '五阶', '六阶'];
+const TIERN = ['', '一阶', '二阶', '三阶', '四阶', '五阶', '六阶', '七阶'];
 let S, view = 'factor', viewSig = '', binds = [], lastFrame = Date.now(), lastSec = 0, cloud = null, cloudBusy = false, lastCloud = 0;
 let msSel = { 3: 0, 4: 0, 5: 0 }, msSize = 3, primeCache = { n: -1, p: 0, at: 0 }, spark = null, nextSpark = Date.now() + rnd(200, 420) * 1000, modalQ = [], modalOpen = false, heroTier = 0;
 const $ = id => document.getElementById(id);
@@ -1500,7 +1575,7 @@ function rnd(a, b) { return a + Math.random() * (b - a); }
 const LAYER = {
   r: { name: '重生', cur: 'RP', gain: () => G.rbGain, can: () => canRebirth(S), act: 'rb', req: () => K.rbReq, k: () => G.rbE, q: () => G.rbQ, cum: 'RPc', fac: 'Rf', sym: 'r', ms: null, tree: RU, auto: 'rb', tot: 'rbTot', facN: 'r（重生因子）' },
   p: { name: '证明', cur: 'TH', gain: () => G.pfGain, can: () => canProof(S), act: 'pf', req: () => K.pfReq, k: () => G.pfE, q: () => G.pfQ, cum: 'THc', fac: 'THf', sym: 'θ', ms: PM, msTot: 'pfTot', tree: PU, auto: 'pf', tot: 'pfTot', facN: 'θ（定理因子）' },
-  o: { name: '超限', cur: 'OR', gain: () => G.trGain, can: () => canTrans(S), act: 'tr', req: () => K.trReq, k: () => G.trE, q: () => G.trQ, cum: 'ORc', fac: null, sym: 'ω', ms: TM, msTot: 'trTot', tree: OU, auto: 'tr', tot: 'trTot', facN: 'ω 引擎的速度' },
+  o: { name: '超限', cur: 'OR', gain: () => G.trGain, can: () => canTrans(S), act: 'tr', req: () => trReqOf(S), k: () => G.trE, q: () => G.trQ, cum: 'ORc', fac: null, sym: 'ω', ms: TM, msTot: 'trTot', tree: OU, auto: 'tr', tot: 'trTot', facN: 'ω 引擎的速度' },
   x: { name: '公理化', cur: 'AX', gain: () => G.axGain, can: () => canAxiom(S), act: 'ax', req: () => K.axReq, k: () => G.axE, q: () => G.axQ, cum: 'AXc', fac: 'AXf', sym: 'α', ms: AM, msTot: 'axTot', tree: AU, auto: 'ax', tot: 'axTot', facN: 'α（公理因子）' },
 };
 
@@ -1530,6 +1605,7 @@ function offline(sec, silent) {
   const nr = Object.keys(S.res.done).length - b.res; if (nr > 0) li.push(`完成研究 ${nr} 项`);
   if (S.tier >= 2) li.push(`素数筛已检验到 ${fmtInt(S.pr.n)}`);
   if (S.tier >= 6) li.push(`ω 增长到 ${fmtBig(S.om.w)}，Ω = ${fx(G.Om, 3)}`);
+  if (S.tier >= 7) li.push(`无穷之塔到达第 ${S.tw.f + 1} 层，ℵ = ${fx(G.al, 4)}`);
   if (S.chap >= 7 && S.ex.n > b.exn) li.push(`完成远征 ${S.ex.n - b.exn} 次，现有灵感 ${fmtBig(S.IN)}`);
   if (S.chap >= 8 && S.g24.ch > 0) li.push(`二十四点有 ${S.g24.ch} 手牌等你来玩`);
   modal('欢迎回来', `<p>你离开了 <b>${fmtT(sec)}</b>，离线期间游戏照常运行：</p><ul>${li.map(x => '<li>' + x + '</li>').join('')}</ul><p class="note">自动购买与自动重置在离线时同样生效。</p>`);
@@ -1589,7 +1665,7 @@ function loadSkin() {
 
 /* ---------------- 新功能说明 ---------------- */
 const NEWS = [
-  { k: 'welcome', c: () => true, t: '欢迎来到无尽演算', b: '<p>每隔一个时间间隔 Δ，你会获得等于公式结果的点数。用点数升级公式里的因子，让产量越来越高。</p><p>你的目标是<b>晋升</b>：每次晋升，公式升高一阶并解锁新玩法。v1.2.1 最高为六阶。</p>' },
+  { k: 'welcome', c: () => true, t: '欢迎来到无尽演算', b: '<p>每隔一个时间间隔 Δ，你会获得等于公式结果的点数。用点数升级公式里的因子，让产量越来越高。</p><p>你的目标是<b>晋升</b>：每次晋升，公式升高一阶、变得更复杂，并解锁新玩法。v1.2.2 最高为七阶。</p>' },
   { k: 'rb', c: () => S.P >= 3.5 || S.rbTot > 0, t: '重生', b: '<p>点数达到 1e4 后可以重生：清空点数与因子，换取<b>重生点</b>。</p><p>累计重生点决定重生因子 <i>r</i>，重生点还能购买<b>重生升级树</b>。</p>' },
   { k: 'tree', c: () => S.rbTot >= 1, t: '升级树与分支', b: '<p>升级按树状排列，必须先买前置节点。标有「择一」的分叉只能选一条路，两条路风格不同、都能通关。</p><p>想换路线时可以「重置升级树」：已花费的货币全额退还，但会触发一次该层的重置。</p>' },
   { k: 't2', c: () => S.tier >= 2, t: '二阶：证明、研究所、素数筛', b: '<p><b>证明</b>：点数达到 1e25 后可证明，重置重生层，获得<b>定理</b>。累计定理提供 θ，并解锁证明升级树与永久里程碑。</p><p><b>研究所</b>：消耗定理（之后还有公理）开始限时研究，离线也会推进。</p><p><b>素数筛</b>：一台永不停歇的筛子逐个检验整数，已发现的素数个数永久加成 a。它跨越所有晋升持续累积。</p>' },
@@ -1598,7 +1674,7 @@ const NEWS = [
   { k: 't4', c: () => S.tier >= 4, t: '四阶：维度、跃迁、常数', b: '<p>新因子 <i>d</i> 用定理购买，<i>λ</i> 用公理购买，λ 作为 θ·α 的指数。</p><p><b>常数</b>：分配算力计算 π 等常数的位数，每个常数加成不同的因子。位数增长越来越慢，分配比例由你决定。</p><p>还有 4×4 幻方与两个新猜想。</p>' },
   { k: 't5', c: () => S.tier >= 5, t: '五阶 · 常数纪元', b: '<p>常数之积 κ 现在直接出现在公式里，指数为 c+λ。五阶的核心是让 <b>κ 的指数</b>不断变大：</p><p><b>分形花园</b>：用公理让四种分形迭代，维数越高加成越多。<br><b>梅森素数搜寻</b>：测试机按顺序检验 2^p − 1，每发现一个梅森素数，κ 都会变强。</p><p>还有 5×5 幻方、常数 γ、新研究与两个新猜想。达到 <b>e10000</b> 即可晋升六阶。</p>' },
   { k: 'v121', c: () => S.tier >= 5 && !!S.mig121, t: '五阶扩展：常数纪元', b: '<p>v1.2.1 扩充了五阶：新增<b>分形花园</b>与<b>梅森素数搜寻</b>，以及新的研究、升级与猜想。晋升六阶的需求提高到 <b>e10000</b>。</p>' },
-  { k: 't6', c: () => S.tier >= 6, t: '六阶 · 超限', b: '<p>整个公式被括起来，获得指数 <b>Ω</b>：P = [ … ]<sup>Ω</sup>。之前所有的因子、层与系统都会被 Ω 放大，Ω 每提高一点，点数的数量级就会大幅上升。</p><p><b>超限</b>：点数达到 1e2500 后可以超限，重置公理层，获得<b>序数</b>。序数用于超限升级树、研究与招募数学家，累计序数还会加速 <b>ω 引擎</b>。</p><p>ω 随时间增长并提升 Ω。六阶有七个章节，会随着最高点数逐步解锁新玩法，通关目标是 <b>e400000</b>。</p>' },
+  { k: 't6', c: () => S.tier >= 6, t: '六阶 · 超限', b: () => `<p>整个公式被括起来，获得指数 <b>Ω</b>：P = [ … ]<sup>Ω</sup>。Ω 越高，同样的因子能产出越多点数。</p><p><b>超限</b>：点数达到 ${fmt(trReqOf(S))} 后可以超限，重置公理层，获得<b>序数</b>。序数用于超限升级树、研究与招募数学家，累计序数还会加速 <b>ω 引擎</b>。</p><p>ω 随时间增长并提升 Ω。六阶的章节会随历史最高点数解锁；达到 <b>${fmt(TIERS[6].req)}</b> 可以晋升七阶。</p>` },
   { k: 'ch1', c: () => S.tier >= 6 && S.chap >= 1, t: '第二章 · 学院', b: '<p><b>数学家学院</b>：用序数依次招募 12 位数学家。入座的数学家会随时间升级并发挥才能，席位有限，选择谁入座由你决定。</p><p><b>图着色</b>：给图的顶点上色，使相邻顶点颜色不同，并且颜色种数不超过要求。每完成一张图，Ω 永久提高。</p>' },
   { k: 'ch2', c: () => S.tier >= 6 && S.chap >= 2, t: '第三章 · 引理', b: '<p><b>引理工坊</b>：引理会定时出现在 4×4 的格子里，两个同级引理可以合成更高一级。最高等级越高，Ω 越大。偶尔出现的 ★ 可以与 4 级及以下的任意引理合成。</p>' },
   { k: 'ch3', c: () => S.tier >= 6 && S.chap >= 3, t: '第四章 · 猜想', b: '<p>四个新的未解难题加入猜想：连续统假设、哥德巴赫猜想、孪生素数猜想与庞加莱猜想。六阶的猜想需要更长的时间来证毕，奖励也直接作用于 Ω 和序数。学院席位 +1。</p>' },
@@ -1611,9 +1687,11 @@ const NEWS = [
   { k: 'v12c10', c: () => S.tier >= 6 && S.chap >= 10, t: '第十一章 · 群星', b: '<p>庞加莱、冯·诺伊曼与埃尔德什可以招募了。更大的数织与远征地点「组合花园」开放。</p>' },
   { k: 'v12c11', c: () => S.tier >= 6 && S.chap >= 11, t: '第十二章 · 极点', b: '<p>猜想「纳维–斯托克斯」与「霍奇猜想」开放，常数 e^π 加入算力分配。</p>' },
   { k: 'v12c12', c: () => S.tier >= 6 && S.chap >= 12, t: '第十三章 · 奇点', b: '<p>ψ 获得额外加成，远征新地点「混沌之海」开放。ee7 就在眼前。</p>' },
-  { k: 'v12c13', c: () => S.tier >= 6 && S.chap >= 13, t: '终章 · ee7', b: '<p>10 的 1000 万次方。从 a·b·r 到 [ … ]<sup>Ω·ψ</sup>，你完成了 v1.2.0 的全部旅程。</p><p>旅程不会在这里结束，敬请期待下一个版本。感谢游玩！</p>' },
+  { k: 'v12c13', c: () => S.tier >= 6 && S.chap >= 13, t: '第十四章 · ee7', b: '<p>10 的 1000 万次方。从 a·b·r 到 [ … ]<sup>Ω·ψ</sup>，你走了很远。</p><p>但还有最后一阶：点数达到 <b>e2e7</b>，即可晋升<b>七阶</b>——最终阶段。</p>' },
+  { k: 'deep', c: () => S.tier >= 7 && G.sc, t: '深空', b: '<p>你的产量越过了 <b>ee8</b>。在这片深空里，数量级的增长会被稀释：超过 ee8 的部分按平方根计算。</p><p>进度不会停下，只是每一步都更费力。未来版本的新玩法，会带你走得更远。</p>' },
+  { k: 't7', c: () => S.tier >= 7, t: '七阶 · 基数（最终阶段）', b: '<p>公式的指数长出了自己的指数：P = [ … ]<sup>(Ω·ψ)<sup>ℵ</sup></sup>。ℵ（阿列夫）是基数，比所有序数都更「大」的无穷。ℵ 每提高一点，整个 Ω·ψ 都会被再放大一次。</p><p><b>无穷之塔</b>：一层层攀登，每 10 层遇见一个传说中的巨大数字。<br><b>质因数分解</b>：点击素数把数除到 1，每解开一个都推动攀登。</p><p>七阶是最后一个阶，此后只会有新的玩法。这次晋升保留了你所有的升级与货币。</p>' },
 ];
-function checkNews() { for (const n of NEWS) if (!S.seen[n.k] && n.c()) { S.seen[n.k] = 1; modal(n.t, n.b); } }
+function checkNews() { for (const n of NEWS) if (!S.seen[n.k] && n.c()) { S.seen[n.k] = 1; modal(n.t, typeof n.b === 'function' ? n.b() : n.b); } }
 
 /* ---------------- 主视觉：公式 ---------------- */
 function formulaHTML(T) {
@@ -1625,14 +1703,14 @@ function formulaHTML(T) {
   if (T === 3) return P + `(${a}${d}${b})<sup>${c}</sup>${d}${t}<sup>${c}−1</sup>${d}${r}${d}${th}${d}${al}`;
   const base = P + `(${a}${d}${b}${d}${dd})<sup>${c}</sup>${d}${t}<sup>${c}−1</sup>${d}${r}${d}(${th}${d}${al})<sup>${lm}</sup>`;
   if (T === 4) return base; const t5 = base + `${d}${k}<sup>${c}+${lm}</sup>`; if (T === 5) return t5;
-  return P + `<span class="op" style="font-size:1.25em">[</span>` + t5.slice(P.length) + `<span class="op" style="font-size:1.25em">]</span><sup><i class="fl" data-a="tab:promo">Ω</i>${S.chap >= 7 ? '<span class="op">·</span><i class="fl" data-a="tab:sw">ψ</i>' : ''}</sup>`;
+  return P + `<span class="op" style="font-size:1.25em">[</span>` + t5.slice(P.length) + `<span class="op" style="font-size:1.25em">]</span><sup>${T >= 7 ? '<span class="op">(</span>' : ''}<i class="fl" data-a="tab:promo">Ω</i>${S.chap >= 7 ? '<span class="op">·</span><i class="fl" data-a="tab:sw">ψ</i>' : ''}${T >= 7 ? '<span class="op">)</span><sup><i class="ft" data-a="tab:tw">ℵ</i></sup>' : ''}</sup>`;
 }
 function fmtBig(x) { return x < 1e9 ? (x < 100 ? fx(x, 2) : Math.floor(x).toLocaleString('en-US')) : fmt(L10(x)); }
 const READS = [
   ['a', () => fmt(G.A), () => true], ['b', () => fmt(G.B), () => true], ['c', () => fx(G.c, 3), () => S.tier >= 2],
   ['d', () => fmt(G.D), () => S.tier >= 4], ['t', () => fmt(G.Tf) + '（指数 ' + fx(G.c - 1 + G.tE, 2) + '）', () => S.tier >= 3],
   ['r', () => fmt(G.Rf), () => true], ['θ', () => fmt(G.THf), () => S.tier >= 2], ['α', () => fmt(G.AXf), () => S.tier >= 3],
-  ['λ', () => fx(G.lam, 3), () => S.tier >= 4], ['κ', () => fmt(G.K), () => S.tier >= 5], ['Ω', () => fx(G.Om, 3), () => S.tier >= 6], ['ψ', () => fx(G.psi || 1, 3), () => S.tier >= 6 && S.chap >= 7], ['ω', () => fmtBig(S.om.w), () => S.tier >= 6],
+  ['λ', () => fx(G.lam, 3), () => S.tier >= 4], ['κ', () => fmt(G.K), () => S.tier >= 5], ['Ω', () => fx(G.Om, 3), () => S.tier >= 6], ['ψ', () => fx(G.psi || 1, 3), () => S.tier >= 6 && S.chap >= 7], ['ℵ', () => fx(G.al || 1, 4) + '（指数 ' + fx(G.EX || 1, 3) + '）', () => S.tier >= 7], ['ω', () => fmtBig(S.om.w), () => S.tier >= 6],
 ];
 function renderHero() {
   if (heroTier !== S.tier * 100 + (S.chap >= 7 ? 1 : 0)) {
@@ -1641,7 +1719,7 @@ function renderHero() {
   }
   $('pts').textContent = fmt(S.P);
   $('formulaResult').textContent = fmt(G.prod);
-  $('rate').innerHTML = `每 <b>${fx(G.dt, 3)}</b> 秒获得 <b class="num">${fmt(G.prod)}</b> · 每秒约 <b class="num">${fmt(G.pps)}</b>` + (S.chal ? ` · <span class="co">猜想「${CJ[S.chal - 1].n}」进行中，目标 ${fmt(chalGoal(S, S.chal))}</span>` : '');
+  $('rate').innerHTML = `每 <b>${fx(G.dt, 3)}</b> 秒获得 <b class="num">${fmt(G.prod)}</b> · 每秒约 <b class="num">${fmt(G.pps)}</b>` + (G.sc ? ` · <span class="cy">深空软上限</span>` : '') + (S.chal ? ` · <span class="co">猜想「${CJ[S.chal - 1].n}」进行中，目标 ${fmt(chalGoal(S, S.chal))}</span>` : '');
   $('reads').querySelectorAll('[data-rd]').forEach(el => { const t = READS[+el.dataset.rd][1](); if (el.textContent !== t) el.textContent = t; });
   const fast = G.dt < 0.2; $('tickbar').classList.toggle('fast', fast);
   if (!fast) $('tickfill').style.width = Math.min(100, S.tick / G.dt * 100) + '%';
@@ -1663,7 +1741,7 @@ function renderBar() {
   const items = [['rb', '重生', () => canRebirth(S), () => canRebirth(S) ? '+' + fmt(G.rbGain) + ' 重生点' : '需要 1e4 点数', 'go']];
   if (S.tier >= 2) items.push(['pf', () => S.chal && S.P >= chalGoal(S, S.chal) ? '证毕猜想' : '证明', () => canProof(S), () => G.pfGain !== NI ? '+' + fmt(G.pfGain) + ' 定理' : S.chal ? '达到猜想目标即可证毕' : '需要 1e25 点数', 'go']);
   if (S.tier >= 3) items.push(['ax', '公理化', () => canAxiom(S), () => S.chal ? '猜想中不可用' : G.axGain !== NI ? '+' + fmt(G.axGain) + ' 公理' : '需要 1e130 点数', 'go']);
-  if (S.tier >= 6) items.push(['tr', '超限', () => canTrans(S), () => S.chal ? '猜想中不可用' : G.trGain !== NI ? '+' + fmt(G.trGain) + ' 序数' : '需要 1e2500 点数', 'go']);
+  if (S.tier >= 6) items.push(['tr', '超限', () => canTrans(S), () => S.chal ? '猜想中不可用' : canTrans(S) ? '+' + fmt(G.trGain) + ' 序数' : '需要 ' + fmt(trReqOf(S)) + ' 点数', 'go']);
   if (canPromote(S)) items.push(['promo', '晋升', () => true, () => '升至' + TIERN[S.tier + 1], 'cy']);
   renderActions($('acts'), items);
   const next = items.some(x => x[0] === 'promo') ? [] : [['tab:promo', '查看晋升', () => true, () => Number.isFinite(TIERS[S.tier].req) ? '需要 ' + fmt(TIERS[S.tier].req) + ' 点数' : '当前版本进度', 'cy']];
@@ -1693,6 +1771,8 @@ const TABS = [
   { id: 'sw', n: '星盘', on: () => S.tier >= 6 && S.chap >= 7, dot: () => SW.some(n => swCan(S, n.id)) },
   { id: 'g24', n: '二十四点', on: () => S.tier >= 6 && S.chap >= 8, dot: () => S.g24.ch >= 1 },
   { id: 'ng', n: '数织', on: () => S.tier >= 6 && S.chap >= 9 },
+  { id: 'tw', n: '无穷之塔', on: () => S.tier >= 7, dot: () => S.tw.c >= 1 },
+  { id: 'fz', n: '分解', on: () => S.tier >= 7, dot: () => S.fz.ch >= 1 },
   { id: 'cj', n: '猜想', on: () => S.u.x3 === 1 || cjTotal(S) > 0 },
   { id: 'res', n: '研究', on: () => S.tier >= 2, dot: () => RS.some(r => resCan(S, r.id)) },
   { id: 'pr', n: '素数', on: () => S.tier >= 2 },
@@ -1704,7 +1784,7 @@ const TABS = [
   { id: 'opt', n: '设置', on: () => true },
 ];
 function treeCan(L) { const arr = LAYER[L].tree, have = curGet(S, LAYER[L].cur); return arr.some(x => upgState(S, x) === 'ok' && have >= x.c); }
-const NAV_SYMBOL = { factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', fr: '△', mp: 'M', tr: 'Ω', om: 'ω', acad: '∑', lm: '⊕', gc: '◇', ex: '↗', sw: '✧', g24: '24', ng: '▤', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
+const NAV_SYMBOL = { factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', fr: '△', mp: 'M', tw: 'ℵ', fz: '∏', tr: 'Ω', om: 'ω', acad: '∑', lm: '⊕', gc: '◇', ex: '↗', sw: '✧', g24: '24', ng: '▤', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
 function renderTabs() {
   const tabs = $('tabs');
   const html = TABS.filter(t => t.on()).map(t => `<button class="tab ${view === t.id ? 'on' : ''}"${view === t.id ? ' aria-current="page"' : ''} data-a="tab:${t.id}"><span class="nav-symbol" aria-hidden="true">${NAV_SYMBOL[t.id] || '·'}</span>${t.n}${t.dot && view !== t.id && t.dot() ? '<span class="dot"></span>' : ''}</button>`).join('');
@@ -1719,7 +1799,7 @@ function renderTabs() {
 
 /* ---------------- 视图 ---------------- */
 function sigOf() {
-  return [view === 'lm' ? JSON.stringify(S.lm.g) + lmSel : view === 'gc' ? JSON.stringify(S.gc) + gcSel.c + gcSel.g : view === 'ex' ? JSON.stringify(exPick) + S.ex.act.length + S.ex.n : view === 'sw' ? Object.keys(S.sw).length + swSel : view === 'g24' ? S.g24.h.join() + JSON.stringify(g24ui.cards) + g24ui.sel + g24ui.op + (S.g24.ch >= 1) : view === 'ng' ? ngSel + JSON.stringify(S.ng[ngSel] || []) : view === 'fr' ? JSON.stringify(S.fr) + !!S.res.done.s37 : view === 'mp' ? S.mp.n + '/' + S.mp.L : '', S.chap, S.trTot >= 1, S.trTot >= 5, Object.keys(S.ac.got).length, S.ac.seat.join(), acSeats(S), view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
+  return [view === 'lm' ? JSON.stringify(S.lm.g) + lmSel : view === 'gc' ? JSON.stringify(S.gc) + gcSel.c + gcSel.g : view === 'ex' ? JSON.stringify(exPick) + S.ex.act.length + S.ex.n : view === 'sw' ? Object.keys(S.sw).length + swSel : view === 'g24' ? S.g24.h.join() + JSON.stringify(g24ui.cards) + g24ui.sel + g24ui.op + (S.g24.ch >= 1) : view === 'ng' ? ngSel + JSON.stringify(S.ng[ngSel] || []) : view === 'tw' ? Math.floor(S.tw.f / 1) + '' : view === 'fz' ? S.fz.cur + ':' + S.fz.fs.length + ':' + (S.fz.ch >= 1) + fzShake : view === 'fr' ? JSON.stringify(S.fr) + !!S.res.done.s37 : view === 'mp' ? S.mp.n + '/' + S.mp.L : '', S.chap, S.trTot >= 1, S.trTot >= 5, Object.keys(S.ac.got).length, S.ac.seat.join(), acSeats(S), view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
 }
 function B(key, fn) { binds.push([key, fn]); return `data-b="${key}"`; }
 function buildView() {
@@ -2075,10 +2155,41 @@ VIEWS.mp = () => {
   if (S.mp.n < MERS.length) h += `<div class="card dim"><div class="nm">第 ${S.mp.n + 1} 个 · ？？？</div><div class="muted">继续检验，等待发现</div></div>`;
   return h + `</div><p class="note">年份是人类第一次发现该梅森素数的时间。完全数是等于自身所有真因数之和的数，例如 6 = 1 + 2 + 3、28 = 1 + 2 + 4 + 7 + 14。</p>`;
 };
+/* ---------- 无穷之塔 ---------- */
+VIEWS.tw = () => {
+  const f = S.tw.f, rows = [];
+  for (let n = f + 4; n >= Math.max(0, f - 2); n--) { const ms = TWN[n + 1]; rows.push(`<div class="twf ${n === f ? 'cur' : n < f ? 'done' : ''} ${ms ? 'ms' : ''}"><span class="num">第 ${n + 1} 层</span>${ms ? `<b>${ms}</b>` : ''}${n === f ? `<div class="twp"><div ${B('twp', () => ({ w: 100 * S.tw.p }))}></div></div>` : ''}</div>`); }
+  const next = Object.keys(TWN).map(Number).find(k => k > f);
+  let h = `<div class="sec">无穷之塔<span class="h">一层层向上攀登，每 10 层会遇见一个传说中的巨大数字</span></div><div class="grid">
+  <div class="card"><div class="tower">${rows.join('')}</div></div>
+  <div class="card"><div class="nm">攀登</div><div class="muted" ${B('twi', () => '当前第 ' + (S.tw.f + 1) + ' 层 · 本层还需 ' + fmtT((1 - S.tw.p) * twFloorTime(S.tw.f) / twSpeed(S)))}></div>
+  <div class="muted" ${B('tws', () => '攀登速度 ×' + fx(twSpeed(S), 2) + ' · 越高的楼层越难攀登')}></div>
+  <div class="fm" ${B('twa', () => 'ℵ +' + fx(K.alS * 0.06 * Math.log(1 + S.tw.f / 10), 4))}></div>
+  <div class="row"><button class="btn" data-a="tws" ${B('twb', () => ({ c: 'btn ' + (S.tw.c >= 1 ? 'go' : ''), d: S.tw.c < 1 }))}>冲刺两层<small ${B('twc', () => '充能 ' + S.tw.c + ' / 3' + (S.tw.c < 3 ? ' · ' + fmtT(14400 - S.tw.t) : ''))}></small></button></div>
+  <p class="note">每完成一次质因数分解，也会让你向上攀登 10 分钟的路程。${next ? `下一个传说：第 ${next} 层「${TWN[next]}」。` : '你已越过所有传说，继续向着绝对无限攀登。'}</p></div></div>`;
+  const met = Object.keys(TWN).map(Number).filter(k => k <= f);
+  if (met.length) h += `<div class="sec">已经遇见</div><div class="grid">${met.map(k => `<div class="card"><div class="t"><span class="nm">${TWN[k]}</span><span class="pill">第 ${k} 层</span></div><div class="ds">${TWD[k]}</div></div>`).join('')}</div>`;
+  return h;
+};
+/* ---------- 质因数分解 ---------- */
+let fzShake = 0;
+VIEWS.fz = () => {
+  const ready = S.fz.ch >= 1, fs = S.fz.fs.length ? S.fz.fs.join(' × ') + (S.fz.rem > 1 ? ' × ' + S.fz.rem : '') : String(S.fz.cur);
+  return `<div class="sec">质因数分解<span class="h">点击素数，把这个数一步步除到 1</span></div><div class="grid">
+  <div class="card" style="grid-column:1/-1"><div class="fzn ${fzShake ? 'shake' : ''}">${S.fz.cur.toLocaleString('en-US')}</div><div class="fm" style="text-align:center">= ${fs}</div>
+  <div class="row" style="justify-content:center">${FZP.map(p => `<button class="btn fzp" data-a="fzt:${p}" ${ready ? '' : 'disabled'}>${p}</button>`).join('')}</div>
+  <div class="row" style="justify-content:center"><button class="btn sm" data-a="fzs">换一个数</button></div></div>
+  <div class="card"><div class="nm">计分板</div><div class="muted" ${B('fzc', () => '可分解的数 ' + S.fz.ch + ' / 8' + (S.fz.ch < 8 ? ' · 下一个 ' + fmtT(1200 - S.fz.t) : ''))}></div>
+  <div class="muted" ${B('fzk', () => '已完成 ' + S.fz.n + ' 次 · ℵ +' + fx(K.alS * 0.025 * L10(1 + S.fz.n), 4))}></div>
+  <p class="note">算术基本定理：每个大于 1 的整数都能唯一地写成素数的乘积。每完成一次分解，无穷之塔向上攀登 10 分钟。点错不会有惩罚。</p></div></div>`;
+};
 VIEWS.promo = () => {
   if (S.tier >= 6) {
-    let h = `<div class="sec">六阶 · 章节<span class="h">六阶没有更高的晋升，章节随本阶最高点数推进</span></div><div class="grid"><div class="card" style="grid-column:1/-1">
-    <div class="muted">通关进度（按数量级的对数）</div><div class="prog"><div ${B('cp', () => ({ w: Math.max(0, Math.min(100, (L10(Math.max(2000, pz(S.Pbest))) - L10(2000)) / (L10(K.endGoal) - L10(2000)) * 100)) }))}></div></div><div class="muted" ${B('cpt', () => '最高 ' + fmt(S.Pbest) + ' / ' + fmt(K.endGoal))}></div>
+    let h = '';
+    if (S.tier === 6) { const req = TIERS[6].req; h += `<div class="sec">晋升 · 最终阶段</div><div class="grid"><div class="card"><div class="nm">六阶 → 七阶</div><div class="muted">需要点数 ${fmt(req)}</div><div class="prog"><div ${B('p7', () => ({ w: Math.max(0, Math.min(100, pz(S.P) / req * 100)) }))}></div></div><div class="muted" ${B('p7t', () => '当前 ' + fmt(S.P))}></div><div class="row"><button class="btn" data-a="promo" ${B('p7b', () => ({ c: 'btn ' + (canPromote(S) ? 'cy' : ''), d: !canPromote(S) }))}>晋升至七阶</button></div></div><div class="card"><div class="nm">七阶将带来</div><ul class="ms">${PROMO_TEXT[7].map(x => '<li>' + x + '</li>').join('')}</ul></div></div>`; }
+    if (S.tier >= 7) h += `<div class="sec">七阶 · 最终阶段<span class="h">此后不再有新的阶，只有新的玩法</span></div><div class="grid"><div class="card"><div class="nm">公式的指数</div><div class="fm" ${B('exf', () => '(Ω·ψ)^ℵ = (' + fx(G.Om, 3) + ' × ' + fx(G.psi || 1, 3) + ')^' + fx(G.al || 1, 4) + ' = ' + fx(G.EX || 1, 4))}></div><div class="muted" ${B('exb', () => '历史最高 ' + fmt(S.Pall))}></div><div class="ds" ${B('scd', () => G.sc ? '深空：本次产量的原始数量级为 ' + fmt(G.scRaw) + '，超过 ee8 的部分按 ^' + K.scQ + ' 计算' : '深空：产量超过 ee8 后，超出的数量级会按 ^' + K.scQ + ' 计算')}></div></div><div class="card"><div class="nm">ℵ 的来源</div><div class="fm">ℵ = 1 + ${fx(K.alS, 2)} × Σ</div><ul class="ms" ${B('alb', () => ({ h: (G.alB || []).map(x => `<li>${x[0]}：+${fx(x[1], 4)}</li>`).join('') }))}></ul></div></div>`;
+    h += `<div class="sec">六阶 · 章节<span class="h">章节随最高点数推进</span></div><div class="grid"><div class="card" style="grid-column:1/-1">
+    <div class="muted" ${B('cpt', () => '历史最高 ' + fmt(S.Pall))}></div>
     <ul class="ms">${CH6.map((c, k) => `<li class="${S.chap >= k ? 'got' : ''}"><b>${c.n}</b>（${fmt(c.k)}）：${c.d}</li>`).join('')}</ul></div>
     <div class="card"><div class="nm">Ω 的来源</div><div class="fm">Ω = 1 + ${fx(K.omS, 2)} × Σ</div><ul class="ms" ${B('omb', () => ({ h: (G.omB || []).map(x => `<li>${x[0]}：+${fx(x[1], 3)}</li>`).join('') }))}></ul><div class="muted" ${B('omv', () => '当前 Ω = ' + fx(G.Om, 4))}></div></div>
     ${S.chap >= 7 ? `<div class="card"><div class="nm">ψ 的来源</div><div class="fm">ψ = 1 + ${fx(K.psS, 2)} × Σ</div><ul class="ms" ${B('psb', () => ({ h: (G.psB || []).map(x => `<li>${x[0]}：+${fx(x[1], 3)}</li>`).join('') }))}></ul><div class="muted" ${B('psv', () => '当前 ψ = ' + fx(G.psi || 1, 4))}></div></div>` : ''}</div>`;
@@ -2107,7 +2218,7 @@ VIEWS.ach = () => {
 VIEWS.stat = () => {
   const rows = [['总游戏时间', () => fmtT(S.st.time)], ['当前阶时长', () => fmtT(S.st.tierT[S.tier] || 0)], ['本轮重生时长', () => fmtT(S.rbT)], ['获得点数次数', () => fmtInt(S.ticks)],
   ['本阶最高点数', () => fmt(S.Pbest)], ['历史最高点数', () => fmt(S.Pall)], ['累计重生', () => String(S.rbTot)], ['累计证明', () => String(S.pfTot)], ['累计公理化', () => String(S.axTot)],
-  ['猜想证毕', () => cjTotal(S) + ' / 48'], ['完成研究', () => Object.keys(S.res.done).length + ' / ' + RS.length], ['捕捉灵光', () => String(S.st.sparks || 0)], ['累计超限', () => String(S.trTot)], ['ω', () => fmtBig(S.om.w)], ['引理最高等级', () => String(S.lm.max)], ['数学家', () => Object.keys(S.ac.got).length + ' / ' + MATH.length], ['梅森素数', () => S.mp.n + ' / ' + MERS.length], ['分形迭代', () => FR.reduce((s, f) => s + (S.fr[f.id] || 0), 0) + ' / ' + FR.reduce((s, f) => s + f.max, 0)], ['图着色', () => gcCount(S) + ' / 8'], ['累计灵感', () => fmtBig(S.INt)], ['远征次数', () => String(S.ex.n)], ['二十四点', () => String(S.g24.n)], ['数织', () => ngCount(S) + ' / 8'], ['星盘', () => Object.keys(S.sw).length + ' / ' + SW.length], ['重置升级树', () => String(S.st.respec || 0)]];
+  ['猜想证毕', () => cjTotal(S) + ' / 48'], ['完成研究', () => Object.keys(S.res.done).length + ' / ' + RS.length], ['捕捉灵光', () => String(S.st.sparks || 0)], ['累计超限', () => String(S.trTot)], ['ω', () => fmtBig(S.om.w)], ['引理最高等级', () => String(S.lm.max)], ['数学家', () => Object.keys(S.ac.got).length + ' / ' + MATH.length], ['梅森素数', () => S.mp.n + ' / ' + MERS.length], ['无穷之塔', () => '第 ' + (S.tw.f + 1) + ' 层'], ['质因数分解', () => String(S.fz.n)], ['分形迭代', () => FR.reduce((s, f) => s + (S.fr[f.id] || 0), 0) + ' / ' + FR.reduce((s, f) => s + f.max, 0)], ['图着色', () => gcCount(S) + ' / 8'], ['累计灵感', () => fmtBig(S.INt)], ['远征次数', () => String(S.ex.n)], ['二十四点', () => String(S.g24.n)], ['数织', () => ngCount(S) + ' / 8'], ['星盘', () => Object.keys(S.sw).length + ' / ' + SW.length], ['重置升级树', () => String(S.st.respec || 0)]];
   return `<div class="sec">统计</div><div class="grid">${rows.map((r, i) => `<div class="card"><div class="muted">${r[0]}</div><div class="num" style="font-size:20px" ${B('st' + i, r[1])}></div></div>`).join('')}</div>`;
 };
 VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
@@ -2118,7 +2229,7 @@ VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
   <div class="row"><button class="btn sm" data-a="save">立即保存</button><button class="btn sm" data-a="exp">导出存档</button><button class="btn sm" data-a="imp">导入存档</button></div>
   <textarea id="saveBox" placeholder="导出的存档字符串会出现在这里；导入时把存档粘贴进来再点「导入存档」"></textarea></div>
   <div class="card"><div class="nm">危险操作</div><div class="ds">彻底删除进度，从头开始。</div><div class="row"><button class="btn sm warn" data-a="hard">删除存档并重新开始</button></div></div>
-  </div><p class="note">无尽演算 v1.2.1 · 共 6 阶、5 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
+  </div><p class="note">无尽演算 v1.2.2 · 共 7 阶、5 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、无穷之塔、质因数分解、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
 
 /* ---------------- 操作 ---------------- */
 function act(a) {
@@ -2171,6 +2282,9 @@ function act(a) {
     case 'sieve': buySieve(S); break;
     case 'frb': if (frBuy(S, p[1])) toast(FRM[p[1]].n + ' 迭代到第 ' + S.fr[p[1]] + ' 次'); viewSig = ''; break;
     case 'mpb': mpBuy(S); break;
+    case 'tws': if (twSprint(S)) toast('冲刺！到达第 ' + (S.tw.f + 1) + ' 层'); viewSig = ''; break;
+    case 'fzt': { const r = fzTap(S, +p[1]); if (r === -1) { fzShake = (fzShake + 1) % 2 + 1; toast(p[1] + ' 不能整除 ' + S.fz.rem); } else if (r === 2) { fzShake = 0; toast('分解完成！'); } else fzShake = 0; viewSig = ''; break; }
+    case 'fzs': fzDeal(S); fzShake = 0; viewSig = ''; break;
     case 'cw': { const id = p[1], v = Math.max(0, Math.min(10, (S.cst.w[id] || 0) + (+p[2]))); S.cst.w[id] = v; break; }
     case 'msz': msSize = +p[1]; viewSig = ''; break;
     case 'msp': msSel[p[1]] = msSel[p[1]] === +p[2] ? 0 : +p[2]; viewSig = ''; break;
@@ -2180,7 +2294,7 @@ function act(a) {
     case 'exp': { const b = $('saveBox'); if (b) { b.value = encodeSave(S); b.select(); try { navigator.clipboard.writeText(b.value); toast('存档已复制到剪贴板'); } catch (e) { toast('存档已显示在文本框中'); } } break; }
     case 'imp': { const b = $('saveBox'); if (!b || !b.value.trim()) { toast('请先把存档粘贴到文本框中'); break; } try { const T = decodeSave(b.value); confirmDo('导入存档', '<p>当前进度将被导入的存档覆盖。</p>', '导入', () => { S = T; NOTA = S.opt.nota || 0; applyTheme(); heroTier = 0; recalc(S); save(); toast('导入成功'); }); } catch (e) { toast('存档格式不正确，请检查是否复制完整'); } break; }
     case 'hard': confirmDo('删除存档', '<p>所有进度将永久删除，且无法恢复。</p>', '删除并重新开始', () => { S = newState(); heroTier = 0; recalc(S); save(); pushCloud(); view = 'factor'; }); break;
-    case 'spark': if (spark) { const ks = ['boost', 'sieve']; if (S.res.act.length) ks.push('res'); if (S.tier >= 4) ks.push('cst'); if (S.tier >= 6) ks.push('omega'); if (S.tier >= 6 && S.chap >= 2) ks.push('lemma'); toast('灵光一现：' + applySpark(S, ks[Math.floor(Math.random() * ks.length)])); spark.remove(); spark = null; } break;
+    case 'spark': if (spark) { const ks = ['boost', 'sieve']; if (S.res.act.length) ks.push('res'); if (S.tier >= 4) ks.push('cst'); if (S.tier >= 6) ks.push('omega'); if (S.tier >= 6 && S.chap >= 2) ks.push('lemma'); if (S.tier >= 7) ks.push('tower'); toast('灵光一现：' + applySpark(S, ks[Math.floor(Math.random() * ks.length)])); spark.remove(); spark = null; } break;
   }
   recalc(S);
 }
