@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>无尽演算 v1.0.0</title>
+<title>无尽演算 v1.2.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -54,6 +54,7 @@ button{font:inherit;color:inherit}
 .rate{color:var(--muted);font-size:13px}
 .rate b{color:var(--ink);font-weight:500}
 .formula{font-family:var(--serif);font-size:clamp(22px,4.6vw,38px);text-align:center;margin:16px 0 8px;line-height:1.5;word-spacing:.05em;overflow-x:auto;white-space:nowrap;padding-bottom:4px}
+.formula.t6{font-size:clamp(14px,3.4vw,34px)}
 .formula sup{font-size:.58em;vertical-align:.95em;margin-left:1px}
 .formula i{font-style:italic;cursor:pointer;padding:0 1px;border-radius:4px}
 .formula i:hover{background:var(--cyanBg)}
@@ -114,9 +115,6 @@ button{font:inherit;color:inherit}
 .prog div{height:100%;background:var(--cyan)}
 .tgl{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;user-select:none}
 .tgl input[type=checkbox]{accent-color:var(--amber);width:16px;height:16px}
-.weight-control{display:grid;grid-template-columns:auto minmax(0,1fr) 2ch;align-items:center;gap:8px;margin-top:8px;font-size:13px}
-.weight-control input[type=range]{width:100%;min-width:0;height:30px;margin:0;accent-color:var(--amber);cursor:pointer}
-.weight-control b{text-align:right;font-variant-numeric:tabular-nums}
 select,input[type=text],textarea{font:inherit;background:var(--paper);color:var(--ink);border:1px solid var(--line2);border-radius:7px;padding:4px 8px}
 input[type=text]{width:110px}
 textarea{width:100%;min-height:90px;font-size:12px}
@@ -169,6 +167,57 @@ ul.ms{padding-left:18px;margin:6px 0;font-size:13.5px}
 .modal ul{padding-left:18px;margin:8px 0}
 .modal .row{justify-content:flex-end}
 
+/* 引理工坊 */
+.lmg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-width:320px;margin:6px 0}
+.lmt{aspect-ratio:1;border:1px solid var(--line2);border-radius:10px;background:var(--paper);font-family:var(--serif);font-size:22px;cursor:pointer;color:var(--ink);padding:0}
+.lmt.sel{outline:2px solid var(--amber);outline-offset:1px}
+.lmt.lv0{color:var(--amber);background:var(--amberBg)}
+.lmt.lv2,.lmt.lv3,.lmt.lv4{background:var(--cyanBg)}
+.lmt.lv5,.lmt.lv6,.lmt.lv7,.lmt.lv8{background:var(--cyanBg);border-color:var(--cyan)}
+.lmt.lv9,.lmt.lv10,.lmt.lv11,.lmt.lv12{background:var(--amberBg);border-color:var(--amber)}
+.lmt.lv13,.lmt.lv14,.lmt.lv15,.lmt.lv16{background:var(--amber);color:var(--bg);border-color:var(--amber)}
+/* 图着色 */
+.gsvg{width:100%;max-width:360px;display:block;margin:0 auto}
+.gsvg line{stroke:var(--line2);stroke-width:2}
+.gsvg line.bad{stroke:var(--coral);stroke-width:3}
+.gsvg circle{stroke:var(--ink);stroke-width:1.5;cursor:pointer}
+.gsvg circle.bad{stroke:var(--coral);stroke-width:3}
+.c0{fill:var(--panel)} .c1{fill:#E8A33D} .c2{fill:#3AA6D0} .c3{fill:#D9604A} .c4{fill:#5DB37A}
+.gpal{width:34px;height:34px;border-radius:50%;border:2px solid var(--line2);cursor:pointer}
+.gpal.c1{background:#E8A33D} .gpal.c2{background:#3AA6D0} .gpal.c3{background:#D9604A} .gpal.c4{background:#5DB37A}
+.gpal.sel{border-color:var(--ink);box-shadow:0 0 0 2px var(--amber)}
+/* 分形 */
+.frc{width:100%;max-width:260px;display:block;margin:6px auto;border:1px solid var(--line2);border-radius:8px;image-rendering:auto}
+/* 星盘 */
+.swgrid{grid-template-columns:minmax(300px,1.5fr) minmax(240px,1fr)}
+@media (max-width:640px){.swgrid{grid-template-columns:1fr}}
+.swsvg{width:100%;max-width:420px;display:block;margin:0 auto}
+.swsvg line{stroke:var(--line2);stroke-width:1.5}
+.swsvg line.own{stroke:var(--cyan);stroke-width:2.5}
+.star{cursor:pointer}
+.star circle{fill:var(--panel);stroke:var(--line2);stroke-width:1.5}
+.star text{font-family:var(--serif);font-size:11px;fill:var(--muted);pointer-events:none}
+.star.own circle{fill:var(--cyan);stroke:var(--cyan)} .star.own text{fill:var(--bg)}
+.star.can circle{stroke:var(--amber);stroke-width:2.5;fill:var(--amberBg)} .star.can text{fill:var(--amber)}
+.star.reach circle{stroke:var(--amber);stroke-dasharray:3 3}
+.star.lock{opacity:.45}
+.star.sel circle{stroke:var(--coral);stroke-width:3}
+/* 二十四点 */
+.row24{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 10px}
+.card24{width:68px;height:92px;border-radius:10px;border:1px solid var(--line2);background:var(--paper);font-family:var(--serif);font-size:26px;cursor:pointer;color:var(--ink);box-shadow:var(--shadow)}
+.card24.sel{border-color:var(--amber);background:var(--amberBg);transform:translateY(-4px)}
+.op24{font-family:var(--serif);font-size:20px;min-width:52px;text-align:center}
+/* 数织 */
+.ngt{border-collapse:collapse;margin:4px 0}
+.ngt th{font-family:var(--serif);font-weight:400;font-size:12px;color:var(--muted);vertical-align:bottom;padding:2px;line-height:1.15;text-align:center}
+.ngt th.rc{text-align:right;white-space:nowrap;vertical-align:middle;padding-right:6px}
+.ngt th.ok{color:var(--green)}
+.ngt td{padding:0}
+.ngc{width:28px;height:28px;border:1px solid var(--line2);background:var(--paper);cursor:pointer;display:block;padding:0;margin:0}
+.ngc.s1{background:var(--ink)}
+.ngc.s2{background:var(--paper);background-image:linear-gradient(45deg,transparent 45%,var(--faint) 45%,var(--faint) 55%,transparent 55%),linear-gradient(-45deg,transparent 45%,var(--faint) 45%,var(--faint) 55%,transparent 55%)}
+.ulam{width:257px;max-width:100%;image-rendering:pixelated;border:1px solid var(--line2);border-radius:6px;margin-top:6px}
+@media (max-width:640px){.ngc{width:24px;height:24px}.card24{width:60px;height:82px}}
 @media (max-width:640px){
   .wrap{padding:0 10px 70px}
   .treebox{--rh:118px}
@@ -258,7 +307,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
   [data-skin="workspace"] .rail-brand strong{font-size:21px}
   [data-skin="workspace"] .rail-brand em{font:italic 18px/1.2 var(--serif);color:var(--muted)}
   [data-skin="workspace"] .tabs{position:fixed;inset:calc(188 * var(--u)) auto 0 0;width:var(--rail);flex-direction:column;gap:4px;overflow-y:auto;overflow-x:hidden;padding:14px 10px 38px;background:var(--rail-bg);border:0;border-right:1px solid var(--line2)}
-  [data-skin="workspace"] .tab{text-align:start;border:0;border-radius:7px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+  [data-skin="workspace"] .tab{text-align:start;border:0;border-radius:7px;padding:10px 12px;display:flex;flex:none;align-items:center;gap:10px}
   [data-skin="workspace"] .tab.on{background:var(--cyanBg);color:var(--cyan)}
   [data-skin="workspace"] .tab .dot{top:50%;right:8px;transform:translateY(-50%)}
   [data-skin="workspace"] .nav-symbol{display:inline-block;font:19px/1 var(--serif);width:20px;text-align:center}
@@ -286,7 +335,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 </head>
 <body>
 <div class="wrap" id="shell" data-view="factor">
-  <header class="top"><div class="brand">无尽演算<small>v1.0.0</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
+  <header class="top"><div class="brand">无尽演算<small>v1.2.1</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
   <div class="rail-brand" aria-hidden="true"><b>Σ</b><strong>无尽演算</strong><em>Axiom</em></div>
   <section class="hero" id="hero">
     <div class="pts"><span class="big num" id="pts">0</span><span class="lbl">点数</span></div>
@@ -309,7 +358,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 <script>
 /* ===================== 公式晋升 v1.0.0 · 核心引擎（后端） ===================== */
 'use strict';
-const VERSION = '1.0.0';
+const VERSION = '1.2.1';
 const NI = -Infinity, L10 = Math.log10;
 /* 所有大数一律以 log10 存储：la=对数加，ls=对数减 */
 function la(a, b) { if (a === NI) return b; if (b === NI) return a; if (a < b) { const t = a; a = b; b = t; } const d = b - a; return d < -17 ? a : a + L10(1 + Math.pow(10, d)); }
@@ -320,7 +369,7 @@ const pz = l => l > 0 ? l : 0;
 const sq = (L, s, h) => L > s ? (L - s) * (L - s) * h : 0;
 const K = { // 主要平衡常数：获取量 = 10^(k·(lgP−需求)^q)
   rbReq: 4, rbK: 0.5, rbQ: 0.75, pfReq: 25, pfK: 0.25, pfQ: 0.6, axReq: 130, axK: 0.22, axQ: 0.55,
-  promo: { 1: 25, 2: 120, 3: 500, 4: 1500 }, endGoal: 2000,
+  promo: { 1: 25, 2: 120, 3: 500, 4: 1500, 5: 10000 }, endGoal: 1e7, extGoal: 1e7, psS: 0.45, trReq: 10000, trK: 1, trQ: 0.4, omS: 0.40,
 };
 
 /* ---------------- 数字格式化 ---------------- */
@@ -333,6 +382,7 @@ function fmt(l, dp) {
   if (l < -2) return '≈0';
   if (l < 3) return trim(Math.pow(10, l), dp);
   if (l < 6) return Math.floor(Math.pow(10, l) + 1e-7).toLocaleString('en-US');
+  if (l >= 1e6) { if (NOTA === 1) return 'e' + Math.round(l).toLocaleString('en-US'); const e2 = Math.floor(L10(l)); let m2 = l / Math.pow(10, e2); return 'e' + m2.toFixed(3) + 'e' + e2; }
   if (NOTA === 1) return 'e' + trim(l, 2);
   let e = Math.floor(l), m = Math.pow(10, l - e);
   if (m >= 9.995) { m = 1; e++; }
@@ -356,14 +406,16 @@ const TIERS = {
   2: { name: '二阶', req: K.promo[2] },
   3: { name: '三阶', req: K.promo[3] },
   4: { name: '四阶', req: K.promo[4] },
-  5: { name: '五阶', req: Infinity },
+  5: { name: '五阶', req: K.promo[5] },
+  6: { name: '六阶', req: Infinity },
 };
-const TB = { rb: [0, 0, 2, 8, 3, 3], pf: [0, 0, 0, 2, 1, 1], ax: [0, 0, 0, 0, 1, 1] }; // 阶加成（log10）
+const TB = { rb: [0, 0, 2, 8, 3, 3, 3], pf: [0, 0, 0, 2, 1, 1, 1], ax: [0, 0, 0, 0, 1, 1, 1] }; // 阶加成（log10）
 const PROMO_TEXT = {
   2: ['公式升级为 (a·b)^c · r · θ', '新因子 c（指数），作用于 a·b 整体', '新重置层「证明」，产出定理与定理因子 θ', '重生升级扩展第二行'],
   3: ['公式升级为 (a·b)^c · t^(c−1) · r · θ · α', '时间因子 t：本次重生经过的时间，指数随 c 增长', '新重置层「公理化」，产出公理与公理因子 α', '新功能「研究所」：消耗定理/公理进行限时研究', '「猜想」挑战（由公理升级解锁）', '重生、证明升级各扩展一行'],
   4: ['公式升级为 (a·b·d)^c · t^(c−1) · r · (θ·α)^λ', '新因子 d（用定理购买）与 λ（用公理购买）', '新功能「常数」：分配算力计算 π 等常数的位数', '猜想开放第三难度与两个新猜想', '所有重置层扩展新升级，研究所扩展新课题'],
-  5: ['公式升级为 … · κ^(c+λ)：常数之积 κ 直接进入公式', '算力 ×2，研究槽位 +1，常数 γ 解锁', '各层新增最终升级，冲击 e2000 极限'],
+  5: ['公式升级为 … · κ^(c+λ)：常数之积 κ 直接进入公式', '算力 ×2，研究槽位 +1，常数 γ 解锁', '分形花园与梅森素数搜寻：让 κ 的指数成长数十倍', '达到 e10000 晋升六阶'],
+  6: ['整个公式获得指数 Ω：P = [ … ]^Ω，所有旧内容都被 Ω 放大', '新重置层「超限」，产出序数', 'ω 序数引擎：随时间与技能增长，持续提升 Ω', '七个章节逐步解锁：数学家学院、引理合成、图着色、新猜想与新常数', 'v1.1.0 通关目标 e400000，极限 e500000'],
 };
 
 /* ---------------- 因子 ---------------- */
@@ -412,6 +464,7 @@ const RU = [ // 重生升级树
   { id: 'r25', t: 5, c: 210, x: 1, y: 18, pre: ['r23', 'r24'], any: true, grp: 'R6', n: '轮回之环', d: 'κ 的指数额外 +r 的指数×0.5', e: S => '+' + fx(G.rExp * 0.5, 2) },
   { id: 'r25b', t: 5, c: 210, x: 3, y: 18, pre: ['r23', 'r24'], any: true, grp: 'R6', n: '永恒轮回', d: 'r 的指数 +0.25' },
   { id: 'r26', t: 5, c: 235, x: 2, y: 19, pre: ['r25', 'r25b'], any: true, n: '无尽重生', d: '重生公式系数 k +0.03' },
+  { id: 'r27', t: 5, c: 290, x: 2, y: 20, pre: ['r26'], n: '终末重生', d: 'κ 的指数 ×1.15' },
 ];
 const PU = [ // 证明（定理）升级树
   { id: 'p1', t: 2, c: 0, x: 2, y: 0, n: '引理', d: '重生点获取 ×5' },
@@ -440,6 +493,7 @@ const PU = [ // 证明（定理）升级树
   { id: 'p20', t: 4, c: 33, x: 2, y: 14, pre: ['p19', 'p19b'], any: true, n: '永恒', d: 't 的指数 +0.25' },
   { id: 'p21', t: 5, c: 36, x: 1, y: 15, pre: ['p20'], n: '收敛', d: 'κ 的指数额外 +0.5' },
   { id: 'p22', t: 5, c: 40, x: 3, y: 15, pre: ['p20'], n: '无穷递降', d: '证明公式系数 k +0.02' },
+  { id: 'p23', t: 5, c: 47, x: 2, y: 16, pre: ['p21', 'p22'], any: true, n: '定理之海', d: 'κ 的指数 ×1.15' },
 ];
 const AU = [ // 公理升级树
   { id: 'x1', t: 3, c: 0, x: 2, y: 0, n: '基石', d: '定理获取 ×10' },
@@ -463,8 +517,37 @@ const AU = [ // 公理升级树
   { id: 'x16', t: 5, c: 16, x: 1, y: 12, pre: ['x15'], grp: 'X4', n: '大一统', d: 'κ 的指数额外 +α 的指数×0.5', e: S => '+' + fx(G.axExp * 0.5, 2) },
   { id: 'x16b', t: 5, c: 16, x: 3, y: 12, pre: ['x15'], grp: 'X4', n: '多元宇宙', d: 'λ +0.2' },
   { id: 'x17', t: 5, c: 17.5, x: 2, y: 13, pre: ['x16', 'x16b'], any: true, n: '超越', d: 'λ 每级效果 +0.01' },
+  { id: 'x18', t: 5, c: 20, x: 2, y: 14, pre: ['x17'], n: '公理之巅', d: 'κ 的指数 ×1.25' },
 ];
-const UPG = {}; RU.forEach(x => { x.L = 'r'; UPG[x.id] = x; }); PU.forEach(x => { x.L = 'p'; UPG[x.id] = x; }); AU.forEach(x => { x.L = 'x'; UPG[x.id] = x; });
+const OU = [ // 超限升级树（六阶）
+  { id: 'o1', t: 6, c: 0, x: 2, y: 0, n: '超限之门', d: 'Ω +0.03' },
+  { id: 'o2', t: 6, c: 2, x: 2, y: 1, pre: ['o1'], n: '良序', d: '序数获取 ×100' },
+  { id: 'o3', t: 6, c: 4, x: 1, y: 2, pre: ['o2'], n: '后继', d: 'ω 引擎速度 ×5' },
+  { id: 'o4', t: 6, c: 4, x: 3, y: 2, pre: ['o2'], n: '极限', d: 'ω 技能充能速度 ×1.5' },
+  { id: 'o5', t: 6, c: 7, x: 1, y: 3, pre: ['o3', 'o4'], grp: 'O1', n: '基数', d: 'Ω +0.05' },
+  { id: 'o5b', t: 6, c: 7, x: 3, y: 3, pre: ['o3', 'o4'], grp: 'O1', n: '序数', d: 'Ω +0.02，ω 引擎速度 ×100' },
+  { id: 'o6', t: 6, c: 10, x: 2, y: 4, pre: ['o5', 'o5b'], any: true, n: '对角线论证', d: 'c 每级效果 +0.02' },
+  { id: 'o7', t: 6, c: 14, x: 1, y: 5, pre: ['o6'], n: '幂集', d: '数学家经验获取 ×2' },
+  { id: 'o8', t: 6, c: 14, x: 3, y: 5, pre: ['o6'], n: '选择函数', d: '引理生成速度 ×2' },
+  { id: 'o9', t: 6, c: 19, x: 1, y: 6, pre: ['o7', 'o8'], grp: 'O2', n: '可数', d: 'Ω +0.06' },
+  { id: 'o9b', t: 6, c: 19, x: 3, y: 6, pre: ['o7', 'o8'], grp: 'O2', n: '不可数', d: 'θ、α 的指数各 +0.5' },
+  { id: 'o10', t: 6, c: 25, x: 2, y: 7, pre: ['o9', 'o9b'], any: true, n: '连续统', d: 'Ω +0.05' },
+  { id: 'o11', t: 6, c: 32, x: 1, y: 8, pre: ['o10'], n: '力迫', d: '超限公式系数 k +0.2' },
+  { id: 'o12', t: 6, c: 32, x: 3, y: 8, pre: ['o10'], n: '内模型', d: 'λ 每级效果 +0.02' },
+  { id: 'o13', t: 6, c: 40, x: 1, y: 9, pre: ['o11', 'o12'], grp: 'O3', n: '可构造', d: 'Ω +0.07' },
+  { id: 'o13b', t: 6, c: 40, x: 3, y: 9, pre: ['o11', 'o12'], grp: 'O3', n: '决定性', d: 'ω 引擎速度 ×1000，「极限跃迁」改为 ω×3' },
+  { id: 'o14', t: 6, c: 50, x: 2, y: 10, pre: ['o13', 'o13b'], any: true, n: '大基数', d: '学院席位 +1' },
+  { id: 'o15', t: 6, c: 62, x: 1, y: 11, pre: ['o14'], n: '不可达基数', d: 'Ω +0.06' },
+  { id: 'o16', t: 6, c: 62, x: 3, y: 11, pre: ['o14'], n: '可测基数', d: '引理合成对 Ω 的加成 ×1.5' },
+  { id: 'o17', t: 6, c: 76, x: 1, y: 12, pre: ['o15', 'o16'], grp: 'O4', n: '超紧致', d: 'Ω +0.08' },
+  { id: 'o17b', t: 6, c: 76, x: 3, y: 12, pre: ['o15', 'o16'], grp: 'O4', n: '伍丁基数', d: 'c +2' },
+  { id: 'o18', t: 6, c: 92, x: 2, y: 13, pre: ['o17', 'o17b'], any: true, n: '终极 L', d: 'Ω +0.08' },
+  { id: 'o19', t: 6, c: 110, x: 1, y: 14, pre: ['o18'], n: '绝对无穷', d: 'Ω +0.06' },
+  { id: 'o20', t: 6, c: 110, x: 3, y: 14, pre: ['o18'], n: '康托尔的乐园', d: 'Ω +0.06' },
+  { id: 'o21', t: 6, c: 135, x: 2, y: 15, pre: ['o19', 'o20'], n: 'Ω', d: 'Ω +0.1' },
+];
+const LARR = { r: RU, p: PU, x: AU, o: OU }, LCUR = { r: 'RP', p: 'TH', x: 'AX', o: 'OR' };
+const UPG = {}; RU.forEach(x => { x.L = 'r'; UPG[x.id] = x; }); PU.forEach(x => { x.L = 'p'; UPG[x.id] = x; }); AU.forEach(x => { x.L = 'x'; UPG[x.id] = x; }); OU.forEach(x => { x.L = 'o'; UPG[x.id] = x; });
 
 /* ---------------- 里程碑（按累计次数，永久） ---------------- */
 const PM = [ // 证明里程碑
@@ -498,6 +581,16 @@ const CJ = [
   { id: 6, n: '定理禁锢', d: '定理因子 θ 与公理因子 α 恒为 1', g: [120, 230, 560], t: [3, 3, 4], rw: 'θ 的指数 +0.1' },
   { id: 7, n: '维度坍缩', d: '维度因子 d 恒为 1，且 c 超出 1 的部分减半', g: [460, 600, 1010], t: [4, 4, 5], rw: 'd 的底数 +0.25' },
   { id: 8, n: '跃迁抑制', d: '跃迁因子 λ 恒为 0.5，且重生因子 r 恒为 1', g: [360, 495, 780], t: [4, 4, 5], rw: 'λ 每级效果 +0.005' },
+  { id: 9, n: '连续统假设', d: 'Ω 超出 1 的部分减半', g: [5600, 15600, 35000], t: [6, 6, 6], rw: 'Ω +0.03' },
+  { id: 10, n: '哥德巴赫猜想', d: '重生因子 r 与定理因子 θ 恒为 1', g: [6000, 17000, 42000], t: [6, 6, 6], rw: '序数获取 ×1000' },
+  { id: 11, n: '孪生素数猜想', d: 'c 的值减半', g: [2800, 8500, 21000], t: [6, 6, 6], rw: 'c +0.5' },
+  { id: 12, n: '庞加莱猜想', d: 'ω 引擎对 Ω 不再生效，且 t 恒为 1', g: [6400, 19000, 45000], t: [6, 6, 6], rw: 'ω 引擎速度 ×3' },
+  { id: 13, n: 'ABC 猜想', d: 'Ω 中引理工坊、图着色与常数 δ 的部分失效', g: [80000, 170000, 400000], t: [6, 6, 6], chp: 9, rw: 'ψ +0.02' },
+  { id: 14, n: 'BSD 猜想', d: '所有数学家的才能失效', g: [120000, 250000, 600000], t: [6, 6, 6], chp: 9, rw: '远征灵感 ×1.5' },
+  { id: 15, n: '纳维–斯托克斯', d: 'λ 恒为 1，且 c 超出 1 的部分减半', g: [19000, 38000, 76000], t: [6, 6, 6], chp: 11, rw: 'c +0.3' },
+  { id: 16, n: '霍奇猜想', d: 'ψ 恒为 1', g: [150000, 300000, 600000], t: [6, 6, 6], chp: 11, rw: 'ψ +0.02' },
+  { id: 17, n: '考拉兹猜想', d: 'κ 恒为 1', g: [1500, 2600, 3600], t: [5, 5, 5], rw: 'κ 的指数 ×1.06' },
+  { id: 18, n: 'P 与 NP', d: 'κ 的指数减半，且 t 恒为 1', g: [2200, 3500, 5200], t: [5, 5, 5], rw: 'κ 的指数 ×1.04，梅森测试速度 ×2' }
 ];
 
 /* ---------------- 研究（永久，限时） ---------------- */
@@ -517,9 +610,29 @@ const RS = [
   { id: 's13', t: 4, cur: 'AX', c: 10, h: 29, n: '代数几何', d: 'λ 每级效果 +0.01', un: ['x11', 'x12'] },
   { id: 's14', t: 4, cur: 'AX', c: 11.5, h: 34, n: '模形式', d: '解锁常数 √2', un: ['p19', 'p19b', 'p20', 'r23', 'r24'] },
   { id: 's15', t: 4, cur: 'AX', c: 13, h: 36, n: '解析数论', d: 'θ、α 的指数各 +0.08', un: ['x13', 'x13b', 'x14'] },
-  { id: 's16', t: 5, cur: 'AX', c: 14, h: 16, n: '朗兰兹纲领', d: 'κ 的指数额外 +1', un: ['p21', 'r25', 'r25b'] },
-  { id: 's17', t: 5, cur: 'AX', c: 15, h: 24, n: '黎曼猜想', d: '算力 ×5', un: ['x16', 'x16b', 'r26'] },
-  { id: 's18', t: 5, cur: 'AX', c: 16, h: 34, n: '万物之式', d: 'c +0.15，λ +0.15', un: ['x17', 'p22'] },
+  { id: 's16', t: 5, cur: 'AX', c: 14, h: 24, n: '朗兰兹纲领', d: 'κ 的指数额外 +1', un: ['p21', 'r25', 'r25b'] },
+  { id: 's17', t: 5, cur: 'AX', c: 15, h: 36, n: '黎曼猜想', d: '算力 ×5', un: ['x16', 'x16b', 'r26'] },
+  { id: 's18', t: 5, cur: 'AX', c: 16, h: 48, n: '万物之式', d: 'c +0.15，λ +0.15', un: ['x17', 'p22'] },
+  { id: 's35', t: 5, cur: 'AX', c: 17.5, h: 30, n: '代数数论', d: 'κ 的指数额外 +0.5', un: ['x18'] },
+  { id: 's36', t: 5, cur: 'AX', c: 19, h: 48, n: '调和分析', d: 'c +0.2，λ +0.2', un: ['r27', 'p23'] },
+  { id: 's37', t: 5, cur: 'AX', c: 21, h: 36, n: '分形几何', d: '解锁希尔伯特曲线；κ 的指数 ×1.25' },
+  { id: 's38', t: 5, cur: 'TH', c: 62, h: 48, n: '计算数论', d: '梅森测试速度 ×4；κ 的指数 ×1.15' },
+  { id: 's19', t: 6, cur: 'OR', c: 5, h: 36, n: 'ZFC 公理系统', d: '研究槽位 +1', un: ['o11', 'o12'] },
+  { id: 's20', t: 6, cur: 'OR', c: 12, h: 72, n: '哥德尔不完备性', d: 'Ω +0.1', un: ['o13', 'o13b', 'o14'] },
+  { id: 's21', t: 6, cur: 'OR', c: 20, h: 96, n: '力迫法', d: '学院席位 +1', un: ['o15', 'o16'] },
+  { id: 's22', t: 6, cur: 'OR', c: 30, h: 120, n: '大基数理论', d: 'ω 引擎速度 ×10', un: ['o17', 'o17b'] },
+  { id: 's23', t: 6, cur: 'OR', c: 42, h: 144, n: '模型论', d: '引理生成速度 ×2', un: ['o18'] },
+  { id: 's24', t: 6, cur: 'OR', c: 55, h: 168, n: '同伦类型论', d: '解锁常数 ζ(3)' },
+  { id: 's25', t: 6, cur: 'OR', c: 70, h: 192, n: '描述集合论', d: 'Ω +0.15', un: ['o19', 'o20'] },
+  { id: 's26', t: 6, cur: 'OR', c: 90, h: 240, n: '终极 L 计划', d: 'Ω +0.2', un: ['o21'] },
+  { id: 's27', t: 6, cur: 'OR', c: 230, h: 24, n: '代数拓扑', d: '远征队伍 +1；解锁远征地点「拓扑迷宫」', ch: 7 },
+  { id: 's28', t: 6, cur: 'OR', c: 260, h: 36, n: '解析组合', d: '二十四点奖励 ×2；ψ +0.02', ch: 8 },
+  { id: 's29', t: 6, cur: 'OR', c: 300, h: 48, n: '遍历论', d: '引理生成速度 ×2；ψ +0.03', ch: 8 },
+  { id: 's30', t: 6, cur: 'OR', c: 350, h: 48, n: '算术几何', d: '解锁远征地点「哥德尔深渊」；所有灵感获取 ×1.5', ch: 9 },
+  { id: 's31', t: 6, cur: 'OR', c: 410, h: 60, n: '随机矩阵', d: 'ψ +0.05', ch: 10 },
+  { id: 's32', t: 6, cur: 'OR', c: 480, h: 60, n: '镜像对称', d: '数学家经验 ×2；ψ +0.03', ch: 11 },
+  { id: 's33', t: 6, cur: 'OR', c: 560, h: 48, n: '几何朗兰兹', d: 'ψ +0.06', ch: 12 },
+  { id: 's34', t: 6, cur: 'OR', c: 650, h: 48, n: '万物之数', d: 'ψ +0.08', ch: 12 },
 ];
 const RSM = {}; RS.forEach(x => { RSM[x.id] = x; (x.un || []).forEach(u => { UPG[u].rq = x.id; }); });
 
@@ -530,6 +643,9 @@ const CS = [
   { id: 'phi', s: 'φ', n: '黄金比例', how: '研究「数值分析」', d: 'c +0.04×lg(1+位数)', e: D => '+' + fx(0.04 * L10(1 + D), 3) },
   { id: 'r2', s: '√2', n: '毕达哥拉斯常数', how: '研究「模形式」', d: 'λ +0.06×lg(1+位数)', e: D => '+' + fx(0.06 * L10(1 + D), 3) },
   { id: 'ga', s: 'γ', n: '欧拉常数', how: '公理升级「欧拉之梦」', d: 'θ、α 的指数 +0.05×lg(1+位数)', e: D => '+' + fx(0.05 * L10(1 + D), 3) },
+  { id: 'de', s: 'δ', n: '费根鲍姆常数', how: '六阶第五章', d: 'Ω +0.03×lg(1+位数)', e: D => '+' + fx(0.03 * L10(1 + D), 3) },
+  { id: 'z3', s: 'ζ(3)', n: '阿培里常数', how: '研究「同伦类型论」', d: 'ω 引擎速度 ×√(1+位数)', e: D => '×' + fmt(0.5 * L10(1 + D)) },
+  { id: 'ge', s: 'e^π', n: '盖尔丰德常数', how: '六阶第十二章', d: 'ψ +0.01×lg(1+位数)', e: D => '+' + fx(0.01 * L10(1 + D), 3) },
 ];
 function cstUnl(S, id) {
   if (S.tier < 4) return false;
@@ -539,6 +655,9 @@ function cstUnl(S, id) {
     case 'phi': return !!S.res.done.s10;
     case 'r2': return !!S.res.done.s14;
     case 'ga': return S.cst.got.ga || S.u.x15 === 1;
+    case 'de': return S.tier >= 6 && S.chap >= 4;
+    case 'z3': return S.tier >= 6 && !!S.res.done.s24;
+    case 'ge': return S.tier >= 6 && S.chap >= 11;
   }
   return false;
 }
@@ -576,13 +695,13 @@ const ACH = [
   ['π 之歌', 'π 计算到 1000 位', S => S.cst.D.pi >= 1000],
   ['五百', '点数达到 1e500', S => S.P >= 500],
   ['千', '点数达到 1e1000', S => S.P >= 1000],
-  ['证毕', '完成所有猜想的全部难度', S => cjTotal(S) >= 24],
+  ['证毕', '完成猜想 1–8 的全部难度', S => [1,2,3,4,5,6,7,8].every(i => (S.cc[i] || 0) >= 3)],
   ['博学', '完成全部研究', S => Object.keys(S.res.done).length >= RS.length],
   ['常数收藏家', '解锁全部 5 个常数', S => CS.every(c => cstUnl(S, c.id))],
-  ['五阶 · 通关', '晋升至五阶（v1.0.0 终点）', S => S.tier >= 5],
+  ['五阶', '晋升至五阶', S => S.tier >= 5],
   ['一千五', '在五阶点数达到 1e1500', S => S.tier >= 5 && S.P >= 1500],
   ['一千八', '点数达到 1e1800', S => S.P >= 1800],
-  ['极限', '点数达到 1e2000', S => S.P >= 2000],
+  ['两千', '点数达到 1e2000', S => S.P >= 2000],
   ['持之以恒', '总游戏时长达到 7 天', S => S.st.time >= 604800],
   ['无为', '在不重生的情况下单轮达到 1e300', S => S.P >= 300 && S.rbN === 0 && S.pfN === 0 && S.tier >= 3],
   ['筛子', '发现 1000 个素数', S => PRM(S) >= 3],
@@ -593,6 +712,51 @@ const ACH = [
   ['五方', '完成 5×5 幻方', S => MS(S, 5) === 1],
   ['灵光一现', '捕捉 10 次灵光', S => (S.st.sparks || 0) >= 10],
   ['另辟蹊径', '重置一次升级树', S => (S.st.respec || 0) >= 1],
+  ['六阶', '晋升至六阶', S => S.tier >= 6],
+  ['超限', '完成第一次超限', S => S.trTot >= 1],
+  ['序数大师', '序数达到 1e50', S => S.OR >= 50],
+  ['ω', 'ω 达到 1e10', S => S.om.w >= 1e10],
+  ['ω²', 'ω 达到 1e30', S => S.om.w >= 1e30],
+  ['学院初成', '招募 6 位数学家', S => Object.keys(S.ac.got).length >= 6],
+  ['群星闪耀', '招募全部 12 位数学家', S => Object.keys(S.ac.got).length >= 12],
+  ['教授', '一位数学家达到 10 级', S => Object.values(S.ac.xp).some(x => lvOf(x) >= 10)],
+  ['引理 Ⅹ', '合成出 10 级引理', S => S.lm.max >= 10],
+  ['引理 ⅩⅤ', '合成出 15 级引理', S => S.lm.max >= 15],
+  ['着色师', '完成 4 张图着色', S => gcCount(S) >= 4],
+  ['四色', '完成全部 8 张图着色', S => gcCount(S) >= 8],
+  ['五千', '六阶点数达到 1e5000', S => S.tier >= 6 && S.P >= 5000],
+  ['一万', '点数达到 1e10000', S => S.P >= 10000],
+  ['五万', '点数达到 1e50000', S => S.P >= 50000],
+  ['十万', '点数达到 1e100000', S => S.P >= 100000],
+  ['二十五万', '点数达到 1e250000', S => S.P >= 250000],
+  ['超越', '点数达到 1e400000', S => S.P >= 400000],
+  ['绝对无穷', '点数达到 1e500000', S => S.P >= 500000],
+  ['未解之谜', '完成猜想 9–12 的全部难度', S => [9, 10, 11, 12].every(i => (S.cc[i] || 0) >= 3)],
+  ['超限循环', '累计超限 100 次', S => S.trTot >= 100],
+  ['Ω 之巅', 'Ω 达到 4', S => G.Om >= 4],
+  ['一月之约', '总游戏时长达到 30 天', S => S.st.time >= 2592000],
+  ['远行', '完成 1 次远征', S => S.ex.n >= 1],
+  ['探险家', '完成 100 次远征', S => S.ex.n >= 100],
+  ['灵感涌泉', '累计获得 1e5 灵感', S => S.INt >= 1e5],
+  ['星盘初明', '点亮 10 颗星', S => Object.keys(S.sw).length >= 10],
+  ['满天星斗', '点亮定理星盘的全部 31 颗星', S => Object.keys(S.sw).length >= 31],
+  ['二十四', '完成一局二十四点', S => S.g24.n >= 1],
+  ['牌桌常客', '完成 100 局二十四点', S => S.g24.n >= 100],
+  ['数织新手', '完成 1 幅数织', S => ngCount(S) >= 1],
+  ['数织大师', '完成全部 8 幅数织', S => ngCount(S) >= 8],
+  ['十五人', '招募全部 15 位数学家', S => Object.keys(S.ac.got).length >= 15],
+  ['ee6', '点数达到 ee6', S => S.P >= 1e6],
+  ['三百万', '点数达到 e3e6', S => S.P >= 3e6],
+  ['奇点', '点数达到 e6e6', S => S.P >= 6e6],
+  ['ee7 · 通关', '点数达到 ee7（v1.2.0 通关）', S => S.P >= 1e7],
+  ['千禧难题', '完成猜想 13–16 的全部难度', S => [13, 14, 15, 16].every(i => (S.cc[i] || 0) >= 3)],
+  ['ψ', 'ψ 达到 1.3', S => (G.psi || 1) >= 1.3],
+  ['分形', '让任意分形迭代 1 次', S => frSum(S) > 0],
+  ['无穷细节', '所有分形都迭代到最高', S => FR.every(f => (S.fr[f.id] || 0) >= f.max)],
+  ['梅森', '发现 10 个梅森素数', S => S.mp.n >= 10],
+  ['GIMPS', '发现第 24 个梅森素数 2^19937−1', S => S.mp.n >= 24],
+  ['五阶一万', '在五阶点数达到 1e10000', S => S.tier >= 5 && S.P >= 10000],
+  ['未竟之问', '完成猜想 17–18 的全部难度', S => (S.cc[17] || 0) >= 3 && (S.cc[18] || 0) >= 3],
 ];
 
 /* ---------------- 状态 ---------------- */
@@ -606,9 +770,13 @@ function newState() {
     AX: NI, AXc: NI, axN: 0, axT: 0, axTot: 0,
     u: {}, chal: 0, cc: {},
     res: { done: {}, act: [] },
-    cst: { D: { pi: 0, e: 0, phi: 0, r2: 0, ga: 0 }, w: { pi: 1, e: 1, phi: 1, r2: 1, ga: 1 }, got: {} },
-    auto: { a: 1, b: 1, dt: 1, c: 1, d: 1, l: 1, rb: { on: 0, m: 0, v: '1' }, pf: { on: 0, m: 0, v: '1' }, ax: { on: 0, m: 0, v: '1' }, cj: 1 },
+    cst: { D: { pi: 0, e: 0, phi: 0, r2: 0, ga: 0, de: 0, z3: 0, ge: 0 }, w: { pi: 1, e: 1, phi: 1, r2: 1, ga: 1, de: 1, z3: 1, ge: 1 }, got: {} },
+    auto: { a: 1, b: 1, dt: 1, c: 1, d: 1, l: 1, rb: { on: 0, m: 0, v: '1' }, pf: { on: 0, m: 0, v: '1' }, ax: { on: 0, m: 0, v: '1' }, tr: { on: 0, m: 0, v: '1' }, cj: 1 },
     pr: { n: 1, L: 0 }, ms: { 3: [], 4: [], 5: [] }, boostT: 0,
+    OR: NI, ORc: NI, trN: 0, trT: 0, trTot: 0, chap: 0,
+    om: { w: 0, c1: 1, t1: 0, c2: 1, t2: 0 }, ac: { got: {}, seat: [], xp: {} }, lm: { g: [], q: 0, t: 0, max: 1 }, gc: {},
+    fr: { cantor: 0, koch: 0, sier: 0, hilb: 0 }, mp: { p: 2, w: 0, L: 0, n: 0 },
+    IN: 0, INt: 0, ex: { act: [], n: 0 }, sw: {}, g24: { h: [], ch: 3, t: 0, n: 0 }, ng: {},
     ach: {}, st: { time: 0, tierT: { 1: 0 }, promoAt: {}, sparks: 0, respec: 0 }, seen: {}, opt: { nota: 0, conf: 1 },
     last: Date.now(),
   };
@@ -617,7 +785,7 @@ function newState() {
 /* ---------------- 派生量 ---------------- */
 const G = {};
 const cjTotal = S => Object.values(S.cc).reduce((a, b) => a + b, 0);
-const resSlots = S => 1 + (S.res.done.s4 ? 1 : 0) + (S.tier >= 5 ? 1 : 0);
+const resSlots = S => 1 + (S.res.done.s4 ? 1 : 0) + (S.tier >= 5 ? 1 : 0) + (S.res.done.s19 ? 1 : 0);
 function autoUnl(S, id) {
   switch (id) {
     case 'a': case 'b': return S.u.r6 === 1 || S.pfTot >= 1;
@@ -626,7 +794,8 @@ function autoUnl(S, id) {
     case 'd': case 'l': return S.tier >= 4 && S.axTot >= 20;
     case 'rb': return S.pfTot >= 3;
     case 'pf': return S.axTot >= 2;
-    case 'ax': return S.axTot >= 30;
+    case 'ax': return S.axTot >= 30 || S.trTot >= 1;
+    case 'tr': return S.trTot >= 5;
   }
   return false;
 }
@@ -641,16 +810,17 @@ function recalc(S) {
   G.prE = PRM(S) >= 10 ? 0.18 : PRM(S) >= 5 ? 0.15 : 0.12;
   G.sieveV = sieveSpeed(S);
   // α
-  G.axExp = 1 + (h('x4') ? 0.25 : 0) + (h('x13') ? 0.1 : 0) + (R('s6') ? 0.2 : 0) + (R('s15') ? 0.08 : 0) + gaB;
+  G.x6th = T >= 6 ? (h('o9b') ? 0.5 : 0) + 0.04 * acL(S, 'noe') + swAdd(S, 'thax') : 0;
+  G.axExp = 1 + G.x6th + (h('x4') ? 0.25 : 0) + (h('x13') ? 0.1 : 0) + (R('s6') ? 0.2 : 0) + (R('s15') ? 0.08 : 0) + gaB;
   G.AXf = (T >= 3 && ch !== 6) ? G.axExp * l1(S.AXc) : 0;
   // θ
-  G.thExp = 1 + (h('p6') ? 0.25 : 0) + (h('p14') ? 0.25 : 0) + (h('p19') ? 0.2 : 0) + 0.1 * C(6) + (R('s3') ? 0.25 : 0) + (R('s15') ? 0.08 : 0) + gaB + (h('p15b') ? 0.2 : 0) + (h('x13b') ? 0.06 : 0) + 0.02 * msLines(S, 3);
+  G.thExp = 1 + G.x6th + (h('p6') ? 0.25 : 0) + (h('p14') ? 0.25 : 0) + (h('p19') ? 0.2 : 0) + 0.1 * C(6) + (R('s3') ? 0.25 : 0) + (R('s15') ? 0.08 : 0) + gaB + (h('p15b') ? 0.2 : 0) + (h('x13b') ? 0.06 : 0) + 0.02 * msLines(S, 3);
   let th = T >= 2 ? G.thExp * l1(S.THc) : 0;
   if (h('p15')) th += 0.25 * G.AXf;
-  G.THf = ch === 6 ? 0 : th;
+  G.THf = (ch === 6 || ch === 10) ? 0 : th;
   // r
   G.rExp = 1 + (h('r5') ? 0.3 : 0) + (h('r9b') ? 0.7 : 0) + (h('r25b') ? 0.25 : 0) + (h('r12') ? 0.15 : 0) + (h('r19') ? 0.1 : 0) + (h('r23') ? 0.05 : 0) + 0.05 * C(1);
-  G.Rf = (ch === 1 || ch === 8) ? 0 : G.rExp * l1(S.RPc);
+  G.Rf = (ch === 1 || ch === 8 || ch === 10) ? 0 : G.rExp * l1(S.RPc);
   // a
   let aM = nAch * L10(1.05);
   if (h('r1')) aM += L10(3);
@@ -664,33 +834,37 @@ function recalc(S) {
   if (h('x7')) bB *= 1.25;
   G.bB = bB; G.B = ch === 2 ? 0 : S.lv.b * L10(bB);
   // c
-  G.cS = 0.05 + (h('r11') ? 0.01 : 0) + (h('p2') ? 0.01 : 0) + (h('x2') ? 0.01 : 0) + (R('s2') ? 0.01 : 0);
-  G.cB = (h('r18') ? 0.15 : 0) + (h('p12') ? 0.1 : 0) + (h('p8') ? 0.012 * l1(S.THc) : 0) + 0.06 * C(4) + (cu('phi') ? 0.04 * L10(1 + D.phi) : 0) + (R('s9') ? 0.3 : 0) + (R('s18') ? 0.15 : 0) + (h('p5b') ? 0.06 : 0) + (h('x7b') ? 0.25 : 0) + (PRM(S) >= 8 ? 0.1 : 0);
-  G.c = (T >= 2 && ch !== 3) ? 1 + G.cS * S.lv.c + G.cB : 1; if (ch === 7) G.c = 1 + (G.c - 1) / 2;
+  G.cS = 0.05 + (h('o6') ? 0.02 : 0) + (h('r11') ? 0.01 : 0) + (h('p2') ? 0.01 : 0) + (h('x2') ? 0.01 : 0) + (R('s2') ? 0.01 : 0);
+  G.cB = (h('o17b') ? 2 : 0) + 0.5 * C(11) + 0.3 * C(15) + (T >= 6 ? swAdd(S, 'cAdd') : 0) + (h('r18') ? 0.15 : 0) + (h('p12') ? 0.1 : 0) + (h('p8') ? 0.012 * l1(S.THc) : 0) + 0.06 * C(4) + (cu('phi') ? 0.04 * L10(1 + D.phi) : 0) + (R('s9') ? 0.3 : 0) + (R('s18') ? 0.15 : 0) + (R('s36') ? 0.2 : 0) + (h('p5b') ? 0.06 : 0) + (h('x7b') ? 0.25 : 0) + (PRM(S) >= 8 ? 0.1 : 0);
+  G.c = (T >= 2 && ch !== 3) ? 1 + G.cS * S.lv.c + G.cB : 1; if (ch === 7) G.c = 1 + (G.c - 1) / 2; if (ch === 11) G.c = Math.max(1, G.c / 2); if (ch === 15) G.c = 1 + (G.c - 1) / 2;
   // Δ
   G.dtB = h('p7') ? 0.9 : 0.92; G.dtMin = h('r15') ? 0.05 : 0.1;
   G.dt = ch === 3 ? 5 : Math.max(G.dtMin, Math.pow(G.dtB, S.lv.dt));
   // t
   let tS = (h('r17') ? L10(5) : 0) + (h('x5') ? L10(1 + S.axN) : 0) + (R('s5') ? 1 : 0) + C(5) * L10(5) + (h('p11') ? 0.05 * l1(S.TH) : 0) + (cu('e') ? 1.5 * L10(1 + D.e) : 0);
   G.tS = tS;
-  G.Tf = (T >= 3 && ch !== 5) ? l1(tS + lg(S.rbT)) : 0;
+  G.Tf = (T >= 3 && ch !== 5 && ch !== 12 && ch !== 18) ? l1(tS + lg(S.rbT)) : 0;
   G.tE = (h('r22') ? 0.25 : 0) + (h('p20') ? 0.25 : 0) + (h('p13') ? 0.2 : 0) + (h('r17b') ? 0.2 : 0);
   // d
   G.dB = 2 + (h('r21') ? 0.5 : 0) + (h('p17') ? 0.5 : 0) + (h('x11') ? 1 : 0) + (R('s12') ? 1 : 0) + 0.25 * C(7) + (MS(S, 4) ? 0.5 : 0);
   G.D = (T >= 4 && ch !== 7) ? S.lv.d * L10(G.dB) : 0;
   // λ
-  G.lS = 0.03 + (h('r24') ? 0.005 : 0) + (h('p18') ? 0.005 : 0) + (h('x10') ? 0.01 : 0) + (h('x17') ? 0.01 : 0) + (R('s13') ? 0.01 : 0) + 0.005 * C(8);
-  G.lam = ch === 8 ? 0.5 : T >= 4 ? 1 + G.lS * S.lv.l + (cu('r2') ? 0.06 * L10(1 + D.r2) : 0) + (R('s18') ? 0.15 : 0) + (h('p19b') ? 0.1 : 0) + (h('x16b') ? 0.2 : 0) + 0.01 * msLines(S, 4) + (PRM(S) >= 9 ? 0.1 : 0) : 1;
+  G.lS = 0.03 + (h('o12') ? 0.02 : 0) + (h('r24') ? 0.005 : 0) + (h('p18') ? 0.005 : 0) + (h('x10') ? 0.01 : 0) + (h('x17') ? 0.01 : 0) + (R('s13') ? 0.01 : 0) + 0.005 * C(8);
+  G.lam = ch === 8 ? 0.5 : T >= 4 ? 1 + G.lS * S.lv.l + (cu('r2') ? 0.06 * L10(1 + D.r2) : 0) + (R('s18') ? 0.15 : 0) + (R('s36') ? 0.2 : 0) + (h('p19b') ? 0.1 : 0) + (h('x16b') ? 0.2 : 0) + 0.01 * msLines(S, 4) + (PRM(S) >= 9 ? 0.1 : 0) : 1;
   // κ
+  if (T >= 6) G.lam += swAdd(S, 'lamAdd'); if (ch === 15) G.lam = 1;
   let ks = 0; CS.forEach(c => { if (cu(c.id)) ks += L10(1 + D[c.id]); });
-  G.kE = 1 + (h('r25') ? 0.5 * G.rExp : 0) + (h('p21') ? 0.5 : 0) + (h('x16') ? 0.5 * G.axExp : 0) + (R('s16') ? 1 : 0) + 0.03 * msLines(S, 5) + 0.5 * MS(S, 5);
-  G.K = T >= 5 ? 0.08 * G.kE * ks : 0;
+  G.kE = 1 + (h('r25') ? 0.5 * G.rExp : 0) + (h('p21') ? 0.5 : 0) + (h('x16') ? 0.5 * G.axExp : 0) + (R('s16') ? 1 : 0) + (R('s35') ? 0.5 : 0) + 0.03 * msLines(S, 5) + 0.5 * MS(S, 5);
+  G.kM = T >= 5 ? kappaMult(S) : 1; G.kE *= G.kM; if (ch === 18) G.kE *= 0.5;
+  if (T >= 6) G.kE *= 1 + 0.08 * acL(S, 'ram');
+  G.K = (T >= 5 && ch !== 17) ? 0.085 * G.kE * ks : 0;
   // 产量
   const c = G.c; let p;
   if (T === 1) p = G.A + G.B + G.Rf;
   else if (T === 2) p = c * (G.A + G.B) + G.Rf + G.THf;
   else if (T === 3) p = c * (G.A + G.B) + (c - 1 + G.tE) * G.Tf + G.Rf + G.THf + G.AXf;
   else { p = c * (G.A + G.B + G.D) + (c - 1 + G.tE) * G.Tf + G.Rf + G.lam * (G.THf + G.AXf); if (T >= 5) p += (c + G.lam) * G.K; }
+  G.Om = T >= 6 ? omega6(S) : 1; G.psi = T >= 6 ? psi6(S) : 1; G.F = p; if (T >= 6) p *= G.Om * G.psi;
   if (ch === 4) p *= 0.5; if (ch === 5) p *= 0.75;
   if (S.boostT > 0) p += 3 * T;
   G.prod = p; G.pps = p - L10(G.dt);
@@ -711,15 +885,20 @@ function recalc(S) {
   G.axGain = (T >= 3 && S.P >= K.axReq) ? G.axE * Math.pow(S.P - K.axReq, G.axQ) + axM : NI;
   if (G.axGain < 0) G.axGain = NI;
   // 其他
-  G.resSpd = 1;
-  G.cpu = T >= 4 ? (1 + l1(S.AXc)) * (h('x12') ? 3 : 1) * (R('s11') ? 3 : 1) * (R('s17') ? 5 : 1) * (T >= 5 ? 2 : 1) : 0;
+  G.trE = K.trK + (h('o11') ? 0.2 : 0); G.trQ = K.trQ;
+  const trM = (h('o2') ? 2 : 0) + 0.4 * acL(S, 'fer') + 3 * C(10) + (S.trTot >= 30 ? 4 : 0);
+  const trq = trReqOf(S); G.trReq = trq;
+  G.trGain = (T >= 6 && S.P >= trq) ? G.trE * Math.pow(S.P - trq, G.trQ) + trM : NI; if (G.trGain < 0) G.trGain = NI;
+  G.omR = T >= 6 ? omRate(S) : 0; G.freeL = S.trTot >= 8;
+  G.resSpd = T >= 6 ? (1 + 0.03 * acL(S, 'rie')) * swMul(S, 'resSpd') : 1;
+  G.cpu = T >= 4 ? (1 + l1(S.AXc)) * (h('x12') ? 3 : 1) * (R('s11') ? 3 : 1) * (R('s17') ? 5 : 1) * (T >= 5 ? 2 : 1) * (T >= 6 ? 1 + 0.5 * acL(S, 'eul') : 1) : 0;
   G.free = S.pfTot >= 30; G.freeD = S.axTot >= 50;
   return G;
 }
 
 /* ---------------- 购买 ---------------- */
-function curGet(S, c) { return c === 'P' ? S.P : c === 'RP' ? S.RP : c === 'TH' ? S.TH : S.AX; }
-function curSet(S, c, v) { if (c === 'P') S.P = v; else if (c === 'RP') S.RP = v; else if (c === 'TH') S.TH = v; else S.AX = v; }
+function curGet(S, c) { return c === 'P' ? S.P : c === 'RP' ? S.RP : c === 'TH' ? S.TH : c === 'OR' ? S.OR : S.AX; }
+function curSet(S, c, v) { if (c === 'P') S.P = v; else if (c === 'RP') S.RP = v; else if (c === 'TH') S.TH = v; else if (c === 'OR') S.OR = v; else S.AX = v; }
 function factorMax(S, id) { // 可购买上限（Δ 到最小值后不可再买）
   if (id === 'dt') { const b = S.u.p7 === 1 ? 0.9 : 0.92, mn = S.u.r15 === 1 ? 0.05 : 0.1; return Math.ceil(L10(mn) / L10(b)); }
   return Infinity;
@@ -732,7 +911,7 @@ function factorLocked(S, id) {
 function buyFactor(S, id, max) {
   if (factorLocked(S, id)) return 0;
   const f = FD[id], cap = factorMax(S, id);
-  const free = (G.free && f.cur === 'P') || (G.freeD && id === 'd');
+  const free = (G.free && f.cur === 'P') || (G.freeD && id === 'd') || (G.freeL && id === 'l');
   let have = curGet(S, f.cur), L = S.lv[id];
   if (L >= cap) return 0;
   if (f.cost(L) > have) return 0;
@@ -755,25 +934,25 @@ function buyFactor(S, id, max) {
 function upgVisible(S, x) { return S.tier >= x.t; }
 function upgLocked(S, x) { return !!(x.rq && !S.res.done[x.rq]); }
 function preMet(S, x) { if (!x.pre || !x.pre.length) return true; return x.any ? x.pre.some(p => S.u[p] === 1) : x.pre.every(p => S.u[p] === 1); }
-function grpTaken(S, x) { if (!x.grp) return null; const arr = x.L === 'r' ? RU : x.L === 'p' ? PU : AU; const o = arr.find(y => y.grp === x.grp && y.id !== x.id && S.u[y.id] === 1); return o || null; }
+function grpTaken(S, x) { if (!x.grp) return null; const arr = LARR[x.L]; const o = arr.find(y => y.grp === x.grp && y.id !== x.id && S.u[y.id] === 1); return o || null; }
 function upgState(S, x) { // owned / locked(研究) / blocked(分支已选他路) / nopre / ok
   if (S.u[x.id] === 1) return 'own'; if (!upgVisible(S, x)) return 'hide'; if (upgLocked(S, x)) return 'res';
   if (grpTaken(S, x)) return 'alt'; if (!preMet(S, x)) return 'pre'; return 'ok';
 }
 function respec(S, L) {
-  const arr = L === 'r' ? RU : L === 'p' ? PU : AU, cur = L === 'r' ? 'RP' : L === 'p' ? 'TH' : 'AX';
+  const arr = LARR[L], cur = LCUR[L];
   let ref = NI; arr.forEach(x => { if (S.u[x.id] === 1) { ref = la(ref, x.c); delete S.u[x.id]; } });
   curSet(S, cur, la(curGet(S, cur), ref));
-  if (L === 'r') resetPoints(S, false); else if (L === 'p') { S.chal = 0; resetRebirthLayer(S); } else { S.chal = 0; resetProofLayer(S); }
+  if (L === 'r') resetPoints(S, false); else if (L === 'p') { S.chal = 0; resetRebirthLayer(S); } else if (L === 'x') { S.chal = 0; resetProofLayer(S); } else { S.chal = 0; resetAxiomLayer(S); }
   S.st.respec = (S.st.respec || 0) + 1; recalc(S); return true;
 }
 function buyUpg(S, id) {
   const x = UPG[id]; if (!x || upgState(S, x) !== 'ok') return false;
-  const c = x.L === 'r' ? 'RP' : x.L === 'p' ? 'TH' : 'AX';
+  const c = LCUR[x.L];
   const have = curGet(S, c); if (have < x.c) return false;
   curSet(S, c, ls(have, x.c)); S.u[id] = 1; return true;
 }
-function buyAllUpg(S, L) { const arr = L === 'r' ? RU : L === 'p' ? PU : AU; let n = 0, k; do { k = 0; arr.slice().sort((p, q) => p.c - q.c).forEach(x => { if (!x.grp && buyUpg(S, x.id)) { n++; k++; } }); } while (k); return n; }
+function buyAllUpg(S, L) { const arr = LARR[L]; let n = 0, k; do { k = 0; arr.slice().sort((p, q) => p.c - q.c).forEach(x => { if (!x.grp && buyUpg(S, x.id)) { n++; k++; } }); } while (k); return n; }
 
 /* ---------------- 重置 ---------------- */
 function resetPoints(S, keepF) {
@@ -812,7 +991,7 @@ function doRebirth(S) {
   resetPoints(S, S.pfTot >= 50); recalc(S); return true;
 }
 function chalGoal(S, id) { const c = CJ[id - 1], k = S.cc[id] || 0; return k < 3 ? c.g[k] : Infinity; }
-function chalAvail(S, id) { const c = CJ[id - 1], k = S.cc[id] || 0; return S.u.x3 === 1 && k < 3 && S.tier >= c.t[k]; }
+function chalAvail(S, id) { const c = CJ[id - 1], k = S.cc[id] || 0; return S.u.x3 === 1 && k < 3 && S.tier >= c.t[k] && (!c.chp || S.chap >= c.chp); }
 function canProof(S) { return G.pfGain >= 0 || (S.chal && S.P >= chalGoal(S, S.chal) && S.tier >= 2); }
 function doProof(S) {
   if (S.tier < 2) return false;
@@ -835,12 +1014,12 @@ function doAxiom(S) {
   const g = G.axGain; S.AX = la(S.AX, g); S.AXc = la(S.AXc, g); S.axN++; S.axTot++; S.axT = 0;
   resetProofLayer(S); recalc(S); return true;
 }
-function canPromote(S) { return S.tier < 5 && S.P >= TIERS[S.tier].req && !S.chal; }
+function canPromote(S) { return S.tier < 6 && S.P >= TIERS[S.tier].req && !S.chal; }
 function doPromote(S) {
   if (!canPromote(S)) return false;
   S.st.promoAt[S.tier + 1] = S.st.time;
   S.tier++; S.st.tierT[S.tier] = 0;
-  S.AX = NI; S.AXc = NI; S.axN = 0; S.axT = 0; S.lv.l = 0;
+  S.AX = NI; S.AXc = NI; S.axN = 0; S.axT = 0; S.lv.l = 0; S.OR = NI; S.ORc = NI; S.trN = 0; S.trT = 0; S.chap = 0;
   S.u = {}; S.chal = 0; S.Pbest = NI;
   S.TH = NI; S.THc = NI; S.pfN = 0; S.pfT = 0; S.lv.d = 0;
   S.RP = NI; S.RPc = NI; S.rbN = 0;
@@ -851,7 +1030,7 @@ function doPromote(S) {
 
 /* ---------------- 研究 ---------------- */
 function resCan(S, id) {
-  const r = RSM[id]; if (!r || S.res.done[id] || S.tier < r.t) return false;
+  const r = RSM[id]; if (!r || S.res.done[id] || S.tier < r.t || (r.ch && S.chap < r.ch)) return false;
   if (S.res.act.some(a => a.id === id)) return false;
   if (S.res.act.length >= resSlots(S)) return false;
   return curGet(S, r.cur) >= r.c;
@@ -874,6 +1053,11 @@ function runAuto(S) {
   for (const id of ['l', 'd', 'c', 'b', 'a', 'dt']) if (S.auto[id] && autoUnl(S, id)) buyFactor(S, id, true);
   recalc(S);
   if (S.chal && S.auto.cj && S.P >= chalGoal(S, S.chal)) { doProof(S); return 'cj'; }
+  if (S.tier >= 6) {
+    if (acSeated(S, 'tur')) { while (S.om.c1 >= 1) useOm1(S); if (S.chap >= 5) while (S.om.c2 >= 1) useOm2(S); }
+    if (S.trTot >= 12) lmMergeAll(S);
+    if (!S.chal && autoLayer(S, 'tr', G.trGain, S.ORc, S.trT)) { doTrans(S); return 'tr'; }
+  }
   if (!S.chal && autoLayer(S, 'ax', G.axGain, S.AXc, S.axT)) { doAxiom(S); return 'ax'; }
   if (autoLayer(S, 'pf', G.pfGain, S.THc, S.pfT) && !S.chal) { doProof(S); return 'pf'; }
   if (autoLayer(S, 'rb', G.rbGain, S.RPc, S.rbT)) { doRebirth(S); return 'rb'; }
@@ -883,7 +1067,7 @@ function runAuto(S) {
 /* ---------------- 主循环 ---------------- */
 function step(S, dt) {
   S.st.time += dt; S.st.tierT[S.tier] = (S.st.tierT[S.tier] || 0) + dt;
-  S.rbT += dt; S.pfT += dt; S.axT += dt;
+  S.rbT += dt; S.pfT += dt; S.axT += dt; S.trT += dt;
   // 研究
   if (S.res.act.length) {
     const sp = G.resSpd || 1;
@@ -893,6 +1077,8 @@ function step(S, dt) {
   // 常数
   if (S.tier >= 4 && G.cpu > 0) cstStep(S, dt);
   if (S.tier >= 2) { S.pr.n += G.sieveV * dt; }
+  if (S.tier >= 5) mpStep(S, dt);
+  if (S.tier >= 6) step6(S, dt);
   if (S.boostT > 0) S.boostT = Math.max(0, S.boostT - dt);
   recalc(S);
   // tick
@@ -903,7 +1089,8 @@ function step(S, dt) {
   }
   // 被动收益
   if (S.pfTot >= 20 && G.rbGain !== NI) { const g = G.rbGain + L10(0.01 * dt); S.RP = la(S.RP, g); S.RPc = la(S.RPc, g); }
-  if (S.axTot >= 7 && G.pfGain !== NI && !S.chal) { const g = G.pfGain + L10(0.01 * dt); S.TH = la(S.TH, g); S.THc = la(S.THc, g); }
+  if (S.tier >= 6 && S.trTot >= 2 && G.axGain !== NI && !S.chal) { const g = G.axGain + L10((S.trTot >= 20 ? 0.05 : 0.01) * dt); S.AX = la(S.AX, g); S.AXc = la(S.AXc, g); }
+  if (S.axTot >= 7 && G.pfGain !== NI && !S.chal) { const g = G.pfGain + L10((S.trTot >= 20 ? 0.05 : 0.01) * dt); S.TH = la(S.TH, g); S.THc = la(S.THc, g); }
   if (S.P > S.Pbest) S.Pbest = S.P; if (S.P > S.Pall) S.Pall = S.P;
 }
 function checkAch(S) {
@@ -953,12 +1140,338 @@ function applySpark(S, kind) {
   if (kind === 'res') { S.res.act.forEach(a => a.t = Math.max(1, a.t - 1200)); return '所有进行中的研究提前 20 分钟'; }
   if (kind === 'sieve') { S.pr.n += G.sieveV * 3600; return '素数筛推进 1 小时'; }
   if (kind === 'cst' && S.tier >= 4) { recalc(S); for (let i = 0; i < 6; i++) cstStep(S, 300); return '常数计算推进 30 分钟'; }
+  if (kind === 'omega' && S.tier >= 6) { S.om.w += G.omR * 3600; return 'ω 引擎推进 1 小时'; }
+  if (kind === 'lemma' && S.tier >= 6) { for (let i = 0; i < 3; i++) lmSpawn(S); return '获得 3 个引理'; }
   S.boostT = 60; return '60 秒内每次获得的点数 ×' + fmt(3 * S.tier);
 }
 function cstStep(S, dt) {
   let wsum = 0; CS.forEach(c => { if (cstUnl(S, c.id)) wsum += S.cst.w[c.id]; });
   if (wsum > 0) CS.forEach(c => { if (!cstUnl(S, c.id)) return; S.cst.got[c.id] = true;
-    const r = G.cpu * S.cst.w[c.id] / wsum, D0 = S.cst.D[c.id]; S.cst.D[c.id] = Math.pow(Math.pow(1 + D0, 1.5) + 1.5 * r * dt, 2 / 3) - 1; });
+    const r = G.cpu * S.cst.w[c.id] / wsum * ((c.id === 'pi' || c.id === 'de') && S.tier >= 6 ? 1 + acL(S, 'arc') : 1), D0 = S.cst.D[c.id]; S.cst.D[c.id] = Math.pow(Math.pow(1 + D0, 1.5) + 1.5 * r * dt, 2 / 3) - 1; });
+}
+
+/* ===================== v1.2.1 · 五阶「常数纪元」 ===================== */
+function trReqOf(S) { return S.legacyTr ? 2500 : K.trReq; }
+/* ---------- 分形花园 ---------- */
+const FR = [
+  { id: 'cantor', n: '康托尔集', dim: Math.log(2) / Math.log(3), c0: 14, cs: 1.8, max: 8, d: '把线段三等分、去掉中间一段，无限重复' },
+  { id: 'koch', n: '科赫曲线', dim: Math.log(4) / Math.log(3), c0: 16, cs: 2.2, max: 7, d: '每条线段的中间三分之一换成一个尖角' },
+  { id: 'sier', n: '谢尔宾斯基三角', dim: Math.log(3) / Math.log(2), c0: 18, cs: 2.6, max: 7, d: '把三角形四等分、挖去中间一块，无限重复' },
+  { id: 'hilb', n: '希尔伯特曲线', dim: 2, c0: 22, cs: 3, max: 7, rs: 's37', d: '一条连续的线，最终填满整个正方形' },
+];
+const FRM = {}; FR.forEach(f => FRM[f.id] = f);
+function frUnl(S, f) { return S.tier >= 5 && (!f.rs || !!S.res.done[f.rs]); }
+function frCost(f, L) { return f.c0 + f.cs * L; }
+function frCan(S, id) { const f = FRM[id], L = S.fr[id] || 0; return !!f && frUnl(S, f) && L < f.max && S.AX >= frCost(f, L); }
+function frBuy(S, id) { if (!frCan(S, id)) return false; const f = FRM[id]; S.AX = ls(S.AX, frCost(f, S.fr[id] || 0)); S.fr[id] = (S.fr[id] || 0) + 1; return true; }
+function frSum(S) { let s = 0; FR.forEach(f => s += (S.fr[f.id] || 0) * f.dim); return s; }
+/* ---------- 梅森素数搜寻 ---------- */
+const MERS = [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423, 9689, 9941, 11213, 19937, 21701, 23209, 44497, 86243, 110503, 132049, 216091];
+const MERSET = new Set(MERS);
+const MPS = (() => { const N = 400000, s = new Uint8Array(N + 1); for (let i = 2; i * i <= N; i++) if (!s[i]) for (let j = i * i; j <= N; j += i) s[j] = 1; return s; })();
+function nextPrime(n) { let k = n + 1; while (k < 400000 && MPS[k]) k++; return k; }
+function mpWork(p) { return p * p * L10(p + 1) / 1000; }
+function mpSpeed(S) { return 2 * Math.pow(3, S.mp.L) * (S.res.done.s38 ? 4 : 1) * Math.pow(2, S.cc[18] || 0); }
+function mpCost(L) { return 26 + 4.5 * L; }
+const MPMAX = 14;
+function mpBuy(S) { if (S.tier < 5 || S.mp.L >= MPMAX || S.TH < mpCost(S.mp.L)) return false; S.TH = ls(S.TH, mpCost(S.mp.L)); S.mp.L++; return true; }
+function mpStep(S, dt) {
+  let budget = mpSpeed(S) * dt, guard = 0;
+  while (budget > 0 && guard++ < 3000 && S.mp.p < 400000) {
+    const need = mpWork(S.mp.p) - S.mp.w;
+    if (budget < need) { S.mp.w += budget; break; }
+    budget -= need; if (MERSET.has(S.mp.p)) { S.mp.n++; S.mp.last = S.mp.p; }
+    S.mp.p = nextPrime(S.mp.p); S.mp.w = 0;
+  }
+}
+function mpDigits(p) { return Math.floor(p * L10(2)) + 1; }
+/* ---------- κ 的指数乘数 ---------- */
+function kappaMult(S) {
+  const h = id => S.u[id] === 1, R = id => !!S.res.done[id], C = id => S.cc[id] || 0;
+  const B = [['分形花园', 1 + 0.045 * frSum(S)], ['梅森素数', 1 + 0.05 * S.mp.n], ['升级', (h('r27') ? 1.15 : 1) * (h('p23') ? 1.15 : 1) * (h('x18') ? 1.25 : 1)], ['研究', (R('s37') ? 1.25 : 1) * (R('s38') ? 1.15 : 1)], ['猜想', Math.pow(1.06, C(17)) * Math.pow(1.04, C(18))]];
+  G.kMB = B; let m = 1; B.forEach(x => m *= x[1]); return m;
+}
+
+/* ===================== 六阶 · 超限 ===================== */
+const TM = [ // 超限里程碑（按累计超限次数，永久）
+  { n: 1, d: '超限时保留所有公理升级；自动公理化永久可用' },
+  { n: 2, d: '每秒自动获得当前可获得公理的 1%' },
+  { n: 3, d: '学院席位 +1' },
+  { n: 5, d: '解锁自动超限' },
+  { n: 8, d: '购买 λ 不再消耗公理' },
+  { n: 12, d: '引理工坊自动合并' },
+  { n: 20, d: '被动获得定理、公理提升为每秒 5%' },
+  { n: 30, d: '序数获取 ×1e4' },
+];
+const MATH = [ // 数学家学院：按顺序招募，花费为序数（log）
+  { id: 'eu', n: '欧几里得', f: '几何', c: 3, d: L => `Ω +${fx(0.008 * L, 3)}` },
+  { id: 'arc', n: '阿基米德', f: '穷竭法', c: 8, d: L => `π 与 δ 的计算速度 ×${fx(1 + L, 2)}` },
+  { id: 'fib', n: '斐波那契', f: '数列', c: 14, d: L => `引理生成速度 ×${fx(1 + 0.15 * L, 2)}` },
+  { id: 'fer', n: '费马', f: '数论', c: 21, d: L => `序数获取 ×${fmt(0.4 * L)}` },
+  { id: 'eul', n: '欧拉', f: '分析', c: 29, d: L => `算力 ×${fx(1 + 0.5 * L, 2)}` },
+  { id: 'gau', n: '高斯', f: '数学王子', c: 38, d: L => `全体数学家经验获取 ×${fx(1 + 0.1 * L, 2)}` },
+  { id: 'rie', n: '黎曼', f: '复分析', c: 48, d: L => `研究速度 ×${fx(1 + 0.03 * L, 3)}` },
+  { id: 'can', n: '康托尔', f: '集合论', c: 60, d: L => `ω 引擎速度 ×${fx(1 + 0.5 * L, 2)}，「极限跃迁」倍率 +${fx(0.05 * L, 2)}` },
+  { id: 'noe', n: '诺特', f: '抽象代数', c: 73, d: L => `θ、α 的指数 +${fx(0.04 * L, 3)}` },
+  { id: 'hil', n: '希尔伯特', f: '公理化方法', c: 88, d: L => `Ω +${fx(0.01 * L, 3)}` },
+  { id: 'ram', n: '拉马努金', f: '无穷级数', c: 105, d: L => `κ 的指数 ×${fx(1 + 0.08 * L, 2)}` },
+  { id: 'tur', n: '图灵', f: '可计算性', c: 125, d: L => `入座时自动使用 ω 技能；Ω +${fx(0.006 * L, 3)}` },
+];
+const MATHM = {}; MATH.forEach((m, i) => { m.i = i; MATHM[m.id] = m; });
+const CH6 = [ // 六阶章节（按六阶最高点数）
+  { k: 10000, n: '第一章 · 超限之门', d: '超限层、公式指数 Ω、ω 序数引擎' },
+  { k: 13000, n: '第二章 · 学院', d: '数学家学院；图着色谜题 1–4' },
+  { k: 19000, n: '第三章 · 引理', d: '引理合成工坊' },
+  { k: 30000, n: '第四章 · 猜想', d: '猜想 9–12；学院席位 +1' },
+  { k: 60000, n: '第五章 · 图论', d: '图着色谜题 5–8；常数 δ' },
+  { k: 110000, n: '第六章 · 深渊', d: 'ω 技能「超限幂」（ω×10，每日充能）；Ω +0.05' },
+  { k: 200000, n: '第七章 · 无穷', d: 'Ω +0.1；学院席位 +1' },
+  { k: 400000, n: '第八章 · 超越', d: '公式新增 ψ；数学家远征；定理星盘' },
+  { k: 600000, n: '第九章 · 牌桌', d: '二十四点；远征地点「级数长河」' },
+  { k: 1e6, n: '第十章 · 数织', d: '数织 1–4；猜想 13–14；远征地点「抽象山脉」' },
+  { k: 1.8e6, n: '第十一章 · 群星', d: '新数学家 3 位；数织 5–8；远征地点「组合花园」' },
+  { k: 3.2e6, n: '第十二章 · 极点', d: '猜想 15–16；常数 e^π' },
+  { k: 6e6, n: '第十三章 · 奇点', d: 'ψ 额外加成；远征地点「混沌之海」' },
+  { k: 1e7, n: '终章 · ee7', d: '通关 v1.2.0' },
+];
+/* ---------- 图着色 ---------- */
+const GRAPHS = (() => {
+  const G = [], add = (n, nm, chi, n0, e, note) => G.push({ n, nm, chi, e, note });
+  const cyc = (k, off) => Array.from({ length: k }, (_, i) => [off + i, off + (i + 1) % k]);
+  add(6, '三棱柱', 3, 0, [...cyc(3, 0), ...cyc(3, 3), [0, 3], [1, 4], [2, 5]], '两个三角形由三条棱相连');
+  { const e = []; for (let i = 0; i < 8; i++) for (let j = i + 1; j < 8; j++) { const x = i ^ j; if (x && !(x & (x - 1))) e.push([i, j]); } add(8, '立方体', 2, 0, e, '二分图只需两种颜色'); }
+  add(6, '五轮图', 4, 0, [...cyc(5, 1), [0, 1], [0, 2], [0, 3], [0, 4], [0, 5]], '奇数圈加上中心点');
+  { const e = []; for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) if (!(j === i + 1 && i % 2 === 0)) e.push([i, j]); add(6, '八面体', 3, 0, e, '正八面体的骨架'); }
+  add(10, '彼得森图', 3, 0, [...cyc(5, 0), ...Array.from({ length: 5 }, (_, i) => [5 + i, 5 + (i + 2) % 5]), ...Array.from({ length: 5 }, (_, i) => [i, 5 + i])], '图论中最著名的反例之一');
+  add(7, '莫泽纺锤', 4, 0, [[0, 1], [0, 2], [1, 2], [1, 3], [2, 3], [0, 4], [0, 5], [4, 5], [4, 6], [5, 6], [3, 6]], '平面单位距离图，需要 4 种颜色');
+  { const e = [...cyc(5, 0)]; for (let i = 0; i < 5; i++) { e.push([5 + i, (i + 1) % 5], [5 + i, (i + 4) % 5], [10, 5 + i]); } add(11, '格罗奇图', 4, 0, e, '没有三角形，却需要 4 种颜色'); }
+  { const e = []; for (let i = 0; i < 5; i++) { e.push([0, 1 + i], [1 + i, 1 + (i + 1) % 5], [1 + i, 6 + i], [1 + i, 6 + (i + 1) % 5], [6 + i, 6 + (i + 1) % 5], [11, 6 + i]); } add(12, '二十面体', 4, 0, e, '正二十面体的骨架'); }
+  return G;
+})();
+function gcUnl(S, i) { return S.tier >= 6 && S.chap >= (i < 4 ? 1 : 4); }
+function gcSolved(S, i) { const g = GRAPHS[i], col = S.gc[i]; if (!col) return false; const used = new Set(); for (let v = 0; v < g.n; v++) { if (!col[v]) return false; used.add(col[v]); } if (used.size > g.chi) return false; return g.e.every(([a, b]) => col[a] !== col[b]); }
+function gcCount(S) { let n = 0; for (let i = 0; i < GRAPHS.length; i++) if (gcUnl(S, i) && gcSolved(S, i)) n++; return n; }
+function gcSet(S, i, v, c) { if (!S.gc[i]) S.gc[i] = new Array(GRAPHS[i].n).fill(0); S.gc[i][v] = c; }
+/* ---------- 学院 ---------- */
+function lvOf(xp) { return 1 + Math.floor(Math.log2(1 + (xp || 0) / 300)); }
+function xpFor(L) { return 300 * (Math.pow(2, L - 1) - 1); }
+function acSeated(S, id) { return S.ac.seat.indexOf(id) >= 0; }
+function acL(S, id) { if (!S.ac || !S.ac.got[id] || S.chal === 14) return 0; const L = lvOf(S.ac.xp[id]); return acSeated(S, id) ? L : 0.25 * L; }
+function acSeats(S) { return 2 + (S.trTot >= 3 ? 1 : 0) + (S.chap >= 3 ? 1 : 0) + (S.res.done.s21 ? 1 : 0) + (S.u.o14 === 1 ? 1 : 0) + (S.chap >= 6 ? 1 : 0) + swAdd(S, 'seat'); }
+function acNext(S) { return MATH.find(m => !S.ac.got[m.id]); }
+function acRecruit(S) { const m = acNext(S); if (!m || S.tier < 6 || S.chap < 1 || (m.i >= 12 && S.chap < 10) || S.OR < m.c) return false; S.OR = ls(S.OR, m.c); S.ac.got[m.id] = 1; S.ac.xp[m.id] = 0; if (S.ac.seat.length < acSeats(S)) S.ac.seat.push(m.id); return true; }
+function acSeat(S, id) { if (!S.ac.got[id] || (typeof exOn === 'function' && exOn(S, id))) return false; const i = S.ac.seat.indexOf(id); if (i >= 0) { S.ac.seat.splice(i, 1); return true; } if (S.ac.seat.length >= acSeats(S)) return false; S.ac.seat.push(id); return true; }
+function acOmega(S) { return 0.008 * acL(S, 'eu') + 0.01 * acL(S, 'hil') + 0.006 * acL(S, 'tur'); }
+function acXpMult(S) { return (1 + 0.1 * acL(S, 'gau')) * (S.u.o7 === 1 ? 2 : 1) * swMul(S, 'xp') * (S.res.done.s32 ? 2 : 1); }
+/* ---------- ω 引擎 ---------- */
+function omRate(S) {
+  if (S.tier < 6) return 0; const h = id => S.u[id] === 1;
+  let r = 0.1 * Math.pow(1 + pz(S.ORc), 1.5);
+  if (h('o3')) r *= 5; if (h('o5b')) r *= 100; if (h('o13b')) r *= 1000;
+  r *= 1 + 0.5 * acL(S, 'can'); if (cstUnl(S, 'z3')) r *= Math.sqrt(1 + S.cst.D.z3);
+  if (S.res.done.s22) r *= 10; r *= Math.pow(3, S.cc[12] || 0); r *= swMul(S, 'om');
+  return r;
+}
+function omMul1(S) { return (S.u.o13b === 1 ? 3 : 2) + 0.05 * acL(S, 'can'); }
+function useOm1(S) { if (S.tier < 6 || S.om.c1 < 1) return false; S.om.c1--; S.om.w = Math.max(1, S.om.w) * omMul1(S); S.st.om1 = (S.st.om1 || 0) + 1; return true; }
+function useOm2(S) { if (S.tier < 6 || S.chap < 5 || S.om.c2 < 1) return false; S.om.c2--; S.om.w = Math.max(1, S.om.w) * 10; return true; }
+const OM1T = 21600, OM2T = 86400;
+/* ---------- 引理工坊 ---------- */
+function lmMult(S) { return (1 + 0.15 * acL(S, 'fib')) * (S.u.o8 === 1 ? 2 : 1) * (S.res.done.s23 ? 2 : 1) * swMul(S, 'lm') * (S.res.done.s29 ? 2 : 1); }
+function lmGrid(S) { const g = S.lm.g; while (g.length < 16) g.push(0); return g; }
+function lmSpawn(S) { const g = lmGrid(S), em = []; for (let i = 0; i < 16; i++) if (!g[i]) em.push(i); if (!em.length) { if (S.lm.q < 32) S.lm.q++; return; } g[em[Math.floor(Math.random() * em.length)]] = Math.random() < 0.05 ? 99 : 1; }
+function lmRefill(S) { const g = lmGrid(S); while (S.lm.q > 0 && g.some(v => !v)) { S.lm.q--; lmSpawn(S); } }
+function lmMerge(S, i, j) {
+  const g = lmGrid(S), a = g[i], b = g[j]; if (i === j || !a || !b) return false; let nv;
+  if (a === 99 && b === 99) nv = 2; else if (a === 99) { if (b > 4) return false; nv = b + 1; } else if (b === 99) { if (a > 4) return false; nv = a + 1; } else if (a === b) nv = a + 1; else return false;
+  g[j] = nv; g[i] = 0; if (nv > S.lm.max) S.lm.max = nv; lmRefill(S); return true;
+}
+function lmMergeAll(S) {
+  const g = lmGrid(S); let n = 0;
+  for (let it = 0; it < 200; it++) {
+    const by = {}; let wild = -1, hi = -1;
+    for (let i = 0; i < 16; i++) { const v = g[i]; if (!v) continue; if (v === 99) { if (wild < 0) wild = i; continue; } (by[v] = by[v] || []).push(i); if (v <= 4 && (hi < 0 || v > g[hi])) hi = i; }
+    const lv = Object.keys(by).map(Number).sort((a, b) => a - b).find(v => by[v].length >= 2);
+    if (lv !== undefined) { lmMerge(S, by[lv][0], by[lv][1]); n++; continue; }
+    if (wild >= 0 && hi >= 0) { lmMerge(S, wild, hi); n++; continue; }
+    break;
+  }
+  return n;
+}
+/* ---------- Ω ---------- */
+const OMT = { o1: 0.03, o5: 0.05, o5b: 0.02, o9: 0.06, o10: 0.05, o13: 0.07, o15: 0.06, o17: 0.08, o18: 0.08, o19: 0.06, o20: 0.06, o21: 0.1 };
+function omega6(S) {
+
+  const B = [], C = id => S.cc[id] || 0, R = id => !!S.res.done[id];
+  B.push(['ω 引擎', S.chal === 12 ? 0 : 0.02 * L10(1 + S.om.w)]);
+  let t = 0; for (const k in OMT) if (S.u[k] === 1) t += OMT[k]; B.push(['超限升级', t]);
+  B.push(['数学家', acOmega(S)]);
+  const c13 = S.chal === 13 ? 0 : 1;
+  B.push(['引理工坊', c13 * 0.025 * Math.max(0, S.lm.max - 1) * (S.u.o16 === 1 ? 1.5 : 1)]);
+  B.push(['图着色', c13 * 0.03 * gcCount(S)]);
+  B.push(['常数 δ', c13 * (cstUnl(S, 'de') ? 0.03 * L10(1 + S.cst.D.de) : 0)]);
+  B.push(['猜想', 0.03 * C(9)]);
+  B.push(['研究', (R('s20') ? 0.1 : 0) + (R('s25') ? 0.15 : 0) + (R('s26') ? 0.2 : 0)]);
+  B.push(['章节', (S.chap >= 5 ? 0.05 : 0) + (S.chap >= 6 ? 0.1 : 0)]);
+  G.omB = B; let s = 0; B.forEach(x => s += x[1]);
+  return 1 + K.omS * s * (S.chal === 9 ? 0.5 : 1);
+}
+/* ---------- 超限重置 ---------- */
+function resetAxiomLayer(S) {
+  S.AX = NI; S.AXc = NI; S.axN = 0; S.axT = 0; S.lv.l = 0;
+  if (S.trTot < 1) AU.forEach(x => { if (S.u[x.id] === 1) delete S.u[x.id]; });
+  resetProofLayer(S);
+}
+function canTrans(S) { return S.tier >= 6 && G.trGain >= 0 && !S.chal; }
+function doTrans(S) { if (!canTrans(S)) return false; const g = G.trGain; S.OR = la(S.OR, g); S.ORc = la(S.ORc, g); S.trN++; S.trTot++; S.trT = 0; resetAxiomLayer(S); recalc(S); return true; }
+function step6(S, dt) {
+  S.om.w += (S.chal === 12 ? 0 : G.omR || 0) * dt;
+  const r1 = S.u.o4 === 1 ? 1.5 : 1;
+  if (S.om.c1 < 3) { S.om.t1 += dt * r1; while (S.om.t1 >= OM1T && S.om.c1 < 3) { S.om.t1 -= OM1T; S.om.c1++; } } if (S.om.c1 >= 3) S.om.t1 = 0;
+  if (S.chap >= 5) { if (S.om.c2 < 2) { S.om.t2 += dt * r1; while (S.om.t2 >= OM2T && S.om.c2 < 2) { S.om.t2 -= OM2T; S.om.c2++; } } if (S.om.c2 >= 2) S.om.t2 = 0; }
+  while (S.ac.seat.length > acSeats(S)) S.ac.seat.pop();
+  const xm = acXpMult(S); S.ac.seat.forEach(id => { S.ac.xp[id] = (S.ac.xp[id] || 0) + dt * xm; });
+  if (S.chap >= 2) { const I = 600 / lmMult(S); S.lm.t += dt; let k = 0; while (S.lm.t >= I && k < 100000) { S.lm.t -= I; lmSpawn(S); k++; if (S.trTot >= 12 && k % 8 === 0) lmMergeAll(S); } }
+  while (S.chap < CH6.length - 1 && S.Pbest >= CH6[S.chap + 1].k) S.chap++;
+  step12(S, dt);
+}
+
+/* ===================== v1.2.0 · 六阶续章 ===================== */
+/* ---------- 数学家扩展 ---------- */
+const MDOM = { eu: '几何', arc: '几何', fib: '数论', fer: '数论', eul: '分析', gau: '数论', rie: '分析', can: '逻辑', noe: '代数', hil: '逻辑', ram: '分析', tur: '逻辑', poi: '拓扑', vne: '组合', erd: '组合' };
+MATH.push(
+  { id: 'poi', n: '庞加莱', f: '拓扑学', c: 230, d: L => `远征获得的灵感 ×${fx(1 + 0.1 * L, 2)}` },
+  { id: 'vne', n: '冯·诺伊曼', f: '博弈论', c: 300, d: L => `二十四点奖励 ×${fx(1 + 0.2 * L, 2)}，ψ +${fx(0.003 * L, 3)}` },
+  { id: 'erd', n: '埃尔德什', f: '组合数学', c: 380, d: L => `ψ +${fx(0.004 * L, 3)}，远征时长 −${Math.min(30, 2 * L).toFixed(0)}%` });
+MATH.forEach((m, i) => { m.i = i; m.dm = MDOM[m.id]; MATHM[m.id] = m; });
+/* ---------- 远征 ---------- */
+const EXS = [
+  { id: 'e1', n: '欧几里得平原', dm: '几何', h: 2, b: 12, ch: 7 },
+  { id: 'e2', n: '素数群岛', dm: '数论', h: 4, b: 26, ch: 7 },
+  { id: 'e3', n: '级数长河', dm: '分析', h: 6, b: 42, ch: 8 },
+  { id: 'e4', n: '抽象山脉', dm: '代数', h: 8, b: 60, ch: 9 },
+  { id: 'e5', n: '组合花园', dm: '组合', h: 3, b: 22, ch: 10 },
+  { id: 'e6', n: '拓扑迷宫', dm: '拓扑', h: 12, b: 100, rs: 's27' },
+  { id: 'e7', n: '混沌之海', dm: '分析', h: 16, b: 150, ch: 12 },
+  { id: 'e8', n: '哥德尔深渊', dm: '逻辑', h: 24, b: 220, rs: 's30' },
+];
+const EXM = {}; EXS.forEach(x => EXM[x.id] = x);
+function exUnl(S, x) { if (S.tier < 6 || S.chap < 7) return false; if (x.rs) return !!S.res.done[x.rs]; return S.chap >= x.ch; }
+function exSlots(S) { return 1 + swAdd(S, 'exSlot') + (S.res.done.s27 ? 1 : 0); }
+function exOn(S, id) { return S.ex.act.some(a => a.team.indexOf(id) >= 0); }
+function exTeamMult(S, x, team) { let m = 0; team.forEach(id => { m += (1 + 0.04 * lvOf(S.ac.xp[id])) * (MATHM[id].dm === x.dm ? 1.5 : 1); }); return m; }
+function inMul(S) { return swMul(S, 'inMul') * (S.res.done.s30 ? 1.5 : 1); }
+function exInMult(S) { return swMul(S, 'exIn') * (1 + 0.1 * acL(S, 'poi')) * Math.pow(1.5, S.cc[14] || 0) * inMul(S); }
+function exDur(S, x) { return x.h * 3600 * swMul(S, 'exSpd') * (1 - Math.min(0.3, 0.02 * acL(S, 'erd'))); }
+function exReward(S, a) { const x = EXM[a.s]; return x.b * exTeamMult(S, x, a.team) * exInMult(S); }
+function exStart(S, sid, team) {
+  const x = EXM[sid]; if (!x || !exUnl(S, x) || S.ex.act.length >= exSlots(S) || !team.length || team.length > 3) return false;
+  if (team.some(id => !S.ac.got[id] || acSeated(S, id) || exOn(S, id))) return false;
+  const d = exDur(S, x); S.ex.act.push({ s: sid, team: team.slice(), t: d, d }); return true;
+}
+function exCancel(S, i) { if (!S.ex.act[i]) return false; S.ex.act.splice(i, 1); return true; }
+/* ---------- 定理星盘 ---------- */
+const SW = (() => {
+  const L = [], add = (r, i, c, k, v, d) => L.push({ id: 'w' + r + '_' + i, r, i, c, k, v, d });
+  add(0, 0, 30, 'psi', 0.01, 'ψ +0.01');
+  [[150, 'psi', 0.02, 'ψ +0.02'], [180, 'exIn', 1.5, '远征灵感 ×1.5'], [220, 'g24', 1, '二十四点：储存上限 +3，发牌速度 ×1.5'], [300, 'exSlot', 1, '远征队伍 +1'], [380, 'xp', 1.5, '数学家经验 ×1.5'], [450, 'psi', 0.02, 'ψ +0.02']].forEach((a, i) => add(1, i, ...a));
+  [[1000, 'psi', 0.02, 'ψ +0.02'], [1100, 'exSpd', 0.8, '远征时长 −20%'], [1300, 'exAuto', 1, '远征归来后自动再次出发'], [1500, 'psi', 0.02, 'ψ +0.02'], [1700, 'g24rw', 2, '二十四点奖励 ×2'], [1900, 'lm', 1.5, '引理生成速度 ×1.5'],
+  [2200, 'psi', 0.02, 'ψ +0.02'], [2500, 'om', 1000, 'ω 引擎速度 ×1000'], [2900, 'inMul', 1.5, '所有灵感获取 ×1.5'], [3400, 'cAdd', 0.5, 'c +0.5'], [4000, 'seat', 1, '学院席位 +1'], [4600, 'psi', 0.02, 'ψ +0.02']].forEach((a, i) => add(2, i, ...a));
+  [[8000, 'psi', 0.04, 'ψ +0.04'], [9500, 'exSlot', 1, '远征队伍 +1'], [11000, 'psi', 0.04, 'ψ +0.04'], [13000, 'thax', 1, 'θ、α 的指数各 +1'], [15500, 'psi', 0.04, 'ψ +0.04'], [18000, 'lamAdd', 0.5, 'λ +0.5'],
+  [21000, 'psi', 0.04, 'ψ +0.04'], [25000, 'inMul', 2, '所有灵感获取 ×2'], [30000, 'psi', 0.04, 'ψ +0.04'], [36000, 'resSpd', 1.2, '研究速度 ×1.2'], [44000, 'psi', 0.04, 'ψ +0.04'], [54000, 'exIn', 2, '远征灵感 ×2']].forEach((a, i) => add(3, i, ...a));
+  return L;
+})();
+const SWM = {}; SW.forEach(n => SWM[n.id] = n);
+const SWN = [1, 6, 12, 12];
+function swAdj(n) { // 相邻的星
+  const out = [], R = n.r, I = n.i, id = (r, i) => 'w' + r + '_' + i;
+  if (R === 1) out.push(id(0, 0)); if (R === 2) out.push(id(1, Math.floor(I / 2))); if (R === 3) out.push(id(2, I));
+  if (R >= 1) { out.push(id(R, (I + 1) % SWN[R]), id(R, (I + SWN[R] - 1) % SWN[R])); }
+  if (R === 0) for (let i = 0; i < 6; i++) out.push(id(1, i));
+  if (R === 1) out.push(id(2, 2 * I), id(2, 2 * I + 1)); if (R === 2) out.push(id(3, I));
+  return out;
+}
+function swHas(S, id) { return S.sw[id] === 1; }
+function swReach(S, n) { return n.r === 0 || swAdj(n).some(a => swHas(S, a)); }
+function swCan(S, id) { const n = SWM[id]; return !!n && S.tier >= 6 && S.chap >= 7 && !swHas(S, id) && swReach(S, n) && S.IN >= n.c; }
+function swBuy(S, id) { if (!swCan(S, id)) return false; S.IN -= SWM[id].c; S.sw[id] = 1; return true; }
+function swAdd(S, k) { let s = 0; for (const id in S.sw) if (S.sw[id] === 1 && SWM[id] && SWM[id].k === k) s += SWM[id].v; return s; }
+function swMul(S, k) { let m = 1; for (const id in S.sw) if (S.sw[id] === 1 && SWM[id] && SWM[id].k === k) m *= SWM[id].v; return m; }
+/* ---------- 二十四点（1–13，保证有解） ---------- */
+function g24Solve(a, intOnly) {
+  const rec = L => {
+    if (L.length === 1) return Math.abs(L[0].v - 24) < 1e-9 ? L[0].s : null;
+    for (let i = 0; i < L.length; i++) for (let j = 0; j < L.length; j++) {
+      if (i === j) continue; const x = L[i], y = L[j], rest = L.filter((_, k) => k !== i && k !== j), c = [];
+      if (i < j) { c.push({ v: x.v + y.v, s: `(${x.s}+${y.s})` }, { v: x.v * y.v, s: `(${x.s}×${y.s})` }); }
+      if (!intOnly || x.v >= y.v) c.push({ v: x.v - y.v, s: `(${x.s}−${y.s})` });
+      if (Math.abs(y.v) > 1e-12 && (!intOnly || (y.v !== 0 && x.v % y.v === 0))) c.push({ v: x.v / y.v, s: `(${x.s}÷${y.s})` });
+      for (const q of c) { const r = rec([...rest, q]); if (r) return r; }
+    }
+    return null;
+  };
+  const r = rec(a.map(v => ({ v, s: String(v) }))); return r ? r.replace(/^\((.*)\)$/, '$1') : null;
+}
+function g24Deal(S) { let h; for (let k = 0; k < 400; k++) { h = Array.from({ length: 4 }, () => 1 + Math.floor(Math.random() * 13)); if (g24Solve(h, false)) break; } S.g24.h = h; }
+function g24Max(S) { return 5 + (swAdd(S, 'g24') ? 3 : 0); }
+function g24Int(S) { return 1800 / (swAdd(S, 'g24') ? 1.5 : 1); }
+function g24Reward(S) { return 15 * swMul(S, 'g24rw') * (S.res.done.s28 ? 2 : 1) * (1 + 0.2 * acL(S, 'vne')) * inMul(S); }
+function g24Claim(S) { if (S.tier < 6 || S.chap < 8 || S.g24.ch < 1) return 0; const r = g24Reward(S); S.IN += r; S.INt += r; S.g24.n++; S.g24.ch--; g24Deal(S); return r; }
+function g24Skip(S) { g24Deal(S); }
+/* ---------- 数织 ---------- */
+const NG = [
+  { n: '加号', p: ['..#..', '..#..', '#####', '..#..', '..#..'] },
+  { n: '乘号', p: ['#...#', '.#.#.', '..#..', '.#.#.', '#...#'] },
+  { n: '三角形 Δ', p: ['...#...', '..#.#..', '..#.#..', '.#...#.', '.#...#.', '#.....#', '#######'] },
+  { n: '根号 √', p: ['....####', '....#...', '...#....', '...#....', '#.#.....', '.##.....', '..#.....'] },
+  { n: '圆周率 π', p: ['########', '########', '.##..##.', '.##..##.', '.##..##.', '.##..##.', '.##..###', '##....##'] },
+  { n: '求和 Σ', p: ['########', '##......', '.##.....', '..##....', '..##....', '.##.....', '##......', '########'] },
+  { n: '无穷 ∞', p: ['.##....##.', '#..#..#..#', '#...##...#', '#..#..#..#', '.##....##.'] },
+  { n: '欧米伽 Ω', p: ['...####...', '..#....#..', '.#......#.', '#........#', '#........#', '#........#', '.#......#.', '..#....#..', '###....###', '###....###'] },
+];
+const runsOf = arr => { const r = []; let c = 0; arr.forEach(v => { if (v) c++; else if (c) { r.push(c); c = 0; } }); if (c) r.push(c); return r; };
+NG.forEach(g => { g.h = g.p.length; g.w = g.p[0].length; g.cell = []; g.p.forEach(row => row.split('').forEach(ch => g.cell.push(ch === '#' ? 1 : 0)));
+  g.rows = g.p.map(row => runsOf(row.split('').map(ch => ch === '#'))); g.cols = Array.from({ length: g.w }, (_, x) => runsOf(g.p.map(row => row[x] === '#'))); });
+function ngUnl(S, i) { return S.tier >= 6 && S.chap >= (i < 4 ? 9 : 10); }
+function ngGrid(S, i) { const g = NG[i]; if (!S.ng[i] || S.ng[i].length !== g.w * g.h) S.ng[i] = new Array(g.w * g.h).fill(0); return S.ng[i]; }
+function ngLineOk(S, i, isRow, k) { const g = NG[i], a = ngGrid(S, i), cells = isRow ? Array.from({ length: g.w }, (_, x) => a[k * g.w + x] === 1) : Array.from({ length: g.h }, (_, y) => a[y * g.w + k] === 1); const want = isRow ? g.rows[k] : g.cols[k]; const got = runsOf(cells); return got.length === want.length && got.every((v, j) => v === want[j]); }
+function ngSolved(S, i) { const g = NG[i]; if (!S.ng[i]) return false; for (let y = 0; y < g.h; y++) if (!ngLineOk(S, i, true, y)) return false; for (let x = 0; x < g.w; x++) if (!ngLineOk(S, i, false, x)) return false; return true; }
+function ngCount(S) { let n = 0; for (let i = 0; i < NG.length; i++) if (ngUnl(S, i) && ngSolved(S, i)) n++; return n; }
+/* ---------- ψ ---------- */
+function psi6(S) {
+  if (S.tier < 6) { G.psB = []; return 1; }
+  const B = [], R = id => !!S.res.done[id], C = id => S.cc[id] || 0;
+  B.push(['定理星盘', swAdd(S, 'psi')]);
+  B.push(['二十四点', 0.05 * L10(1 + S.g24.n)]);
+  B.push(['数织', 0.03 * ngCount(S)]);
+  B.push(['远征', 0.02 * L10(1 + S.ex.n)]);
+  B.push(['研究', (R('s28') ? 0.02 : 0) + (R('s29') ? 0.03 : 0) + (R('s31') ? 0.05 : 0) + (R('s32') ? 0.03 : 0) + (R('s33') ? 0.06 : 0) + (R('s34') ? 0.08 : 0)]);
+  B.push(['猜想', 0.02 * C(13) + 0.02 * C(16)]);
+  B.push(['数学家', 0.003 * acL(S, 'vne') + 0.004 * acL(S, 'erd')]);
+  B.push(['常数 e^π', cstUnl(S, 'ge') ? 0.01 * L10(1 + S.cst.D.ge) : 0]);
+  B.push(['章节', S.chap >= 12 ? 0.03 : 0]);
+  G.psB = B; if (S.chal === 16) return 1; let s = 0; B.forEach(x => s += x[1]); return 1 + K.psS * s;
+}
+function step12(S, dt) {
+  if (S.chap < 7) return;
+  // 远征
+  const ex = S.ex, xm = acXpMult(S) * 0.5;
+  for (let k = ex.act.length - 1; k >= 0; k--) {
+    const a = ex.act[k]; a.team.forEach(id => { S.ac.xp[id] = (S.ac.xp[id] || 0) + dt * xm; }); a.t -= dt;
+    let guard = 0;
+    while (a.t <= 0 && guard++ < 50) {
+      const r = exReward(S, a); S.IN += r; S.INt += r; ex.n++;
+      if (swAdd(S, 'exAuto')) { const over = -a.t; a.d = exDur(S, EXM[a.s]); a.t = a.d - over; } else { ex.act.splice(k, 1); break; }
+    }
+  }
+  // 二十四点发牌
+  if (S.chap >= 8) { if (!S.g24.h || S.g24.h.length !== 4) g24Deal(S); const mx = g24Max(S), I = g24Int(S); if (S.g24.ch < mx) { S.g24.t += dt; while (S.g24.t >= I && S.g24.ch < mx) { S.g24.t -= I; S.g24.ch++; } } if (S.g24.ch >= mx) S.g24.t = 0; }
+}
+function cmpVer(a, b) { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); } return 0; }
+function migrate(S) { // 旧存档迁移：章节表变化后重新计算章节（只升不降）
+  if (cmpVer(S.ver || '1.0.0', '1.2.1') < 0 && S.tier >= 6) { let c = 0; while (c < CH6.length - 1 && S.Pbest >= CH6[c + 1].k) c++; S.chap = Math.max(S.chap || 0, c); S.legacyTr = 1; }
+  if (cmpVer(S.ver || '1.0.0', '1.2.1') < 0 && S.tier >= 5) S.mig121 = 1;
+  S.ver = VERSION; return S;
 }
 
 /* ---------------- 存档 ---------------- */
@@ -967,18 +1480,18 @@ function deserialize(str) {
   const o = JSON.parse(str, (k, v) => v === '-inf' ? NI : v);
   const base = newState();
   (function merge(t, s) { for (const k in s) { if (s[k] && typeof s[k] === 'object' && !Array.isArray(s[k]) && t[k] && typeof t[k] === 'object' && !Array.isArray(t[k])) merge(t[k], s[k]); else t[k] = s[k]; } })(base, o);
-  return base;
+  return migrate(base);
 }
 function encodeSave(S) { const s = serialize(S); return typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(s))) : Buffer.from(s).toString('base64'); }
 function decodeSave(b) { const s = typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(b.trim()))) : Buffer.from(b, 'base64').toString(); return deserialize(s); }
 
-if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep };
+if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
 
-/* ===================== 无尽演算 v1.0.0 · 界面 ===================== */
+/* ===================== 无尽演算 v1.2.1 · 界面 ===================== */
 const SAVE_KEY = 'formula-ascend-save-v1';
 const SKIN_KEY = 'formula-ascend-skin';
-const CURN = { P: '点数', RP: '重生点', TH: '定理', AX: '公理' };
-const TIERN = ['', '一阶', '二阶', '三阶', '四阶', '五阶'];
+const CURN = { P: '点数', RP: '重生点', TH: '定理', AX: '公理', OR: '序数', IN: '灵感' };
+const TIERN = ['', '一阶', '二阶', '三阶', '四阶', '五阶', '六阶'];
 let S, view = 'factor', viewSig = '', binds = [], lastFrame = Date.now(), lastSec = 0, cloud = null, cloudBusy = false, lastCloud = 0;
 let msSel = { 3: 0, 4: 0, 5: 0 }, msSize = 3, primeCache = { n: -1, p: 0, at: 0 }, spark = null, nextSpark = Date.now() + rnd(200, 420) * 1000, modalQ = [], modalOpen = false, heroTier = 0;
 const $ = id => document.getElementById(id);
@@ -987,6 +1500,7 @@ function rnd(a, b) { return a + Math.random() * (b - a); }
 const LAYER = {
   r: { name: '重生', cur: 'RP', gain: () => G.rbGain, can: () => canRebirth(S), act: 'rb', req: () => K.rbReq, k: () => G.rbE, q: () => G.rbQ, cum: 'RPc', fac: 'Rf', sym: 'r', ms: null, tree: RU, auto: 'rb', tot: 'rbTot', facN: 'r（重生因子）' },
   p: { name: '证明', cur: 'TH', gain: () => G.pfGain, can: () => canProof(S), act: 'pf', req: () => K.pfReq, k: () => G.pfE, q: () => G.pfQ, cum: 'THc', fac: 'THf', sym: 'θ', ms: PM, msTot: 'pfTot', tree: PU, auto: 'pf', tot: 'pfTot', facN: 'θ（定理因子）' },
+  o: { name: '超限', cur: 'OR', gain: () => G.trGain, can: () => canTrans(S), act: 'tr', req: () => K.trReq, k: () => G.trE, q: () => G.trQ, cum: 'ORc', fac: null, sym: 'ω', ms: TM, msTot: 'trTot', tree: OU, auto: 'tr', tot: 'trTot', facN: 'ω 引擎的速度' },
   x: { name: '公理化', cur: 'AX', gain: () => G.axGain, can: () => canAxiom(S), act: 'ax', req: () => K.axReq, k: () => G.axE, q: () => G.axQ, cum: 'AXc', fac: 'AXf', sym: 'α', ms: AM, msTot: 'axTot', tree: AU, auto: 'ax', tot: 'axTot', facN: 'α（公理因子）' },
 };
 
@@ -1002,7 +1516,7 @@ function load() {
 function save() { S.last = Date.now(); try { localStorage.setItem(SAVE_KEY, serialize(S)); } catch (e) { } }
 function offline(sec, silent) {
   sec = Math.min(sec, 30 * 86400);
-  const b = { P: S.P, RP: S.RPc, TH: S.THc, AX: S.AXc, tier: S.tier, rb: S.rbTot, pf: S.pfTot, ax: S.axTot, res: Object.keys(S.res.done).length };
+  const b = { exn: S.ex.n, tr: S.trTot, P: S.P, RP: S.RPc, TH: S.THc, AX: S.AXc, tier: S.tier, rb: S.rbTot, pf: S.pfTot, ax: S.axTot, res: Object.keys(S.res.done).length };
   const steps = Math.min(4000, Math.max(20, Math.ceil(sec / 3))), dt = sec / steps;
   for (let i = 0; i < steps; i++) { step(S, dt); runAuto(S); }
   checkAch(S); recalc(S); viewSig = '';
@@ -1012,8 +1526,12 @@ function offline(sec, silent) {
   if (S.rbTot > b.rb) li.push(`自动重生 ${S.rbTot - b.rb} 次`);
   if (S.pfTot > b.pf) li.push(`自动证明 ${S.pfTot - b.pf} 次`);
   if (S.axTot > b.ax) li.push(`自动公理化 ${S.axTot - b.ax} 次`);
+  if (S.trTot > b.tr) li.push(`自动超限 ${S.trTot - b.tr} 次`);
   const nr = Object.keys(S.res.done).length - b.res; if (nr > 0) li.push(`完成研究 ${nr} 项`);
   if (S.tier >= 2) li.push(`素数筛已检验到 ${fmtInt(S.pr.n)}`);
+  if (S.tier >= 6) li.push(`ω 增长到 ${fmtBig(S.om.w)}，Ω = ${fx(G.Om, 3)}`);
+  if (S.chap >= 7 && S.ex.n > b.exn) li.push(`完成远征 ${S.ex.n - b.exn} 次，现有灵感 ${fmtBig(S.IN)}`);
+  if (S.chap >= 8 && S.g24.ch > 0) li.push(`二十四点有 ${S.g24.ch} 手牌等你来玩`);
   modal('欢迎回来', `<p>你离开了 <b>${fmtT(sec)}</b>，离线期间游戏照常运行：</p><ul>${li.map(x => '<li>' + x + '</li>').join('')}</ul><p class="note">自动购买与自动重置在离线时同样生效。</p>`);
 }
 /* 云存档：claude.ai 中跨设备同步（不可用时自动忽略） */
@@ -1054,11 +1572,14 @@ function showModal() {
 }
 function confirmDo(title, html, okText, fn) { modal(title, html, [{ t: '取消' }, { t: okText, c: 'go', fn }]); }
 function applyTheme() { const t = (S && S.opt.theme) || 0; if (t === 1) document.documentElement.dataset.theme = 'light'; else if (t === 2) document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme; }
+
 function applySkin(value, remember = false) {
   const skin = value === 'workspace' ? 'workspace' : 'blueprint';
   document.documentElement.dataset.skin = skin;
   $('skin').value = skin;
   if (remember) { try { localStorage.setItem(SKIN_KEY, skin); } catch (e) { } }
+  if (view === 'pr') drawUlam();
+  if (view === 'fr') FR.forEach(f => drawFractal(f.id));
 }
 function loadSkin() {
   let skin;
@@ -1068,14 +1589,29 @@ function loadSkin() {
 
 /* ---------------- 新功能说明 ---------------- */
 const NEWS = [
-  { k: 'welcome', c: () => true, t: '欢迎来到无尽演算', b: '<p>每隔一个时间间隔 Δ，你会获得等于公式结果的点数。用点数升级公式里的因子，让产量越来越高。</p><p>你的目标是<b>晋升</b>：每次晋升，公式升高一阶、变得更复杂，并解锁新玩法。v1.0.0 最高为五阶。</p>' },
+  { k: 'welcome', c: () => true, t: '欢迎来到无尽演算', b: '<p>每隔一个时间间隔 Δ，你会获得等于公式结果的点数。用点数升级公式里的因子，让产量越来越高。</p><p>你的目标是<b>晋升</b>：每次晋升，公式升高一阶并解锁新玩法。v1.2.1 最高为六阶。</p>' },
   { k: 'rb', c: () => S.P >= 3.5 || S.rbTot > 0, t: '重生', b: '<p>点数达到 1e4 后可以重生：清空点数与因子，换取<b>重生点</b>。</p><p>累计重生点决定重生因子 <i>r</i>，重生点还能购买<b>重生升级树</b>。</p>' },
   { k: 'tree', c: () => S.rbTot >= 1, t: '升级树与分支', b: '<p>升级按树状排列，必须先买前置节点。标有「择一」的分叉只能选一条路，两条路风格不同、都能通关。</p><p>想换路线时可以「重置升级树」：已花费的货币全额退还，但会触发一次该层的重置。</p>' },
   { k: 't2', c: () => S.tier >= 2, t: '二阶：证明、研究所、素数筛', b: '<p><b>证明</b>：点数达到 1e25 后可证明，重置重生层，获得<b>定理</b>。累计定理提供 θ，并解锁证明升级树与永久里程碑。</p><p><b>研究所</b>：消耗定理（之后还有公理）开始限时研究，离线也会推进。</p><p><b>素数筛</b>：一台永不停歇的筛子逐个检验整数，已发现的素数个数永久加成 a。它跨越所有晋升持续累积。</p>' },
   { k: 't3', c: () => S.tier >= 3, t: '三阶：公理化、时间因子、幻方', b: '<p><b>公理化</b>：点数达到 1e130 后可公理化，重置证明层，获得<b>公理</b>与公理因子 α。</p><p>时间因子 <i>t</i> 是本次重生经过的时间，指数随 c 增长：重生得越频繁，t 就越小，需要权衡。</p><p><b>幻方</b>：把 1–9 填入 3×3 方格，每条行、列、对角线和为 15 都会给予加成。</p><p>从这一阶起，研究会解锁新的升级节点。</p>' },
   { k: 'cj', c: () => S.u.x3 === 1, t: '猜想', b: '<p>进入猜想会执行一次证明重置，并施加限制条件。在限制下让点数达到目标即可「证毕」，获得永久奖励。每个猜想有三个难度，第三难度需要更高的阶。</p>' },
   { k: 't4', c: () => S.tier >= 4, t: '四阶：维度、跃迁、常数', b: '<p>新因子 <i>d</i> 用定理购买，<i>λ</i> 用公理购买，λ 作为 θ·α 的指数。</p><p><b>常数</b>：分配算力计算 π 等常数的位数，每个常数加成不同的因子。位数增长越来越慢，分配比例由你决定。</p><p>还有 4×4 幻方与两个新猜想。</p>' },
-  { k: 't5', c: () => S.tier >= 5, t: '五阶：常数进入公式', b: '<p>常数之积 κ 现在直接出现在公式里，指数为 c+λ。你已到达 v1.0.0 的终点阶，继续冲击 <b>e2000</b> 的极限吧。</p><p>新增 5×5 幻方、第三个研究槽位与常数 γ。</p>' },
+  { k: 't5', c: () => S.tier >= 5, t: '五阶 · 常数纪元', b: '<p>常数之积 κ 现在直接出现在公式里，指数为 c+λ。五阶的核心是让 <b>κ 的指数</b>不断变大：</p><p><b>分形花园</b>：用公理让四种分形迭代，维数越高加成越多。<br><b>梅森素数搜寻</b>：测试机按顺序检验 2^p − 1，每发现一个梅森素数，κ 都会变强。</p><p>还有 5×5 幻方、常数 γ、新研究与两个新猜想。达到 <b>e10000</b> 即可晋升六阶。</p>' },
+  { k: 'v121', c: () => S.tier >= 5 && !!S.mig121, t: '五阶扩展：常数纪元', b: '<p>v1.2.1 扩充了五阶：新增<b>分形花园</b>与<b>梅森素数搜寻</b>，以及新的研究、升级与猜想。晋升六阶的需求提高到 <b>e10000</b>。</p>' },
+  { k: 't6', c: () => S.tier >= 6, t: '六阶 · 超限', b: '<p>整个公式被括起来，获得指数 <b>Ω</b>：P = [ … ]<sup>Ω</sup>。之前所有的因子、层与系统都会被 Ω 放大，Ω 每提高一点，点数的数量级就会大幅上升。</p><p><b>超限</b>：点数达到 1e2500 后可以超限，重置公理层，获得<b>序数</b>。序数用于超限升级树、研究与招募数学家，累计序数还会加速 <b>ω 引擎</b>。</p><p>ω 随时间增长并提升 Ω。六阶有七个章节，会随着最高点数逐步解锁新玩法，通关目标是 <b>e400000</b>。</p>' },
+  { k: 'ch1', c: () => S.tier >= 6 && S.chap >= 1, t: '第二章 · 学院', b: '<p><b>数学家学院</b>：用序数依次招募 12 位数学家。入座的数学家会随时间升级并发挥才能，席位有限，选择谁入座由你决定。</p><p><b>图着色</b>：给图的顶点上色，使相邻顶点颜色不同，并且颜色种数不超过要求。每完成一张图，Ω 永久提高。</p>' },
+  { k: 'ch2', c: () => S.tier >= 6 && S.chap >= 2, t: '第三章 · 引理', b: '<p><b>引理工坊</b>：引理会定时出现在 4×4 的格子里，两个同级引理可以合成更高一级。最高等级越高，Ω 越大。偶尔出现的 ★ 可以与 4 级及以下的任意引理合成。</p>' },
+  { k: 'ch3', c: () => S.tier >= 6 && S.chap >= 3, t: '第四章 · 猜想', b: '<p>四个新的未解难题加入猜想：连续统假设、哥德巴赫猜想、孪生素数猜想与庞加莱猜想。六阶的猜想需要更长的时间来证毕，奖励也直接作用于 Ω 和序数。学院席位 +1。</p>' },
+  { k: 'ch4', c: () => S.tier >= 6 && S.chap >= 4, t: '第五章 · 图论', b: '<p>新增 4 张更难的图：彼得森图、莫泽纺锤、格罗奇图与二十面体。常数 <b>δ</b>（费根鲍姆常数）加入算力分配，直接提高 Ω。</p>' },
+  { k: 'ch5', c: () => S.tier >= 6 && S.chap >= 5, t: '第六章 · 深渊', b: '<p>ω 引擎新增技能「超限幂」：ω × 10，每日充能。Ω 额外 +0.05。</p>' },
+  { k: 'ch6', c: () => S.tier >= 6 && S.chap >= 6, t: '第七章 · 无穷', b: '<p>Ω 额外 +0.1，学院席位 +1。终点 e400000 就在前方。</p>' },
+  { k: 'v12', c: () => S.tier >= 6 && S.chap >= 7, t: '第八章 · 超越', b: '<p>你抵达了 e400000。旅程还在继续：公式的指数现在是 <b>Ω·ψ</b>，新的符号 ψ 从 1 开始，由本章起的新玩法共同推高。</p><p><b>远征</b>：让未入座的数学家组队去探索，领域与地点相符的成员收益更高，带回<b>灵感</b>。</p><p><b>定理星盘</b>：用灵感从中心开始点亮相邻的星，点亮顺序由你决定，没有互斥分支。</p><p>v1.2.0 的终点是 <b>ee7</b>（10 的 10⁷ 次方）。</p>' },
+  { k: 'v12c8', c: () => S.tier >= 6 && S.chap >= 8, t: '第九章 · 牌桌', b: '<p><b>二十四点</b>：用加减乘除把四张牌算成 24。牌局随时间补充并可以储存，完成的局数会带来灵感并提高 ψ。远征新地点「级数长河」开放。</p>' },
+  { k: 'v12c9', c: () => S.tier >= 6 && S.chap >= 9, t: '第十章 · 数织', b: '<p><b>数织</b>：根据每行、每列的数字涂黑格子，画出隐藏的数学符号。每完成一幅，ψ 永久提高。</p><p>两个千禧年难题加入猜想：ABC 猜想与 BSD 猜想。远征新地点「抽象山脉」开放。</p>' },
+  { k: 'v12c10', c: () => S.tier >= 6 && S.chap >= 10, t: '第十一章 · 群星', b: '<p>庞加莱、冯·诺伊曼与埃尔德什可以招募了。更大的数织与远征地点「组合花园」开放。</p>' },
+  { k: 'v12c11', c: () => S.tier >= 6 && S.chap >= 11, t: '第十二章 · 极点', b: '<p>猜想「纳维–斯托克斯」与「霍奇猜想」开放，常数 e^π 加入算力分配。</p>' },
+  { k: 'v12c12', c: () => S.tier >= 6 && S.chap >= 12, t: '第十三章 · 奇点', b: '<p>ψ 获得额外加成，远征新地点「混沌之海」开放。ee7 就在眼前。</p>' },
+  { k: 'v12c13', c: () => S.tier >= 6 && S.chap >= 13, t: '终章 · ee7', b: '<p>10 的 1000 万次方。从 a·b·r 到 [ … ]<sup>Ω·ψ</sup>，你完成了 v1.2.0 的全部旅程。</p><p>旅程不会在这里结束，敬请期待下一个版本。感谢游玩！</p>' },
 ];
 function checkNews() { for (const n of NEWS) if (!S.seen[n.k] && n.c()) { S.seen[n.k] = 1; modal(n.t, n.b); } }
 
@@ -1088,17 +1624,19 @@ function formulaHTML(T) {
   if (T === 2) return P + `(${a}${d}${b})<sup>${c}</sup>${d}${r}${d}${th}`;
   if (T === 3) return P + `(${a}${d}${b})<sup>${c}</sup>${d}${t}<sup>${c}−1</sup>${d}${r}${d}${th}${d}${al}`;
   const base = P + `(${a}${d}${b}${d}${dd})<sup>${c}</sup>${d}${t}<sup>${c}−1</sup>${d}${r}${d}(${th}${d}${al})<sup>${lm}</sup>`;
-  return T === 4 ? base : base + `${d}${k}<sup>${c}+${lm}</sup>`;
+  if (T === 4) return base; const t5 = base + `${d}${k}<sup>${c}+${lm}</sup>`; if (T === 5) return t5;
+  return P + `<span class="op" style="font-size:1.25em">[</span>` + t5.slice(P.length) + `<span class="op" style="font-size:1.25em">]</span><sup><i class="fl" data-a="tab:promo">Ω</i>${S.chap >= 7 ? '<span class="op">·</span><i class="fl" data-a="tab:sw">ψ</i>' : ''}</sup>`;
 }
+function fmtBig(x) { return x < 1e9 ? (x < 100 ? fx(x, 2) : Math.floor(x).toLocaleString('en-US')) : fmt(L10(x)); }
 const READS = [
   ['a', () => fmt(G.A), () => true], ['b', () => fmt(G.B), () => true], ['c', () => fx(G.c, 3), () => S.tier >= 2],
   ['d', () => fmt(G.D), () => S.tier >= 4], ['t', () => fmt(G.Tf) + '（指数 ' + fx(G.c - 1 + G.tE, 2) + '）', () => S.tier >= 3],
   ['r', () => fmt(G.Rf), () => true], ['θ', () => fmt(G.THf), () => S.tier >= 2], ['α', () => fmt(G.AXf), () => S.tier >= 3],
-  ['λ', () => fx(G.lam, 3), () => S.tier >= 4], ['κ', () => fmt(G.K), () => S.tier >= 5],
+  ['λ', () => fx(G.lam, 3), () => S.tier >= 4], ['κ', () => fmt(G.K), () => S.tier >= 5], ['Ω', () => fx(G.Om, 3), () => S.tier >= 6], ['ψ', () => fx(G.psi || 1, 3), () => S.tier >= 6 && S.chap >= 7], ['ω', () => fmtBig(S.om.w), () => S.tier >= 6],
 ];
 function renderHero() {
-  if (heroTier !== S.tier) {
-    heroTier = S.tier; $('formula').innerHTML = formulaHTML(S.tier); $('tierb').textContent = TIERN[S.tier];
+  if (heroTier !== S.tier * 100 + (S.chap >= 7 ? 1 : 0)) {
+    heroTier = S.tier * 100 + (S.chap >= 7 ? 1 : 0); $('formula').innerHTML = formulaHTML(S.tier); $('formula').parentElement.classList.toggle('t6', S.tier >= 6); $('tierb').textContent = TIERN[S.tier];
     $('reads').innerHTML = READS.filter(x => x[2]()).map((x, i) => `<span class="chip"><i>${x[0]}</i><span data-rd="${READS.indexOf(x)}"></span></span>`).join('');
   }
   $('pts').textContent = fmt(S.P);
@@ -1118,14 +1656,17 @@ function renderBar() {
   if (S.rbTot > 0 || S.tier > 1) c.push(['重生点', S.RP, `累计 ${fmt(S.RPc)} · r ×${fmt(G.Rf)}`]);
   if (S.tier >= 2) c.push(['定理', S.TH, `累计 ${fmt(S.THc)} · θ ×${fmt(G.THf)}`]);
   if (S.tier >= 3) c.push(['公理', S.AX, `累计 ${fmt(S.AXc)} · α ×${fmt(G.AXf)}`]);
+  if (S.tier >= 6) c.push(['序数', S.OR, `累计 ${fmt(S.ORc)} · Ω = ${fx(G.Om, 3)}`]);
+  if (S.tier >= 6 && S.chap >= 7) c.push(['灵感', lg(S.IN), `累计 ${fmtBig(S.INt)} · ψ = ${fx(G.psi || 1, 3)}`]);
   const html = c.map(x => `<div class="cur"><div class="k">${x[0]}</div><div class="v num">${fmt(x[1])}</div><div class="s">${x[2]}</div></div>`).join('');
   if ($('curs').innerHTML !== html) $('curs').innerHTML = html;
   const items = [['rb', '重生', () => canRebirth(S), () => canRebirth(S) ? '+' + fmt(G.rbGain) + ' 重生点' : '需要 1e4 点数', 'go']];
   if (S.tier >= 2) items.push(['pf', () => S.chal && S.P >= chalGoal(S, S.chal) ? '证毕猜想' : '证明', () => canProof(S), () => G.pfGain !== NI ? '+' + fmt(G.pfGain) + ' 定理' : S.chal ? '达到猜想目标即可证毕' : '需要 1e25 点数', 'go']);
   if (S.tier >= 3) items.push(['ax', '公理化', () => canAxiom(S), () => S.chal ? '猜想中不可用' : G.axGain !== NI ? '+' + fmt(G.axGain) + ' 公理' : '需要 1e130 点数', 'go']);
+  if (S.tier >= 6) items.push(['tr', '超限', () => canTrans(S), () => S.chal ? '猜想中不可用' : G.trGain !== NI ? '+' + fmt(G.trGain) + ' 序数' : '需要 1e2500 点数', 'go']);
   if (canPromote(S)) items.push(['promo', '晋升', () => true, () => '升至' + TIERN[S.tier + 1], 'cy']);
   renderActions($('acts'), items);
-  const next = items.some(x => x[0] === 'promo') ? [] : [['tab:promo', '查看晋升', () => true, () => S.tier < 5 ? '需要 ' + fmt(TIERS[S.tier].req) + ' 点数' : '当前版本进度', 'cy']];
+  const next = items.some(x => x[0] === 'promo') ? [] : [['tab:promo', '查看晋升', () => true, () => Number.isFinite(TIERS[S.tier].req) ? '需要 ' + fmt(TIERS[S.tier].req) + ' 点数' : '当前版本进度', 'cy']];
   renderActions($('workspaceActions'), [...items, ...next]);
 }
 function renderActions(box, items) {
@@ -1141,6 +1682,17 @@ const TABS = [
   { id: 'rb', n: '重生', on: () => S.rbTot > 0 || S.P >= 3.5 || S.tier > 1, dot: () => treeCan('r') },
   { id: 'pf', n: '证明', on: () => S.tier >= 2, dot: () => treeCan('p') },
   { id: 'ax', n: '公理', on: () => S.tier >= 3, dot: () => treeCan('x') },
+  { id: 'fr', n: '分形', on: () => S.tier >= 5, dot: () => FR.some(f => frCan(S, f.id)) },
+  { id: 'mp', n: '梅森', on: () => S.tier >= 5, dot: () => S.mp.L < MPMAX && S.TH >= mpCost(S.mp.L) },
+  { id: 'tr', n: '超限', on: () => S.tier >= 6, dot: () => treeCan('o') },
+  { id: 'om', n: 'ω 引擎', on: () => S.tier >= 6, dot: () => S.om.c1 >= 1 || (S.chap >= 5 && S.om.c2 >= 1) },
+  { id: 'acad', n: '学院', on: () => S.tier >= 6 && S.chap >= 1, dot: () => { const m = acNext(S); return !!m && S.OR >= m.c; } },
+  { id: 'lm', n: '引理', on: () => S.tier >= 6 && S.chap >= 2 },
+  { id: 'gc', n: '图论', on: () => S.tier >= 6 && S.chap >= 1 },
+  { id: 'ex', n: '远征', on: () => S.tier >= 6 && S.chap >= 7, dot: () => S.ex.act.length < exSlots(S) },
+  { id: 'sw', n: '星盘', on: () => S.tier >= 6 && S.chap >= 7, dot: () => SW.some(n => swCan(S, n.id)) },
+  { id: 'g24', n: '二十四点', on: () => S.tier >= 6 && S.chap >= 8, dot: () => S.g24.ch >= 1 },
+  { id: 'ng', n: '数织', on: () => S.tier >= 6 && S.chap >= 9 },
   { id: 'cj', n: '猜想', on: () => S.u.x3 === 1 || cjTotal(S) > 0 },
   { id: 'res', n: '研究', on: () => S.tier >= 2, dot: () => RS.some(r => resCan(S, r.id)) },
   { id: 'pr', n: '素数', on: () => S.tier >= 2 },
@@ -1152,7 +1704,7 @@ const TABS = [
   { id: 'opt', n: '设置', on: () => true },
 ];
 function treeCan(L) { const arr = LAYER[L].tree, have = curGet(S, LAYER[L].cur); return arr.some(x => upgState(S, x) === 'ok' && have >= x.c); }
-const NAV_SYMBOL = { factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
+const NAV_SYMBOL = { factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', fr: '△', mp: 'M', tr: 'Ω', om: 'ω', acad: '∑', lm: '⊕', gc: '◇', ex: '↗', sw: '✧', g24: '24', ng: '▤', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
 function renderTabs() {
   const tabs = $('tabs');
   const html = TABS.filter(t => t.on()).map(t => `<button class="tab ${view === t.id ? 'on' : ''}"${view === t.id ? ' aria-current="page"' : ''} data-a="tab:${t.id}"><span class="nav-symbol" aria-hidden="true">${NAV_SYMBOL[t.id] || '·'}</span>${t.n}${t.dot && view !== t.id && t.dot() ? '<span class="dot"></span>' : ''}</button>`).join('');
@@ -1167,7 +1719,7 @@ function renderTabs() {
 
 /* ---------------- 视图 ---------------- */
 function sigOf() {
-  return [view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
+  return [view === 'lm' ? JSON.stringify(S.lm.g) + lmSel : view === 'gc' ? JSON.stringify(S.gc) + gcSel.c + gcSel.g : view === 'ex' ? JSON.stringify(exPick) + S.ex.act.length + S.ex.n : view === 'sw' ? Object.keys(S.sw).length + swSel : view === 'g24' ? S.g24.h.join() + JSON.stringify(g24ui.cards) + g24ui.sel + g24ui.op + (S.g24.ch >= 1) : view === 'ng' ? ngSel + JSON.stringify(S.ng[ngSel] || []) : view === 'fr' ? JSON.stringify(S.fr) + !!S.res.done.s37 : view === 'mp' ? S.mp.n + '/' + S.mp.L : '', S.chap, S.trTot >= 1, S.trTot >= 5, Object.keys(S.ac.got).length, S.ac.seat.join(), acSeats(S), view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
 }
 function B(key, fn) { binds.push([key, fn]); return `data-b="${key}"`; }
 function buildView() {
@@ -1175,9 +1727,17 @@ function buildView() {
   const f = VIEWS[view] || VIEWS.factor;
   $('shell').dataset.view = view;
   $('view').innerHTML = f();
+  if (view === 'pr') drawUlam(); if (view === 'fr') FR.forEach(f => drawFractal(f.id));
   const els = {}; $('view').querySelectorAll('[data-b]').forEach(el => els[el.dataset.b] = el);
   binds = binds.map(([k, fn]) => [els[k], fn]).filter(x => x[0]);
   updBinds();
+}
+function drawUlam() {
+  const cv = $('ulam'); if (!cv || !cv.getContext) return; const ctx = cv.getContext('2d'); if (!ctx) return;
+  const N = 257, lim = Math.min(N * N, Math.floor(S.pr.n)), st = getComputedStyle(document.body);
+  ctx.fillStyle = st.getPropertyValue('--paper') || '#000'; ctx.fillRect(0, 0, N, N); ctx.fillStyle = (st.getPropertyValue('--amber') || '#fa0').trim();
+  let x = 128, y = 128, dx = 1, dy = 0, len = 1, k = 1;
+  outer: while (true) { for (let rep = 0; rep < 2; rep++) { for (let s = 0; s < len; s++) { if (k > lim) break outer; if (k >= 2 && !PT.s[k]) ctx.fillRect(x, y, 1, 1); x += dx; y += dy; k++; } const t = dx; dx = -dy; dy = t; } len++; }
 }
 function updBinds() {
   for (const [el, fn] of binds) {
@@ -1227,11 +1787,11 @@ VIEWS.factor = () => {
 };
 function layerView(L) {
   const C = LAYER[L];
-  let h = `<div class="sec">${C.name}<span class="h">${L === 'r' ? '清空点数与因子' : L === 'p' ? '清空重生层（重生点、重生升级）与点数' : '清空证明层（定理、证明升级、d）及以下'}</span></div>`;
+  let h = `<div class="sec">${C.name}<span class="h">${L === 'r' ? '清空点数与因子' : L === 'p' ? '清空重生层（重生点、重生升级）与点数' : L === 'x' ? '清空证明层（定理、证明升级、d）及以下' : '清空公理层（公理、λ）及以下；公理升级由里程碑保留'}</span></div>`;
   h += `<div class="grid"><div class="card"><div class="fm" ${B('lf', () => `获取 = 10^(${fx(C.k(), 3)} × (lg 点数 − ${C.req()})^${fx(C.q(), 2)})`)}></div>
   <div class="ds">需要点数 ≥ 1e${C.req()}。累计${CURN[C.cur]}决定 ${C.facN}，更高层的重置会清空累计。</div>
   <div class="row"><button class="btn" data-a="${C.act}" ${B('lb', () => { const can = C.can(); return { c: 'btn ' + (can ? 'go' : ''), d: !can }; })}>${C.name}<small ${B('lbs', () => { const g = C.gain(); return g !== NI && g >= 0 ? '+' + fmt(g) + ' ' + CURN[C.cur] : '尚未达到需求'; })}></small></button></div>
-  <div class="muted" style="margin-top:6px">当前 <b class="num" ${B('lc', () => fmt(curGet(S, C.cur)))}></b> · 累计 <b class="num" ${B('lcc', () => fmt(S[C.cum]))}></b> · ${C.sym} ×<b class="num" ${B('lfv', () => fmt(G[C.fac]))}></b> · 共 ${C.name} <b ${B('lt', () => String(S[C.tot]))}></b> 次</div></div>`;
+  <div class="muted" style="margin-top:6px">当前 <b class="num" ${B('lc', () => fmt(curGet(S, C.cur)))}></b> · 累计 <b class="num" ${B('lcc', () => fmt(S[C.cum]))}></b> · ${C.fac ? C.sym + ' ×' : 'ω 引擎 '}<b class="num" ${B('lfv', () => C.fac ? fmt(G[C.fac]) : fmtBig(G.omR) + ' /秒')}></b> · 共 ${C.name} <b ${B('lt', () => String(S[C.tot]))}></b> 次</div></div>`;
   if (autoUnl(S, C.auto)) {
     const a = S.auto[C.auto];
     h += `<div class="card"><div class="nm">自动${C.name}</div><div class="row"><label class="tgl"><input type="checkbox" data-in="ao:${C.auto}" ${a.on ? 'checked' : ''}>启用</label>
@@ -1261,6 +1821,7 @@ function treeHTML(arr, L) {
   return `<div class="treebox" style="height:${H}px;--rh:${rh}px">${lines}<svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" style="height:${H}px">${paths}</svg>${nodes}</div>`;
 }
 VIEWS.rb = () => layerView('r');
+VIEWS.tr = () => layerView('o');
 VIEWS.pf = () => layerView('p');
 VIEWS.ax = () => layerView('x');
 VIEWS.cj = () => {
@@ -1306,6 +1867,7 @@ VIEWS.pr = () => {
   <div class="card"><div class="nm">扩大筛表</div><div class="ds">每级使筛速 ×2。等级永久保留。</div><div class="muted">等级 <b ${B('pl', () => String(S.pr.L))}></b></div>
   <div class="row"><button class="btn sm" data-a="sieve" ${B('pb', () => { const c = sieveCost(S.pr.L), can = S.TH >= c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: `升级 · ${fmt(c)} 定理` }; })}></button></div></div>
   <div class="card"><div class="nm">素数里程碑</div><ul class="ms">${PRM_MS.map((m, i) => `<li ${B('pm' + i, () => ({ c: PRM(S) >= m.k ? 'got' : '' }))}>发现 1e${m.k} 个素数：${m.d}</li>`).join('')}</ul></div></div>
+  <div class="card" style="margin-top:10px"><div class="nm">乌拉姆螺旋</div><div class="ds">把正整数从中心按螺旋排开、只点亮素数，会浮现出神秘的斜线。这里画出了前 ${fmtInt(Math.min(66049, Math.floor(S.pr.n)))} 个整数。</div><canvas id="ulam" width="257" height="257" class="ulam"></canvas></div>
   <p class="note">素数个数增长约为 n / ln n，越往后越稀疏；孪生素数（相差 2 的素数对）更加稀少。超过 10 万后显示的是素数定理给出的估计值。</p>`;
   return h;
 };
@@ -1336,20 +1898,202 @@ VIEWS.cst = () => {
     const u = cstUnl(S, c.id);
     h += `<div class="card ${u ? '' : 'dim'}"><div class="t"><span><span class="sym l">${c.s}</span> <span class="nm">${c.n}</span></span><span class="muted">${u ? '' : c.how}</span></div>
     <div class="ds">${c.d}</div>${u ? `<div class="muted">已算出 <b class="num" ${B('cd_' + c.id, () => fmtInt(S.cst.D[c.id]))}></b> 位 · 效果 <b class="cy" ${B('ce_' + c.id, () => c.e(S.cst.D[c.id]))}></b></div>
-    <label class="weight-control"><span>权重</span><input type="range" min="0" max="10" step="1" value="${S.cst.w[c.id]}" data-in="w:${c.id}" aria-label="${c.n}权重"><b ${B('cw_' + c.id, () => String(S.cst.w[c.id]))}></b></label>` : ''}</div>`;
+    <div class="row"><span class="muted">权重</span><button class="btn sm" data-a="cw:${c.id}:-1" aria-label="${c.n}权重减一">−</button><b class="num" style="min-width:2ch;text-align:center" ${B('cw_' + c.id, () => String(S.cst.w[c.id]))}></b><button class="btn sm" data-a="cw:${c.id}:1" aria-label="${c.n}权重加一">＋</button><span class="faint" ${B('cs_' + c.id, () => { let ws = 0; CS.forEach(x => { if (cstUnl(S, x.id)) ws += S.cst.w[x.id]; }); return ws ? '分到 ' + fx(100 * S.cst.w[c.id] / ws, 1) + '% 算力' : '未分配算力'; })}></span></div>` : ''}</div>`;
   });
-  return h + `</div><p class="note">位数的增长速度会随位数增加而放缓（约为时间的 2/3 次方），把算力集中给一个常数收益递减。常数位数永久保留。</p>`;
+  if (S.tier >= 5) h += `<div class="card"><div class="nm">κ 的指数</div><div class="fm" ${B('kke', () => 'κ = ∏(1+位数)^' + fx(0.085 * G.kE, 3))}></div><ul class="ms" ${B('kmb', () => ({ h: (G.kMB || []).map(x => `<li>${x[0]}：×${fx(x[1], 3)}</li>`).join('') + `<li>合计乘数 ×${fx(G.kM || 1, 3)}</li>` }))}></ul></div>`;
+  return h + `</div><p class="note">位数的增长速度会随位数增加而放缓（约为时间的 2/3 次方），把算力集中给一个常数收益递减。常数位数永久保留。五阶起，κ 的指数可以通过分形花园、梅森素数等大幅提升。</p>`;
+};
+VIEWS.om = () => {
+  const can2 = S.chap >= 5;
+  return `<div class="sec">ω 序数引擎<span class="h">ω 随时间增长，Ω 获得 0.02 × lg(1+ω) × 缩放系数</span></div><div class="grid">
+  <div class="card" style="grid-column:1/-1"><div class="muted">当前序数计数</div><div class="sieve">ω = <span ${B('ow', () => fmtBig(S.om.w))}></span></div>
+  <div class="row"><span class="pill">速度 <b ${B('or', () => fmtBig(G.omR) + ' /秒')}></b></span><span class="pill">对 Ω 的贡献 <b ${B('oo', () => '+' + fx(K.omS * 0.02 * L10(1 + S.om.w), 3))}></b></span>${acSeated(S, 'tur') ? '<span class="pill ok">图灵入座：自动使用技能</span>' : ''}</div>
+  <div class="ds">速度 = 0.1 × (1 + lg 累计序数)^1.5 × 各种加成。累计序数越多，ω 增长越快。</div></div>
+  <div class="card"><div class="nm">极限跃迁</div><div class="ds" ${B('o1d', () => 'ω × ' + fx(omMul1(S), 2) + '。每 6 小时充能 1 次，最多储存 3 次。')}></div>
+  <div class="muted" ${B('o1c', () => '充能 ' + S.om.c1 + ' / 3' + (S.om.c1 < 3 ? ' · 下次 ' + fmtT((OM1T - S.om.t1) / (S.u.o4 === 1 ? 1.5 : 1)) : ''))}></div>
+  <div class="row"><button class="btn sm" data-a="om1" ${B('o1b', () => ({ c: 'btn sm ' + (S.om.c1 >= 1 ? 'go' : ''), d: S.om.c1 < 1 }))}>使用</button></div></div>
+  <div class="card ${can2 ? '' : 'dim'}"><div class="nm">超限幂</div><div class="ds">ω × 10。每 24 小时充能 1 次，最多储存 2 次。${can2 ? '' : '第六章解锁。'}</div>
+  ${can2 ? `<div class="muted" ${B('o2c', () => '充能 ' + S.om.c2 + ' / 2' + (S.om.c2 < 2 ? ' · 下次 ' + fmtT((OM2T - S.om.t2) / (S.u.o4 === 1 ? 1.5 : 1)) : ''))}></div><div class="row"><button class="btn sm" data-a="om2" ${B('o2b', () => ({ c: 'btn sm ' + (S.om.c2 >= 1 ? 'go' : ''), d: S.om.c2 < 1 }))}>使用</button></div>` : ''}</div></div>
+  <p class="note">技能的充能可以储存，每天上线一两次就不会浪费。招募图灵并让他入座后会自动使用。</p>`;
+};
+VIEWS.acad = () => {
+  const seats = acSeats(S), nx = acNext(S);
+  let h = `<div class="sec">数学家学院<span class="h">席位 ${S.ac.seat.length} / ${seats} · 入座的数学家积累经验并发挥全部才能，未入座者只发挥 25%</span></div><div class="grid">`;
+  MATH.forEach(m => {
+    const got = S.ac.got[m.id], seated = acSeated(S, m.id), isNext = nx && nx.id === m.id;
+    if (!got && !isNext) { h += `<div class="card dim"><div class="t"><span class="nm">？？？</span><span class="faint">待招募</span></div><div class="ds">招募前一位数学家后揭晓</div></div>`; return; }
+    h += `<div class="card ${got ? '' : 'dim'}"><div class="t"><span><span class="sym l" style="font-size:20px">${m.n.slice(0, 1)}</span> <span class="nm">${m.n}</span> <span class="faint">${m.f}${m.dm ? ' · ' + m.dm : ''}</span></span>${seated ? '<span class="pill ok">入座</span>' : exOn(S, m.id) ? '<span class="pill am">远征中</span>' : ''}</div>`;
+    if (got) {
+      h += `<div class="ds" ${B('ad_' + m.id, () => m.d(acL(S, m.id)))}></div><div class="muted" ${B('al_' + m.id, () => { const x = S.ac.xp[m.id] || 0, L = lvOf(x); return '等级 ' + L + ' · 经验 ' + fmtBig(x) + ' / ' + fmtBig(xpFor(L + 1)); })}></div>
+      <div class="prog"><div ${B('ap_' + m.id, () => { const x = S.ac.xp[m.id] || 0, L = lvOf(x), a = xpFor(L), b = xpFor(L + 1); return { w: 100 * (x - a) / (b - a) }; })}></div></div>
+      <div class="row"><button class="btn sm ${seated ? '' : 'go'}" data-a="seat:${m.id}" ${(!seated && S.ac.seat.length >= seats) || exOn(S, m.id) ? 'disabled' : ''}>${seated ? '离座' : '入座'}</button></div>`;
+    } else if (m.i >= 12 && S.chap < 10) h += `<div class="ds">第十一章「群星」后可招募</div>`; else h += `<div class="ds">才能：${m.d(1).replace(/[\d.]+/, '…')}</div><div class="row"><button class="btn sm" data-a="rec" ${B('arb', () => { const can = S.OR >= m.c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '招募 · ' + fmt(m.c) + ' 序数' }; })}></button></div>`;
+    h += `</div>`;
+  });
+  return h + `</div><p class="note">等级 = 1 + ⌊log₂(1 + 经验/300)⌋，越往后升级越慢。席位来自超限里程碑、第四章、第七章、研究「力迫法」、超限升级「大基数」与定理星盘。未入座的数学家可以去远征。</p>`;
+};
+let lmSel = -1;
+VIEWS.lm = () => {
+  const g = lmGrid(S);
+  const cells = g.map((v, i) => `<button class="lmt lv${Math.min(v === 99 ? 0 : v, 16)} ${lmSel === i ? 'sel' : ''}" data-a="lmc:${i}" aria-label="格子 ${i + 1}">${v === 99 ? '★' : v || ''}</button>`).join('');
+  return `<div class="sec">引理工坊<span class="h">两个同级引理合成高一级；★ 可与 4 级及以下任意引理合成</span></div><div class="grid">
+  <div class="card"><div class="lmg">${cells}</div><div class="row"><button class="btn sm go" data-a="lmall">一键合并</button>${S.trTot >= 12 ? '<span class="pill ok">自动合并中</span>' : ''}</div>
+  <div class="muted">点击一个引理，再点击另一个同级引理即可合成。</div></div>
+  <div class="card"><div class="nm">工坊状态</div><div class="muted" ${B('lms', () => '最高等级 ' + S.lm.max + ' · 对 Ω 贡献 +' + fx(K.omS * 0.025 * Math.max(0, S.lm.max - 1) * (S.u.o16 === 1 ? 1.5 : 1), 3))}></div>
+  <div class="muted" ${B('lmt', () => '每 ' + fmtT(600 / lmMult(S)) + ' 生成一个引理 · 下一个 ' + fmtT(600 / lmMult(S) - S.lm.t))}></div><div class="muted" ${B('lmq', () => '等待放入的引理：' + S.lm.q + ' / 32')}></div>
+  <p class="note">每一级都需要前一级数量的两倍，所以最高等级大约是已生成引理数的 log₂。格子满时新引理会排队，队列满了就会浪费，记得常来合并。</p></div></div>`;
+};
+const GL = [ // 图的版面坐标（0–1）
+  (() => { const p = []; for (let r of [0.42, 0.18]) for (let k = 0; k < 3; k++) p.push([0.5 + r * Math.sin(2 * Math.PI * k / 3), 0.55 - r * Math.cos(2 * Math.PI * k / 3)]); return p; })(),
+  [[0.15, 0.15], [0.85, 0.15], [0.15, 0.85], [0.85, 0.85], [0.35, 0.35], [0.65, 0.35], [0.35, 0.65], [0.65, 0.65]],
+  [[0.5, 0.5], ...Array.from({ length: 5 }, (_, k) => [0.5 + 0.4 * Math.sin(2 * Math.PI * k / 5), 0.5 - 0.4 * Math.cos(2 * Math.PI * k / 5)])],
+  (() => { const p = []; for (let k = 0; k < 3; k++) { const a = 2 * Math.PI * k / 3; p.push([0.5 + 0.42 * Math.sin(a), 0.55 - 0.42 * Math.cos(a)], [0.5 - 0.17 * Math.sin(a), 0.55 + 0.17 * Math.cos(a)]); } return p; })(),
+  (() => { const p = []; for (let r of [0.42, 0.2]) for (let k = 0; k < 5; k++) p.push([0.5 + r * Math.sin(2 * Math.PI * k / 5), 0.52 - r * Math.cos(2 * Math.PI * k / 5)]); return p; })(),
+  [[0.5, 0.92], [0.24, 0.62], [0.44, 0.5], [0.2, 0.16], [0.76, 0.62], [0.56, 0.5], [0.8, 0.16]],
+  (() => { const p = []; for (let r of [0.44, 0.24]) for (let k = 0; k < 5; k++) p.push([0.5 + r * Math.sin(2 * Math.PI * k / 5), 0.52 - r * Math.cos(2 * Math.PI * k / 5)]); p.push([0.5, 0.52]); return p; })(),
+  (() => { const p = [[0.5, 0.52]]; for (let k = 0; k < 5; k++) p.push([0.5 + 0.2 * Math.sin(2 * Math.PI * k / 5), 0.52 - 0.2 * Math.cos(2 * Math.PI * k / 5)]); for (let k = 0; k < 5; k++) p.push([0.5 + 0.38 * Math.sin(2 * Math.PI * (k + 0.5) / 5), 0.52 - 0.38 * Math.cos(2 * Math.PI * (k + 0.5) / 5)]); p.push([0.5, 0.04]); return p; })(),
+];
+let gcSel = { g: 0, c: 1 };
+VIEWS.gc = () => {
+  const avail = GRAPHS.map((g, i) => i).filter(i => gcUnl(S, i)); if (!avail.includes(gcSel.g)) gcSel.g = avail[0] || 0;
+  const i = gcSel.g, g = GRAPHS[i], P = GL[i], col = S.gc[i] || [], solved = gcSolved(S, i), used = new Set(col.filter(Boolean));
+  const bad = new Set(); g.e.forEach(([a, b]) => { if (col[a] && col[a] === col[b]) { bad.add(a); bad.add(b); } });
+  const W = 340;
+  let svg = `<svg viewBox="0 0 ${W} ${W}" class="gsvg" role="img" aria-label="${g.nm}">`;
+  g.e.forEach(([a, b]) => { const c = col[a] && col[a] === col[b]; svg += `<line x1="${P[a][0] * W}" y1="${P[a][1] * W}" x2="${P[b][0] * W}" y2="${P[b][1] * W}" class="${c ? 'bad' : ''}"/>`; });
+  P.forEach((p, v) => { svg += `<circle cx="${p[0] * W}" cy="${p[1] * W}" r="15" class="gv c${col[v] || 0} ${bad.has(v) ? 'bad' : ''}" data-a="gcv:${i}:${v}"/>`; });
+  svg += `</svg>`;
+  return `<div class="sec">图着色<span class="h">给每个顶点上色，相邻顶点颜色不同，且颜色种数不超过要求</span></div>
+  <div class="row">${avail.map(k => `<button class="btn sm ${k === i ? 'go' : ''}" data-a="gcg:${k}">${GRAPHS[k].nm}${gcSolved(S, k) ? ' ✓' : ''}</button>`).join('')}${avail.length < 8 ? '<span class="faint">第五章解锁更多</span>' : ''}</div>
+  <div class="grid" style="margin-top:8px"><div class="card">${svg}<div class="row">${[1, 2, 3, 4].map(c => `<button class="gpal c${c} ${gcSel.c === c ? 'sel' : ''}" data-a="gcc:${c}" aria-label="颜色 ${c}"></button>`).join('')}<button class="btn sm" data-a="gcc:0">橡皮</button><button class="btn sm warn" data-a="gcclr:${i}">清空</button></div></div>
+  <div class="card"><div class="nm">${g.nm}</div><div class="ds">${g.note}</div><div class="muted">最多使用 <b>${g.chi}</b> 种颜色 · 已用 ${used.size} 种 · ${g.n} 个顶点，${g.e.length} 条边</div>
+  <div class="${solved ? 'ok' : 'muted'}" style="margin-top:6px">${solved ? '已完成：Ω +' + fx(0.03 * K.omS, 3) : bad.size ? '有相邻顶点同色（红色标出）' : '尚未完成'}</div><p class="note">先选颜色，再点击顶点。每完成一张图，Ω 永久提高。</p></div></div>`;
+};
+/* ---------- 远征 ---------- */
+let exPick = { s: 'e1', team: [] };
+VIEWS.ex = () => {
+  const sites = EXS.filter(x => exUnl(S, x)); if (!sites.find(x => x.id === exPick.s)) exPick.s = sites[0] ? sites[0].id : 'e1';
+  const free = MATH.filter(m => S.ac.got[m.id] && !acSeated(S, m.id) && !exOn(S, m.id)); exPick.team = exPick.team.filter(id => free.some(m => m.id === id));
+  const x = EXM[exPick.s], slots = exSlots(S);
+  let h = `<div class="sec">数学家远征<span class="h">队伍 ${S.ex.act.length} / ${slots} · 派未入座的数学家去探索，带回灵感${swAdd(S, 'exAuto') ? ' · 归来后自动再次出发' : ''}</span></div>`;
+  if (S.ex.act.length) h += `<div class="grid">${S.ex.act.map((a, i) => `<div class="card"><div class="t"><span class="nm">${EXM[a.s].n}</span><span class="pill">${EXM[a.s].dm}</span></div><div class="ds">${a.team.map(id => MATHM[id].n).join('、')}</div>
+    <div class="prog"><div ${B('xp' + i, () => { const q = S.ex.act[i]; return { w: q ? 100 * (1 - q.t / q.d) : 100 }; })}></div></div><div class="muted" ${B('xt' + i, () => { const q = S.ex.act[i]; return q ? '剩余 ' + fmtT(q.t) + ' · 预计 +' + fmtBig(exReward(S, q)) + ' 灵感' : '已归来'; })}></div>
+    <div class="row"><button class="btn sm warn" data-a="exx:${i}">召回</button></div></div>`).join('')}</div>`;
+  if (S.ex.act.length < slots) {
+    h += `<div class="sec">组建新队伍</div><div class="row">${sites.map(s => `<button class="btn sm ${s.id === exPick.s ? 'go' : ''}" data-a="exs:${s.id}">${s.n}<small>${s.dm} · ${fmtT(exDur(S, s))}</small></button>`).join('')}</div>`;
+    h += `<div class="card" style="margin-top:8px"><div class="ds">选择最多 3 位数学家。领域与地点相同（${x.dm}）的成员收益 ×1.5，等级越高收益越多。</div><div class="row">${free.length ? free.map(m => `<button class="btn sm ${exPick.team.includes(m.id) ? 'cy' : ''}" data-a="exm:${m.id}">${m.n}<small>${m.dm} · ${lvOf(S.ac.xp[m.id])} 级${m.dm === x.dm ? ' · 擅长' : ''}</small></button>`).join('') : '<span class="faint">没有空闲的数学家：让一位离座，或招募更多数学家</span>'}</div>
+    <div class="muted" style="margin-top:6px">${exPick.team.length ? `预计 ${fmtT(exDur(S, x))} 后带回 <b>${fmtBig(x.b * exTeamMult(S, x, exPick.team) * exInMult(S))}</b> 灵感` : '尚未选择队员'}</div>
+    <div class="row"><button class="btn go" data-a="exgo" ${exPick.team.length ? '' : 'disabled'}>出发</button></div></div>`;
+  }
+  return h + `<p class="note">远征中的数学家仍会获得一半经验，但不能入座。完成的远征次数也会少量提升 ψ。</p>`;
+};
+/* ---------- 定理星盘 ---------- */
+let swSel = 'w0_0';
+const SWI = { psi: 'ψ', exIn: '远', g24: '牌', exSlot: '队', xp: '经', exSpd: '速', exAuto: '自', g24rw: '牌', lm: '引', om: 'ω', inMul: '灵', cAdd: 'c', seat: '席', thax: 'θα', lamAdd: 'λ', resSpd: '研' };
+function swPos(n) { const RR = [0, 62, 122, 182]; let a; if (n.r === 0) return [200, 200]; if (n.r === 1) a = n.i * 60 - 90; else a = Math.floor(n.i / 2) * 60 - 90 + (n.i % 2 ? 15 : -15); a = a * Math.PI / 180; return [200 + RR[n.r] * Math.cos(a), 200 + RR[n.r] * Math.sin(a)]; }
+VIEWS.sw = () => {
+  let lines = '', dots = '';
+  SW.forEach(n => swAdj(n).forEach(id => { if (id <= n.id) return; const m = SWM[id], p = swPos(n), q = swPos(m); lines += `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" class="${swHas(S, n.id) && swHas(S, id) ? 'own' : ''}"/>`; }));
+  SW.forEach(n => { const p = swPos(n), st = swHas(S, n.id) ? 'own' : swReach(S, n) ? (S.IN >= n.c ? 'can' : 'reach') : 'lock'; dots += `<g class="star ${st} ${swSel === n.id ? 'sel' : ''}" data-a="sws:${n.id}"><circle cx="${p[0]}" cy="${p[1]}" r="${n.r === 0 ? 17 : 14}"/><text x="${p[0]}" y="${p[1] + 4}" text-anchor="middle">${SWI[n.k]}</text></g>`; });
+  const n = SWM[swSel];
+  return `<div class="sec">定理星盘<span class="h">已点亮 ${Object.keys(S.sw).length} / ${SW.length} · 从中心开始，只能点亮与已亮星相邻的星</span></div><div class="grid swgrid">
+  <div class="card"><svg viewBox="0 0 400 400" class="swsvg" role="img" aria-label="定理星盘">${lines}${dots}</svg></div>
+  <div class="card"><div class="nm">${n.r === 0 ? '中心' : '第 ' + n.r + ' 环'}之星</div><div class="fm">${n.d}</div><div class="muted">费用 ${fmtBig(n.c)} 灵感 · 当前 <b ${B('swin', () => fmtBig(S.IN))}></b></div>
+  <div class="row"><button class="btn" data-a="swb:${n.id}" ${B('swbb', () => { const own = swHas(S, n.id), can = swCan(S, n.id); return { c: 'btn ' + (can ? 'go' : ''), d: !can, t: own ? '已点亮' : !swReach(S, n) ? '需先点亮相邻的星' : can ? '点亮' : '灵感不足' }; })}></button></div>
+  <p class="note">点击星星查看效果。星盘没有互斥的分支，所有星最终都能点亮，先点哪颗由你决定。灵感来自远征与二十四点。</p></div></div>`;
+};
+/* ---------- 二十四点 ---------- */
+const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a || 1; };
+const frac = (n, d) => { if (d < 0) { n = -n; d = -d; } const g = gcd(n, d); return { n: n / g, d: d / g }; };
+const fstr = f => f.d === 1 ? String(f.n) : f.n + '/' + f.d;
+let g24ui = { key: '', cards: [], sel: -1, op: '', hist: [] };
+function g24Sync() { const k = (S.g24.h || []).join(',') + '|' + S.g24.n; if (g24ui.key !== k) { g24ui = { key: k, cards: (S.g24.h || []).map(v => frac(v, 1)), sel: -1, op: '', hist: [] }; } }
+VIEWS.g24 = () => {
+  g24Sync(); const ready = S.g24.ch >= 1;
+  const cards = g24ui.cards.map((c, i) => `<button class="card24 ${g24ui.sel === i ? 'sel' : ''}" data-a="g24c:${i}" ${ready ? '' : 'disabled'}>${fstr(c)}</button>`).join('');
+  return `<div class="sec">二十四点<span class="h">用加减乘除把四张牌算成 24，每张牌恰好用一次</span></div><div class="grid">
+  <div class="card"><div class="row24">${cards}</div>
+  <div class="row">${['+', '−', '×', '÷'].map(o => `<button class="btn op24 ${g24ui.op === o ? 'go' : ''}" data-a="g24o:${o}" ${ready ? '' : 'disabled'}>${o}</button>`).join('')}</div>
+  <div class="row"><button class="btn sm" data-a="g24u" ${g24ui.hist.length ? '' : 'disabled'}>撤销</button><button class="btn sm" data-a="g24r">重来</button><button class="btn sm warn" data-a="g24s" ${ready ? '' : 'disabled'}>换一手牌</button></div>
+  <div class="muted" style="margin-top:6px">操作：先点一张牌，再点运算符，再点另一张牌，两张牌会合成一张新牌。</div></div>
+  <div class="card"><div class="nm">牌桌</div><div class="muted" ${B('g24c', () => '可玩的牌局 ' + S.g24.ch + ' / ' + g24Max(S) + (S.g24.ch < g24Max(S) ? ' · 下一手 ' + fmtT(g24Int(S) - S.g24.t) : ''))}></div>
+  <div class="muted" ${B('g24w', () => '每局奖励 ' + fmtBig(g24Reward(S)) + ' 灵感 · 已完成 ' + S.g24.n + ' 局')}></div>
+  <p class="note">牌局会随时间补充并可以储存，空闲时来玩几局即可。完成的局数也会提升 ψ。换牌不消耗牌局。</p></div></div>`;
+};
+/* ---------- 数织 ---------- */
+let ngSel = 0;
+VIEWS.ng = () => {
+  const av = NG.map((g, i) => i).filter(i => ngUnl(S, i)); if (!av.includes(ngSel)) ngSel = av[0] || 0;
+  const g = NG[ngSel], a = ngGrid(S, ngSel), solved = ngSolved(S, ngSel);
+  let t = '<table class="ngt"><tr><td></td>';
+  for (let x = 0; x < g.w; x++) t += `<th class="${ngLineOk(S, ngSel, false, x) ? 'ok' : ''}">${g.cols[x].length ? g.cols[x].join('<br>') : '0'}</th>`;
+  t += '</tr>';
+  for (let y = 0; y < g.h; y++) { t += `<tr><th class="rc ${ngLineOk(S, ngSel, true, y) ? 'ok' : ''}">${g.rows[y].length ? g.rows[y].join(' ') : '0'}</th>`; for (let x = 0; x < g.w; x++) { const v = a[y * g.w + x]; t += `<td><button class="ngc s${v}" data-a="ngc:${ngSel}:${y * g.w + x}" aria-label="第${y + 1}行第${x + 1}列"></button></td>`; } t += '</tr>'; }
+  t += '</table>';
+  return `<div class="sec">数织<span class="h">数字表示该行或该列中连续涂黑格子的长度与顺序</span></div>
+  <div class="row">${av.map(i => `<button class="btn sm ${i === ngSel ? 'go' : ''}" data-a="ngs:${i}">${NG[i].w}×${NG[i].h}${ngSolved(S, i) ? ' · ' + NG[i].n + ' ✓' : ''}</button>`).join('')}${av.length < 8 ? '<span class="faint">第十一章解锁更多</span>' : ''}</div>
+  <div class="grid" style="margin-top:8px"><div class="card" style="overflow-x:auto">${t}<div class="row"><button class="btn sm warn" data-a="ngclr:${ngSel}">清空</button></div></div>
+  <div class="card"><div class="nm">${solved ? g.n : '这幅画是什么？'}</div><div class="${solved ? 'ok' : 'muted'}">${solved ? '已完成：ψ +' + fx(0.03 * K.psS, 3) : '点击格子：第一次涂黑，第二次标记 ×，第三次清空'}</div><p class="note">满足某一行或某一列的数字后，它的提示会变成绿色。每完成一幅数织，ψ 永久提高。</p></div></div>`;
+};
+/* ---------- 分形花园 ---------- */
+function drawFractal(id) {
+  const cv = $('fr_' + id); if (!cv || !cv.getContext) return; const c = cv.getContext('2d'); if (!c) return;
+  const W = cv.width, H = cv.height, st = getComputedStyle(document.body), ink = (st.getPropertyValue('--cyan') || '#0A6C96').trim(), bg = (st.getPropertyValue('--paper') || '#fff').trim();
+  const L = Math.max(0, S.fr[id] || 0); c.fillStyle = bg; c.fillRect(0, 0, W, H); c.strokeStyle = ink; c.fillStyle = ink; c.lineWidth = 1;
+  if (id === 'cantor') { let segs = [[12, W - 12]]; const rh = (H - 16) / 9;
+    for (let r = 0; r <= L; r++) { segs.forEach(([a, b]) => c.fillRect(a, 8 + r * rh, Math.max(0.6, b - a), rh * 0.55)); const n = []; segs.forEach(([a, b]) => { const d = (b - a) / 3; n.push([a, a + d], [b - d, b]); }); segs = n; } }
+  if (id === 'koch') { const R = W * 0.38, cx = W / 2, cy = H / 2 + 14; let P = [0, 1, 2].map(k => [cx + R * Math.sin(k * 2.0944), cy - R * Math.cos(k * 2.0944)]); P.push(P[0]);
+    for (let it = 0; it < L; it++) { const N = []; for (let i = 0; i < P.length - 1; i++) { const [x1, y1] = P[i], [x2, y2] = P[i + 1], dx = (x2 - x1) / 3, dy = (y2 - y1) / 3, ax = x1 + dx, ay = y1 + dy, bx = x1 + 2 * dx, by = y1 + 2 * dy, px = ax + dx * 0.5 + dy * 0.866, py = ay + dy * 0.5 - dx * 0.866; N.push([x1, y1], [ax, ay], [px, py], [bx, by]); } N.push(P[P.length - 1]); P = N; }
+    c.beginPath(); P.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.closePath(); c.globalAlpha = 0.18; c.fill(); c.globalAlpha = 1; c.stroke(); }
+  if (id === 'sier') { const tri = (ax, ay, bx, by, cx2, cy2, d) => { if (d === 0) { c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by); c.lineTo(cx2, cy2); c.closePath(); c.fill(); return; } const mab = [(ax + bx) / 2, (ay + by) / 2], mbc = [(bx + cx2) / 2, (by + cy2) / 2], mca = [(cx2 + ax) / 2, (cy2 + ay) / 2]; tri(ax, ay, mab[0], mab[1], mca[0], mca[1], d - 1); tri(mab[0], mab[1], bx, by, mbc[0], mbc[1], d - 1); tri(mca[0], mca[1], mbc[0], mbc[1], cx2, cy2, d - 1); };
+    tri(W / 2, 14, 12, H - 14, W - 12, H - 14, L); }
+  if (id === 'hilb') { const n = Math.pow(2, L + 1), m = W - 28, s = m / n; const d2xy = d => { let x = 0, y = 0, t = d; for (let q = 1; q < n; q *= 2) { const rx = 1 & (t / 2), ry = 1 & (t ^ rx); if (ry === 0) { if (rx === 1) { x = q - 1 - x; y = q - 1 - y; } const tmp = x; x = y; y = tmp; } x += q * rx; y += q * ry; t = Math.floor(t / 4); } return [x, y]; };
+    c.beginPath(); for (let d = 0; d < n * n; d++) { const [x, y] = d2xy(d), px = 14 + (x + 0.5) * s, py = 14 + (y + 0.5) * s; d ? c.lineTo(px, py) : c.moveTo(px, py); } c.lineWidth = L > 4 ? 0.8 : 1.6; c.stroke(); }
+}
+VIEWS.fr = () => {
+  let h = `<div class="sec">分形花园<span class="h">用公理让分形迭代：每一次迭代都让 κ 的指数变大，维数越高的分形加成越多</span></div><div class="grid">`;
+  FR.forEach(f => { const L = S.fr[f.id] || 0, un = frUnl(S, f);
+    h += `<div class="card ${un ? '' : 'dim'}"><div class="t"><span class="nm">${f.n}</span><span class="pill">维数 ${fx(f.dim, 4)}</span></div><canvas id="fr_${f.id}" width="240" height="200" class="frc"></canvas>
+    <div class="ds">${f.d}</div><div class="muted">迭代 <b>${L}</b> / ${f.max} · 每次迭代 κ 的指数乘数 +${fx(0.045 * f.dim, 3)}</div>
+    ${un ? `<div class="row"><button class="btn sm" data-a="frb:${f.id}" ${B('frb_' + f.id, () => { const L2 = S.fr[f.id] || 0, can = frCan(S, f.id); return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: L2 >= f.max ? '已达最高迭代' : '迭代 · ' + fmt(frCost(f, L2)) + ' 公理' }; })}></button></div>` : '<div class="faint">研究「分形几何」后解锁</div>'}</div>`; });
+  return h + `</div><p class="note">分形维数衡量一个图形「填满空间」的程度：康托尔集介于点和线之间，希尔伯特曲线最终会填满整个平面（维数 2）。分形的迭代永久保留，晋升也不会清空。</p>`;
+};
+/* ---------- 梅森素数搜寻 ---------- */
+const MYEAR = { 2: '古代', 3: '古代', 5: '古代', 7: '古代', 13: '1456', 17: '1588', 19: '1588', 31: '1772', 61: '1883', 89: '1911', 107: '1914', 127: '1876', 521: '1952', 607: '1952', 1279: '1952', 2203: '1952', 2281: '1952', 3217: '1957', 4253: '1961', 4423: '1961', 9689: '1963', 9941: '1963', 11213: '1963', 19937: '1971', 21701: '1978', 23209: '1979', 44497: '1979', 86243: '1982', 110503: '1988', 132049: '1983', 216091: '1985' };
+VIEWS.mp = () => {
+  const found = MERS.slice(0, S.mp.n);
+  let h = `<div class="sec">梅森素数搜寻<span class="h">形如 2^p − 1 的素数。测试机按顺序用卢卡斯–莱默检验检查每一个素数指数 p</span></div><div class="grid">
+  <div class="card" style="grid-column:1/-1"><div class="muted">正在检验</div><div class="sieve">2<sup ${B('mpp', () => S.mp.p >= 400000 ? '…' : String(S.mp.p))}></sup> − 1</div>
+  <div class="prog"><div ${B('mpw', () => ({ w: Math.min(100, 100 * S.mp.w / mpWork(S.mp.p)) }))}></div></div>
+  <div class="row"><span class="pill">已发现 <b ${B('mpn', () => S.mp.n + ' / ' + MERS.length)}></b></span><span class="pill">测试速度 <b ${B('mps', () => fmtBig(mpSpeed(S)) + ' /秒')}></b></span><span class="pill">本次检验约需 <b ${B('mpe', () => fmtT((mpWork(S.mp.p) - S.mp.w) / mpSpeed(S)))}></b></span></div>
+  <div class="fm" ${B('mpk', () => 'κ 的指数 ×' + fx(1 + 0.05 * S.mp.n, 2) + '（每个梅森素数 +0.05）')}></div></div>
+  <div class="card"><div class="nm">升级测试机</div><div class="ds">每级使测试速度 ×3，最高 ${MPMAX} 级。等级永久保留。</div><div class="muted">等级 <b ${B('mpl', () => String(S.mp.L))}></b></div>
+  <div class="row"><button class="btn sm" data-a="mpb" ${B('mpbb', () => { const can = S.mp.L < MPMAX && S.TH >= mpCost(S.mp.L); return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: S.mp.L >= MPMAX ? '已满级' : '升级 · ' + fmt(mpCost(S.mp.L)) + ' 定理' }; })}></button></div>
+  <p class="note">指数 p 越大，检验越慢（约与 p² 成正比），所以越往后的梅森素数越难找到——和人类的真实历史一样。</p></div></div>
+  <div class="sec">已发现的梅森素数<span class="h">每个梅森素数都对应一个完全数 2^(p−1)·(2^p − 1)</span></div><div class="grid">`;
+  found.forEach((p, i) => { h += `<div class="card"><div class="t"><span class="nm">第 ${i + 1} 个 · 2<sup>${p}</sup> − 1</span><span class="pill">${MYEAR[p] || ''}</span></div><div class="muted">${fmtBig(mpDigits(p))} 位数 · 对应的完全数有 ${fmtBig(Math.floor((2 * p - 1) * L10(2)) + 1)} 位</div></div>`; });
+  if (S.mp.n < MERS.length) h += `<div class="card dim"><div class="nm">第 ${S.mp.n + 1} 个 · ？？？</div><div class="muted">继续检验，等待发现</div></div>`;
+  return h + `</div><p class="note">年份是人类第一次发现该梅森素数的时间。完全数是等于自身所有真因数之和的数，例如 6 = 1 + 2 + 3、28 = 1 + 2 + 4 + 7 + 14。</p>`;
 };
 VIEWS.promo = () => {
+  if (S.tier >= 6) {
+    let h = `<div class="sec">六阶 · 章节<span class="h">六阶没有更高的晋升，章节随本阶最高点数推进</span></div><div class="grid"><div class="card" style="grid-column:1/-1">
+    <div class="muted">通关进度（按数量级的对数）</div><div class="prog"><div ${B('cp', () => ({ w: Math.max(0, Math.min(100, (L10(Math.max(2000, pz(S.Pbest))) - L10(2000)) / (L10(K.endGoal) - L10(2000)) * 100)) }))}></div></div><div class="muted" ${B('cpt', () => '最高 ' + fmt(S.Pbest) + ' / ' + fmt(K.endGoal))}></div>
+    <ul class="ms">${CH6.map((c, k) => `<li class="${S.chap >= k ? 'got' : ''}"><b>${c.n}</b>（${fmt(c.k)}）：${c.d}</li>`).join('')}</ul></div>
+    <div class="card"><div class="nm">Ω 的来源</div><div class="fm">Ω = 1 + ${fx(K.omS, 2)} × Σ</div><ul class="ms" ${B('omb', () => ({ h: (G.omB || []).map(x => `<li>${x[0]}：+${fx(x[1], 3)}</li>`).join('') }))}></ul><div class="muted" ${B('omv', () => '当前 Ω = ' + fx(G.Om, 4))}></div></div>
+    ${S.chap >= 7 ? `<div class="card"><div class="nm">ψ 的来源</div><div class="fm">ψ = 1 + ${fx(K.psS, 2)} × Σ</div><ul class="ms" ${B('psb', () => ({ h: (G.psB || []).map(x => `<li>${x[0]}：+${fx(x[1], 3)}</li>`).join('') }))}></ul><div class="muted" ${B('psv', () => '当前 ψ = ' + fx(G.psi || 1, 4))}></div></div>` : ''}</div>`;
+    return h;
+  }
+
   let h = `<div class="sec">晋升<span class="h">晋升是最高的重置层：重置除研究、猜想、常数、素数、幻方、里程碑与成就以外的一切</span></div>`;
-  if (S.tier < 5) {
+  if (S.tier < 6) {
     const req = TIERS[S.tier].req;
     h += `<div class="grid"><div class="card"><div class="nm">${TIERN[S.tier]} → ${TIERN[S.tier + 1]}</div><div class="muted">需要点数 ${fmt(req)}</div>
     <div class="prog"><div ${B('pp', () => ({ w: Math.max(0, Math.min(100, pz(S.P) / req * 100)) }))}></div></div><div class="muted" ${B('ppt', () => '当前 ' + fmt(S.P) + '（' + fx(Math.max(0, Math.min(100, pz(S.P) / req * 100)), 1) + '%，按数量级计）')}></div>
     <div class="row"><button class="btn" data-a="promo" ${B('pb', () => ({ c: 'btn ' + (canPromote(S) ? 'cy' : ''), d: !canPromote(S) }))}>晋升至${TIERN[S.tier + 1]}</button></div></div>
     <div class="card"><div class="nm">${TIERN[S.tier + 1]}将带来</div><ul class="ms">${PROMO_TEXT[S.tier + 1].map(x => '<li>' + x + '</li>').join('')}</ul></div></div>`;
   } else {
-    h += `<div class="grid"><div class="card"><div class="nm">你已到达 v1.0.0 的最高阶</div><div class="ds">继续推进，冲击极限 e2000。六阶将在后续版本开放。</div>
+    h += `<div class="grid"><div class="card"><div class="nm">已到达最高阶</div><div class="ds">继续推进。</div>
     <div class="prog"><div ${B('pp', () => ({ w: Math.max(0, Math.min(100, pz(S.P) / K.endGoal * 100)) }))}></div></div><div class="muted" ${B('ppt', () => '当前 ' + fmt(S.P) + ' / ' + fmt(K.endGoal))}></div></div></div>`;
   }
   const hist = Object.entries(S.st.promoAt).map(([t, s]) => `<li>${TIERN[t]}：游戏时间 ${fmtT(s)}</li>`).join('');
@@ -1363,7 +2107,7 @@ VIEWS.ach = () => {
 VIEWS.stat = () => {
   const rows = [['总游戏时间', () => fmtT(S.st.time)], ['当前阶时长', () => fmtT(S.st.tierT[S.tier] || 0)], ['本轮重生时长', () => fmtT(S.rbT)], ['获得点数次数', () => fmtInt(S.ticks)],
   ['本阶最高点数', () => fmt(S.Pbest)], ['历史最高点数', () => fmt(S.Pall)], ['累计重生', () => String(S.rbTot)], ['累计证明', () => String(S.pfTot)], ['累计公理化', () => String(S.axTot)],
-  ['猜想证毕', () => cjTotal(S) + ' / 24'], ['完成研究', () => Object.keys(S.res.done).length + ' / ' + RS.length], ['捕捉灵光', () => String(S.st.sparks || 0)], ['重置升级树', () => String(S.st.respec || 0)]];
+  ['猜想证毕', () => cjTotal(S) + ' / 48'], ['完成研究', () => Object.keys(S.res.done).length + ' / ' + RS.length], ['捕捉灵光', () => String(S.st.sparks || 0)], ['累计超限', () => String(S.trTot)], ['ω', () => fmtBig(S.om.w)], ['引理最高等级', () => String(S.lm.max)], ['数学家', () => Object.keys(S.ac.got).length + ' / ' + MATH.length], ['梅森素数', () => S.mp.n + ' / ' + MERS.length], ['分形迭代', () => FR.reduce((s, f) => s + (S.fr[f.id] || 0), 0) + ' / ' + FR.reduce((s, f) => s + f.max, 0)], ['图着色', () => gcCount(S) + ' / 8'], ['累计灵感', () => fmtBig(S.INt)], ['远征次数', () => String(S.ex.n)], ['二十四点', () => String(S.g24.n)], ['数织', () => ngCount(S) + ' / 8'], ['星盘', () => Object.keys(S.sw).length + ' / ' + SW.length], ['重置升级树', () => String(S.st.respec || 0)]];
   return `<div class="sec">统计</div><div class="grid">${rows.map((r, i) => `<div class="card"><div class="muted">${r[0]}</div><div class="num" style="font-size:20px" ${B('st' + i, r[1])}></div></div>`).join('')}</div>`;
 };
 VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
@@ -1374,7 +2118,7 @@ VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
   <div class="row"><button class="btn sm" data-a="save">立即保存</button><button class="btn sm" data-a="exp">导出存档</button><button class="btn sm" data-a="imp">导入存档</button></div>
   <textarea id="saveBox" placeholder="导出的存档字符串会出现在这里；导入时把存档粘贴进来再点「导入存档」"></textarea></div>
   <div class="card"><div class="nm">危险操作</div><div class="ds">彻底删除进度，从头开始。</div><div class="row"><button class="btn sm warn" data-a="hard">删除存档并重新开始</button></div></div>
-  </div><p class="note">无尽演算 v1.0.0 · 共 5 阶、4 个重置层、${RU.length + PU.length + AU.length} 个升级节点、8 个猜想、${RS.length} 项研究、5 个常数、3 个幻方、${ACH.length} 个成就。</p>`;
+  </div><p class="note">无尽演算 v1.2.1 · 共 6 阶、5 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
 
 /* ---------------- 操作 ---------------- */
 function act(a) {
@@ -1386,13 +2130,48 @@ function act(a) {
     case 'upgall': buyAllUpg(S, p[1]); viewSig = ''; break;
     case 'respec': confirmDo('重置升级树', `<p>${LAYER[p[1]].name}升级树中已购买的节点将全部移除，花费的${CURN[LAYER[p[1]].cur]}全额退还。</p><p>同时会进行一次<b>不获得收益</b>的${p[1] === 'r' ? '点数' : p[1] === 'p' ? '重生层' : '证明层'}重置。</p>`, '确认重置', () => respec(S, p[1])); break;
     case 'rb': doRebirth(S); break;
+    case 'tr': if (S.opt.conf) confirmDo('超限', `<p>将获得 <b>${fmt(G.trGain)}</b> 序数，并重置公理层及以下的进度。</p>`, '超限', () => doTrans(S)); else doTrans(S); break;
+    case 'om1': if (useOm1(S)) toast('极限跃迁：ω = ' + fmtBig(S.om.w)); break;
+    case 'om2': if (useOm2(S)) toast('超限幂：ω = ' + fmtBig(S.om.w)); break;
+    case 'rec': { const m = acNext(S); if (acRecruit(S)) { toast(m.n + ' 加入了学院'); viewSig = ''; } break; }
+    case 'seat': if (!acSeat(S, p[1])) toast('席位已满，请先让一位数学家离座'); viewSig = ''; break;
+    case 'lmc': { const i = +p[1], g = lmGrid(S); if (lmSel < 0) { if (g[i]) lmSel = i; } else if (lmSel === i) lmSel = -1; else { if (lmMerge(S, lmSel, i)) lmSel = -1; else lmSel = g[i] ? i : -1; } viewSig = ''; break; }
+    case 'lmall': { const n = lmMergeAll(S); lmSel = -1; toast(n ? '合并了 ' + n + ' 次' : '没有可以合并的引理'); viewSig = ''; break; }
+    case 'gcg': gcSel.g = +p[1]; viewSig = ''; break;
+    case 'gcc': gcSel.c = +p[1]; viewSig = ''; break;
+    case 'gcv': { const gi = +p[1], v = +p[2], before = gcSolved(S, gi), cur = (S.gc[gi] || [])[v]; gcSet(S, gi, v, cur === gcSel.c ? 0 : gcSel.c); if (!before && gcSolved(S, gi)) toast(GRAPHS[gi].nm + ' 着色完成！'); viewSig = ''; break; }
+    case 'gcclr': S.gc[+p[1]] = []; viewSig = ''; break;
+    case 'exs': exPick.s = p[1]; viewSig = ''; break;
+    case 'exm': { const id = p[1], i = exPick.team.indexOf(id); if (i >= 0) exPick.team.splice(i, 1); else if (exPick.team.length < 3) exPick.team.push(id); else toast('每支队伍最多 3 人'); viewSig = ''; break; }
+    case 'exgo': if (exStart(S, exPick.s, exPick.team)) { toast('远征队出发前往「' + EXM[exPick.s].n + '」'); exPick.team = []; } viewSig = ''; break;
+    case 'exx': confirmDo('召回远征队', '<p>召回后本次远征不会带回任何灵感。</p>', '召回', () => exCancel(S, +p[1])); break;
+    case 'sws': swSel = p[1]; viewSig = ''; break;
+    case 'swb': if (swBuy(S, p[1])) toast('点亮：' + SWM[p[1]].d); viewSig = ''; break;
+    case 'g24c': { g24Sync(); if (S.g24.ch < 1) break; const i = +p[1], u = g24ui;
+      if (u.sel < 0) u.sel = i; else if (u.sel === i) { u.sel = -1; u.op = ''; }
+      else if (!u.op) u.sel = i;
+      else { const a = u.cards[u.sel], b = u.cards[i]; let r;
+        if (u.op === '+') r = frac(a.n * b.d + b.n * a.d, a.d * b.d); else if (u.op === '−') r = frac(a.n * b.d - b.n * a.d, a.d * b.d); else if (u.op === '×') r = frac(a.n * b.n, a.d * b.d); else { if (b.n === 0) { toast('不能除以 0'); break; } r = frac(a.n * b.d, a.d * b.n); }
+        u.hist.push(u.cards.map(c => ({ ...c }))); const nc = u.cards.filter((_, k) => k !== u.sel && k !== i); const pos = Math.min(i, nc.length); nc.splice(pos, 0, r); u.cards = nc; u.sel = pos; u.op = '';
+        if (nc.length === 1) { if (r.n === 24 && r.d === 1) { const got = g24Claim(S); toast('算出 24！获得 ' + fmtBig(got) + ' 灵感'); } else toast('结果是 ' + fstr(r) + '，不是 24，可以撤销重试'); } }
+      viewSig = ''; break; }
+    case 'g24o': g24Sync(); if (g24ui.sel >= 0) g24ui.op = g24ui.op === p[1] ? '' : p[1]; else toast('先选一张牌'); viewSig = ''; break;
+    case 'g24u': if (g24ui.hist.length) { g24ui.cards = g24ui.hist.pop(); g24ui.sel = -1; g24ui.op = ''; } viewSig = ''; break;
+    case 'g24r': g24ui.key = ''; g24Sync(); viewSig = ''; break;
+    case 'g24s': g24Skip(S); g24ui.key = ''; viewSig = ''; break;
+    case 'ngs': ngSel = +p[1]; viewSig = ''; break;
+    case 'ngc': { const gi = +p[1], k = +p[2], a = ngGrid(S, gi), before = ngSolved(S, gi); a[k] = (a[k] + 1) % 3; if (!before && ngSolved(S, gi)) toast('数织完成：' + NG[gi].n + '！'); viewSig = ''; break; }
+    case 'ngclr': S.ng[+p[1]] = []; viewSig = ''; break;
     case 'pf': doProof(S); viewSig = ''; break;
     case 'ax': if (S.opt.conf) confirmDo('公理化', `<p>将获得 <b>${fmt(G.axGain)}</b> 公理，并重置证明层及以下的全部进度。</p>`, '公理化', () => doAxiom(S)); else doAxiom(S); break;
-    case 'promo': if (!canPromote(S)) break; confirmDo('晋升至' + TIERN[S.tier + 1], `<p>晋升将重置点数、三个重置层的货币与升级。研究、猜想、常数、素数筛、幻方、里程碑与成就会保留。</p><ul>${PROMO_TEXT[S.tier + 1].map(x => '<li>' + x + '</li>').join('')}</ul>`, '晋升', () => { doPromote(S); heroTier = 0; view = 'factor'; save(); toast('晋升至' + TIERN[S.tier] + '！'); }); break;
+    case 'promo': if (!canPromote(S)) break; confirmDo('晋升至' + TIERN[S.tier + 1], `<p>晋升将重置点数、各重置层的货币与升级。研究、猜想、常数、素数筛、幻方、里程碑与成就会保留。</p><ul>${PROMO_TEXT[S.tier + 1].map(x => '<li>' + x + '</li>').join('')}</ul>`, '晋升', () => { doPromote(S); heroTier = 0; view = 'factor'; save(); toast('晋升至' + TIERN[S.tier] + '！'); }); break;
     case 'cj': confirmDo('开始猜想「' + CJ[+p[1] - 1].n + '」', `<p>限制：${CJ[+p[1] - 1].d}</p><p>将立即进行一次证明重置（不获得定理）。目标：点数达到 ${fmt(chalGoal(S, +p[1]))}。</p>`, '开始', () => enterChal(S, +p[1])); break;
     case 'cjx': confirmDo('放弃猜想', '<p>将退出猜想并进行一次证明重置（不获得定理）。</p>', '放弃', () => exitChal(S)); break;
     case 'res': resStart(S, p[1]); viewSig = ''; break;
     case 'sieve': buySieve(S); break;
+    case 'frb': if (frBuy(S, p[1])) toast(FRM[p[1]].n + ' 迭代到第 ' + S.fr[p[1]] + ' 次'); viewSig = ''; break;
+    case 'mpb': mpBuy(S); break;
+    case 'cw': { const id = p[1], v = Math.max(0, Math.min(10, (S.cst.w[id] || 0) + (+p[2]))); S.cst.w[id] = v; break; }
     case 'msz': msSize = +p[1]; viewSig = ''; break;
     case 'msp': msSel[p[1]] = msSel[p[1]] === +p[2] ? 0 : +p[2]; viewSig = ''; break;
     case 'msc': { const n = +p[1], i = +p[2], before = MS(S, n); msSet(S, n, i, msSel[n] || 0); if (!before && MS(S, n)) toast(`${n}×${n} 幻方完成！`); viewSig = ''; break; }
@@ -1401,7 +2180,7 @@ function act(a) {
     case 'exp': { const b = $('saveBox'); if (b) { b.value = encodeSave(S); b.select(); try { navigator.clipboard.writeText(b.value); toast('存档已复制到剪贴板'); } catch (e) { toast('存档已显示在文本框中'); } } break; }
     case 'imp': { const b = $('saveBox'); if (!b || !b.value.trim()) { toast('请先把存档粘贴到文本框中'); break; } try { const T = decodeSave(b.value); confirmDo('导入存档', '<p>当前进度将被导入的存档覆盖。</p>', '导入', () => { S = T; NOTA = S.opt.nota || 0; applyTheme(); heroTier = 0; recalc(S); save(); toast('导入成功'); }); } catch (e) { toast('存档格式不正确，请检查是否复制完整'); } break; }
     case 'hard': confirmDo('删除存档', '<p>所有进度将永久删除，且无法恢复。</p>', '删除并重新开始', () => { S = newState(); heroTier = 0; recalc(S); save(); pushCloud(); view = 'factor'; }); break;
-    case 'spark': if (spark) { const ks = ['boost', 'sieve']; if (S.res.act.length) ks.push('res'); if (S.tier >= 4) ks.push('cst'); toast('灵光一现：' + applySpark(S, ks[Math.floor(Math.random() * ks.length)])); spark.remove(); spark = null; } break;
+    case 'spark': if (spark) { const ks = ['boost', 'sieve']; if (S.res.act.length) ks.push('res'); if (S.tier >= 4) ks.push('cst'); if (S.tier >= 6) ks.push('omega'); if (S.tier >= 6 && S.chap >= 2) ks.push('lemma'); toast('灵光一现：' + applySpark(S, ks[Math.floor(Math.random() * ks.length)])); spark.remove(); spark = null; } break;
   }
   recalc(S);
 }
