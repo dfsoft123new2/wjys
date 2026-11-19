@@ -232,16 +232,19 @@ ul.ms{padding-left:18px;margin:6px 0;font-size:13.5px}
 .card24.sel{border-color:var(--amber);background:var(--amberBg);transform:translateY(-4px)}
 .op24{font-family:var(--serif);font-size:20px;min-width:52px;text-align:center}
 /* 数织 */
-.ngt{border-collapse:collapse;margin:4px 0}
+.ng-layout{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);align-items:start;margin-top:8px}
+.ngt{table-layout:fixed;border-collapse:collapse;width:100%;max-width:calc(48px + var(--ng-cols)*34px);margin:4px 0}
+.ngt .ng-clues{width:48px}
 .ngt th{font-family:var(--serif);font-weight:400;font-size:12px;color:var(--muted);vertical-align:bottom;padding:2px;line-height:1.15;text-align:center}
 .ngt th.rc{text-align:right;white-space:nowrap;vertical-align:middle;padding-right:6px}
 .ngt th.ok{color:var(--green)}
 .ngt td{padding:0}
-.ngc{width:28px;height:28px;border:1px solid var(--line2);background:var(--paper);cursor:pointer;display:block;padding:0;margin:0}
+.ngc{width:100%;aspect-ratio:1;border:1px solid var(--line2);background:var(--paper);cursor:pointer;display:block;padding:0;margin:0}
 .ngc.s1{background:var(--ink)}
 .ngc.s2{background:var(--paper);background-image:linear-gradient(45deg,transparent 45%,var(--faint) 45%,var(--faint) 55%,transparent 55%),linear-gradient(-45deg,transparent 45%,var(--faint) 45%,var(--faint) 55%,transparent 55%)}
 .ulam{width:257px;max-width:100%;image-rendering:pixelated;border:1px solid var(--line2);border-radius:6px;margin-top:6px}
-@media (max-width:640px){.ngc{width:24px;height:24px}.card24{width:60px;height:82px}}
+@media (max-width:740px){.grid.ng-layout{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.ng-layout .ng-board{padding-inline:8px}.card24{width:60px;height:82px}}
 @media (max-width:640px){
   .wrap{padding:0 10px 70px}
   .treebox{--rh:118px}
@@ -2245,14 +2248,14 @@ let ngSel = 0;
 VIEWS.ng = () => {
   const av = NG.map((g, i) => i).filter(i => ngUnl(S, i)); if (!av.includes(ngSel)) ngSel = av[0] || 0;
   const g = NG[ngSel], a = ngGrid(S, ngSel), solved = ngSolved(S, ngSel);
-  let t = '<table class="ngt"><tr><td></td>';
+  let t = `<table class="ngt" style="--ng-cols:${g.w}" aria-label="${g.w}×${g.h} 数织棋盘"><colgroup><col class="ng-clues"><col span="${g.w}"></colgroup><tr><td></td>`;
   for (let x = 0; x < g.w; x++) t += `<th class="${ngLineOk(S, ngSel, false, x) ? 'ok' : ''}">${g.cols[x].length ? g.cols[x].join('<br>') : '0'}</th>`;
   t += '</tr>';
   for (let y = 0; y < g.h; y++) { t += `<tr><th class="rc ${ngLineOk(S, ngSel, true, y) ? 'ok' : ''}">${g.rows[y].length ? g.rows[y].join(' ') : '0'}</th>`; for (let x = 0; x < g.w; x++) { const v = a[y * g.w + x]; t += `<td><button class="ngc s${v}" data-a="ngc:${ngSel}:${y * g.w + x}" aria-label="第${y + 1}行第${x + 1}列"></button></td>`; } t += '</tr>'; }
   t += '</table>';
   return `<div class="sec">数织<span class="h">数字表示该行或该列中连续涂黑格子的长度与顺序</span></div>
   <div class="row">${av.map(i => `<button class="btn sm ${i === ngSel ? 'go' : ''}" data-a="ngs:${i}">${NG[i].w}×${NG[i].h}${ngSolved(S, i) ? ' · ' + NG[i].n + ' ✓' : ''}</button>`).join('')}${av.length < 8 ? '<span class="faint">第十一章解锁更多</span>' : ''}</div>
-  <div class="grid" style="margin-top:8px"><div class="card" style="overflow-x:auto">${t}<div class="row"><button class="btn sm warn" data-a="ngclr:${ngSel}">清空</button></div></div>
+  <div class="grid ng-layout"><div class="card ng-board">${t}<div class="row"><button class="btn sm warn" data-a="ngclr:${ngSel}">清空</button></div></div>
   <div class="card"><div class="nm">${solved ? g.n : '这幅画是什么？'}</div><div class="${solved ? 'ok' : 'muted'}">${solved ? '已完成：ψ +' + fx(0.03 * K.psS, 3) : '点击格子：第一次涂黑，第二次标记 ×，第三次清空'}</div><p class="note">满足某一行或某一列的数字后，它的提示会变成绿色。每完成一幅数织，ψ 永久提高。</p></div></div>`;
 };
 /* ---------- 分形花园 ---------- */
