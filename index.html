@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>无尽演算 v1.5.1</title>
+<title>无尽演算 v1.5.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -481,7 +481,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 </head>
 <body>
 <div class="wrap" id="shell" data-view="factor">
-  <header class="top"><div class="brand">无尽演算<small>v1.5.1</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
+  <header class="top"><div class="brand">无尽演算<small>v1.5.2</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
   <div class="rail-brand" aria-hidden="true"><b>Σ</b><strong>无尽演算</strong><em>Axiom</em></div>
   <section class="hero" id="hero">
     <div class="pts"><span class="big num" id="pts">0</span><span class="lbl">点数</span></div>
@@ -507,7 +507,109 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 <script>
 /* ===================== 公式晋升 v1.0.0 · 核心引擎（后端） ===================== */
 'use strict';
-const VERSION = '1.5.1';
+const VERSION = '1.5.2';
+/* ===================== 层塔 TowerNum —— 无尽演算的大数库（v1.5.2） =====================
+ * 每个数是一个普通对象 { s, k, m, e }：
+ *   s：符号 −1 / 0 / 1
+ *   k = 0（科学层）：值 = s · m · 10^e，1 ≤ m < 10，e 为整数，|e| ≤ 9e15 —— 约 15 位有效数字
+ *   k ≥ 2（塔层）：值 = s · 10^10^…^m（共 k 个 10），m ∈ [15.95, 9e15)，e 不使用
+ *   （k = 1 不使用：科学层已覆盖到 10^(9e15)）
+ * 可表示到远超 10↑↑10 的数；所有运算都只使用普通对象，便于 V8 优化，也能直接存档。
+ */
+const TN_EMAX = 9e15, TN_LMAX = Math.log10(9e15);
+function tnMk(s, k, m, e) { return { s: s, k: k, m: m, e: e }; }
+const TN_ZERO = tnMk(0, 0, 0, 0), TN_ONE = tnMk(1, 0, 1, 0);
+function tnSci(s, m, e) { // 规范化科学层
+  if (m === 0 || s === 0) return TN_ZERO;
+  if (m >= 10 || m < 1) { const d = Math.floor(Math.log10(m)); m /= Math.pow(10, d); e += d; if (m >= 10) { m /= 10; e += 1; } else if (m < 1) { m *= 10; e -= 1; } }
+  if (e >= TN_EMAX) return tnTower(s, 2, Math.log10(e + Math.log10(m)));
+  if (e <= -TN_EMAX) return TN_ZERO;
+  return tnMk(s, 0, m, e);
+}
+function tnTower(s, k, v) { // 规范化塔层：值 = 10^…^v（k 个 10）
+  while (v >= TN_EMAX) { v = Math.log10(v); k++; }
+  while (k >= 2 && v < TN_LMAX) { if (k === 2) return tnFromLog(Math.pow(10, v), s); v = Math.pow(10, v); k--; }
+  return tnMk(s, k, v, 0);
+}
+function tn(x) { // 普通数字 → 层塔
+  if (x === 0 || x !== x) return TN_ZERO;
+  const s = x < 0 ? -1 : 1, a = Math.abs(x);
+  if (a === Infinity) return tnMk(s, 0, 1.7976931348623157, 308);
+  const e = Math.floor(Math.log10(a)); return tnSci(s, a / Math.pow(10, e), e);
+}
+function tnFromLog(L, s) { // 值 = 10^L（L 为普通数字）
+  s = s || 1; if (L !== L) return TN_ZERO;
+  if (L >= TN_EMAX) return tnTower(s, 2, Math.log10(L));
+  if (L <= -TN_EMAX) return TN_ZERO;
+  const e = Math.floor(L); let m = Math.pow(10, L - e); if (m >= 10) { m = 1; return tnMk(s, 0, m, e + 1); } return tnMk(s, 0, m, e);
+}
+function tnClone(a) { return tnMk(a.s, a.k, a.m, a.e); }
+function tnIs(a) { return !!a && typeof a === 'object' && 'k' in a && 'm' in a; }
+function tnNeg(a) { return tnMk(-a.s, a.k, a.m, a.e); }
+function tnAbs(a) { return a.s < 0 ? tnMk(1, a.k, a.m, a.e) : a; }
+function tnCmpAbs(a, b) { // 比较绝对值
+  if (a.s === 0) return b.s === 0 ? 0 : -1; if (b.s === 0) return 1;
+  if (a.k !== b.k) return a.k > b.k ? 1 : -1;
+  if (a.k === 0) { if (a.e !== b.e) return a.e > b.e ? 1 : -1; return a.m === b.m ? 0 : a.m > b.m ? 1 : -1; }
+  return a.m === b.m ? 0 : a.m > b.m ? 1 : -1;
+}
+function tnCmp(a, b) { if (a.s !== b.s) return a.s > b.s ? 1 : -1; const c = tnCmpAbs(a, b); return a.s < 0 ? -c : c; }
+function tnGt(a, b) { return tnCmp(a, b) > 0; } function tnGte(a, b) { return tnCmp(a, b) >= 0; } function tnLt(a, b) { return tnCmp(a, b) < 0; }
+function tnMax(a, b) { return tnCmp(a, b) >= 0 ? a : b; } function tnMin(a, b) { return tnCmp(a, b) <= 0 ? a : b; }
+function tnLog10(a) { // 返回 log10(a)（层塔）；a ≤ 0 时返回 −∞ 的近似（0）
+  if (a.s <= 0) return tnMk(-1, 0, 1, 308);
+  if (a.k === 0) return tn(a.e + Math.log10(a.m));
+  if (a.k === 2) return tnFromLog(a.m);
+  return tnMk(1, a.k - 1, a.m, 0);
+}
+function tnPow10(a) { // 返回 10^a
+  if (a.k === 0) { if (a.s <= 0 || a.e < 15) return tnFromLog(tnNumber(a)); return tnTower(1, 2, a.e + Math.log10(a.m)); }
+  if (a.s < 0) return TN_ZERO; return tnTower(1, a.k + 1, a.m);
+}
+function tnMul(a, b) {
+  if (a.s === 0 || b.s === 0) return TN_ZERO; const s = a.s * b.s;
+  if (a.k === 0 && b.k === 0) return tnSci(s, a.m * b.m, a.e + b.e);
+  const r = tnPow10(tnAdd(tnLog10(tnAbs(a)), tnLog10(tnAbs(b)))); return s < 0 ? tnNeg(r) : r;
+}
+function tnDiv(a, b) {
+  if (b.s === 0) return tnMk(a.s || 1, 0, 1.7976931348623157, 308); if (a.s === 0) return TN_ZERO; const s = a.s * b.s;
+  if (a.k === 0 && b.k === 0) return tnSci(s, a.m / b.m, a.e - b.e);
+  const r = tnPow10(tnSub(tnLog10(tnAbs(a)), tnLog10(tnAbs(b)))); return s < 0 ? tnNeg(r) : r;
+}
+function tnAdd(a, b) {
+  if (a.s === 0) return b; if (b.s === 0) return a;
+  if (a.k !== 0 || b.k !== 0) { const c = tnCmpAbs(a, b); if (c === 0) return a.s === b.s ? (a.k === 0 ? tnMul(a, tn(2)) : a) : TN_ZERO; return c > 0 ? a : b; } // 塔层：较大者占绝对主导
+  let big = a, sm = b; if (b.e > a.e || (b.e === a.e && b.m > a.m)) { big = b; sm = a; }
+  const de = big.e - sm.e; if (de > 17) return big;
+  const m = big.s * big.m + sm.s * sm.m / Math.pow(10, de); if (m === 0) return TN_ZERO;
+  return tnSci(m < 0 ? -1 : 1, Math.abs(m), big.e);
+}
+function tnSub(a, b) { return tnAdd(a, tnNeg(b)); }
+function tnPow(a, p) { // a^p，p 可以是数字或层塔
+  const P = tnIs(p) ? p : tn(p); if (a.s === 0) return P.s > 0 ? TN_ZERO : TN_ONE; if (a.s < 0) a = tnAbs(a);
+  if (a.k === 0 && P.k === 0 && P.e < 6) { const L = (a.e + Math.log10(a.m)) * tnNumber(P); if (Math.abs(L) < TN_EMAX) return tnFromLog(L); }
+  return tnPow10(tnMul(tnLog10(a), P));
+}
+function tnNumber(a) { // 转回普通数字（过大时为 ±Infinity）
+  if (a.s === 0) return 0; if (a.k > 0) return a.s * Infinity;
+  if (a.e > 308) return a.s * Infinity; if (a.e < -324) return 0; return a.s * a.m * Math.pow(10, a.e);
+}
+function tnLg(a) { return tnNumber(tnLog10(a)); } // log10 → 普通数字
+function tnLgLg(a) { return a.s <= 0 ? -Infinity : a.k === 0 ? Math.log10(Math.max(1e-300, a.e + Math.log10(a.m))) : a.k === 2 ? a.m : tnNumber(tnFromLog(a.m)) === Infinity ? Infinity : Math.log10(tnLg(tnLog10(a))); }
+function tnSlog(a) { // 以 10 为底的超对数（线性近似）：10↑↑x 中的 x
+  if (a.s <= 0) return -1; let n, x;
+  if (a.k === 0) { n = 0; x = a.e + Math.log10(a.m); if (x < 0) return Math.pow(10, x) - 1; x = Math.pow(10, Math.min(x, 308)); if (a.e > 300) { n = 1; x = a.e + Math.log10(a.m); } }
+  else { n = a.k; x = a.m; }
+  while (x >= 10) { x = Math.log10(x); n++; } return n + (x - 1) / 9;
+}
+function tnSciStr(v, dp) { const f = Math.floor(v); let m = Math.pow(10, v - f), e = f; if (m.toFixed(dp) === (10).toFixed(dp)) { m = 1; e++; } return m.toFixed(dp) + 'e' + e.toLocaleString('en-US'); }
+function tnFmt(a, dp) { // 与游戏一致的显示：1,234 → 1.234e56 → e1.234e78 → ee1.234e56 → …
+  dp = dp === undefined ? 3 : dp; if (a.s === 0) return '0'; const sg = a.s < 0 ? '−' : '';
+  if (a.k === 0) { if (a.e < 6 && a.e >= -3) return sg + (a.m * Math.pow(10, a.e)).toLocaleString('en-US', { maximumFractionDigits: a.e >= 3 ? 0 : 3 }); if (a.e < 1e6) { let m = a.m, e = a.e; if (m.toFixed(dp) === (10).toFixed(dp)) { m = 1; e++; } return sg + m.toFixed(dp) + 'e' + e; } return sg + 'e' + tnSciStr(a.e + Math.log10(a.m), dp); }
+  if (a.k <= 6) return sg + 'e'.repeat(a.k - 1) + tnSciStr(a.m, dp);
+  return sg + '10↑↑' + tnSlog(a).toFixed(3);
+}
+
 const NI = -Infinity, L10 = Math.log10;
 /* 所有大数一律以 log10 存储：la=对数加，ls=对数减 */
 function la(a, b) { if (a === NI) return b; if (b === NI) return a; if (a < b) { const t = a; a = b; b = t; } const d = b - a; return d < -17 ? a : a + L10(1 + Math.pow(10, d)); }
@@ -1035,6 +1137,9 @@ const ACH = [
   ['ee50 终极点', '终极点达到 ee50', S => S.ult.on && S.ult.Ub >= 1e50],
   ['ee100 终极点', '终极点达到 ee100', S => S.ult.on && S.ult.Ub >= 1e100],
   ['ee200 终极点', '终极点达到 ee200', S => S.ult.on && S.ult.Ub >= 1e200],
+  ['突破浮点', '终极点超过 ee300——普通数字已经装不下了', S => S.ult.on && !!S.ult.UbB && uLgU(S, S.ult.UbB) >= 300],
+  ['ee1000 终极点', '终极点达到 ee1000', S => S.ult.on && !!S.ult.UbB && uLgU(S, S.ult.UbB) >= 1000],
+  ['eee5 终极点', '终极点达到 eee5（10^10^10^5）', S => S.ult.on && !!S.ult.UbB && uLgU(S, S.ult.UbB) >= 1e5],
   ['阿列夫', 'ℵ 达到 1.1', S => (G.al || 1) >= 1.1],
   ['基数之谜', '完成猜想 19–20 的全部难度', S => (S.cc[19] || 0) >= 3 && (S.cc[20] || 0) >= 3],
 ];
@@ -1472,7 +1577,11 @@ function mxGrow(S) { const m = mxM(S); if (!mxOn(S) || m.n >= mxMax(S)) return f
   const old = m.c.slice(); m.c = Array(49).fill(''); for (let r = 0; r < m.n; r++) for (let c = 0; c < m.n; c++) m.c[r * (m.n + 1) + c] = old[r * m.n + c]; m.n++; return true; }
 function mxPlace(S, i, t) { const m = mxM(S); if (!mxOn(S) || i < 0 || i >= m.n * m.n) return false; if (t && !(MXF[t] || MXB[t])) return false;
   if (t) { const used = m.c.slice(0, m.n * m.n).filter((x, k) => x === t && k !== i).length; if (used >= m.own[t]) return false; } m.c[i] = t || ''; return true; }
-function mxCalc(S) { // 返回各类因子的总倍率与每个格子的强度
+const MXCACHE = new WeakMap(); // v1.5.2 性能：矩阵结果缓存，只在矩阵或相关升级变化时重算
+function mxCalc(S) { const m = S.ult && S.ult.rf ? S.ult.rf.mx : null; if (!m) return mxCalcRaw(S);
+  const sig = m.n + '|' + m.c.join(',') + '|' + m.lv.G + ',' + m.lv.D + ',' + m.lv.P + ',' + m.lv.X + ',' + (m.lv.F || 1) + ',' + (m.lv.L || 1) + '|' + (S.ult.rf.up.mx2 ? 1 : 0) + (S.ult.rf.up.mx ? 1 : 0) + '|' + crLv(S, 'm') + '|' + trAct(S);
+  const c = MXCACHE.get(m); if (c && c.sig === sig) return c.out; const out = mxCalcRaw(S); MXCACHE.set(m, { sig: sig, out: out }); return out; }
+function mxCalcRaw(S) { // 返回各类因子的总倍率与每个格子的强度
   const m = mxM(S), N = m.n, at = (r, c) => (r >= 0 && c >= 0 && r < N && c < N) ? m.c[r * N + c] : '', out = { G: 1, D: 1, P: 1, X: 1, cell: [] };
   out.F = 1; out.L = 1; if (!mxOn(S) || trAct(S) === 'nomx') return out; const amp = (S.ult.rf.up.mx2 ? 1.2 : 1) * (1 + 0.1 * crLv(S, 'm')), add = { G: 0, D: 0, P: 0, X: 0, F: 0, L: 0 };
   const mid = N % 2 ? (N - 1) / 2 : -1, core = mid >= 0 && at(mid, mid) === 'O';
@@ -1596,7 +1705,7 @@ function dmResAmp(S) { return (dmu(S, 'r2') ? 1.5 : 1) * (dmu(S, 'r3') ? 1.5 : 1
 function dmResD(S, x) { return dmu(S, 'r1') && trAct(S) !== 'quiet' ? 0.004 * (S.ult.dm.rs[x.id] || 0) * x.f(S) * dmResAmp(S) : 0; }
 function dmDim(S) { if (!S.ult || !S.ult.dm) return 1; const m = S.ult.dm; if (m.tr && m.tr.act === 'one') return 1; let d = 1; DMT.forEach(x => { if (x.dD && m.up[x.id]) d += x.dD; }); d += 0.01 * m.ex; DRES.forEach(x => d += dmResD(S, x)); if (!(m.tr && m.tr.act === 'quiet')) d += 0.003 * Math.sqrt(m.Et); if (m.tr) d += trD(S) + ptD(S) + 0.04 * srLv(S, 'sd'); return d; }
 function dmMult(S) { return (S.ult.dm.sr ? Math.pow(1.5, srLv(S, 'sdp')) : 1) * (dmu(S, 'm1') ? 2 : 1) * (dmu(S, 'm2') ? 2 : 1) * (dmu(S, 'm3') ? 2 : 1) * (dmMs(S, 1) ? 1.5 : 1) * (dmMs(S, 4) ? 2 : 1); }
-function dmX(S) { const U = Math.max(S.ult.rf.Ur, S.ult.U); return U > 1 ? L10(U) : 0; } // 本轮最高的 lg 终极点
+function dmX(S) { const U = Math.max(S.ult.rf.Ur, S.ult.U); if (U >= 1e299 && S.ult.UB) return uLgU(S, tnMax(S.ult.rf.UrB || TN_ZERO, S.ult.UB)); return U > 1 ? L10(U) : 0; } // 本轮最高的 lg 终极点
 function dmGain(S) { const x = dmX(S); return x >= 15 ? Math.floor(1 + Math.pow((x - 15) / 1.5, 3) * dmMult(S)) : 0; }
 function canAscend(S) { return dmOn(S) && dmGain(S) >= 1 && !S.chal && !trAct(S); }
 function doAscend(S) { if (!canAscend(S)) return 0; const u = S.ult, m = u.dm, r = u.rf, g = dmGain(S); m.DP += g; m.DPt += g; m.n++; m.best = Math.max(m.best, dmX(S));
@@ -1645,7 +1754,7 @@ function fdPsi(S) { if (trAct(S) === 'flat') return 1; return S.ult.rf.fd ? Math
 function fdRate(S) { if (!fdOn(S)) return 0; const r = S.ult.rf, mx = r.mx ? mxCalc(S).F : 1; // 每天 ln Ψ 的增量
   const lgU = L10(Math.max(1, uPre(S))), damp = 1 / (1 + K.fdD * (S.ult.dm && S.ult.dm.sr ? Math.pow(0.92, srLv(S, 'sf')) : 1) * Math.max(0, lgU - 12)); // ee12 之后的高维阻尼
   return (K.fdB + 0.12 * Math.log(mx) + (r.up.fd2 ? 0.1 : 0) + 0.015 * Math.min(10, crLv(S, 'f')) + 0.02 * Math.min(10, rfRepLv(S, 'rf')) + (r.eg ? egFold(S) : 0)) * damp; }
-function uPre(S, U) { const D = dmDim(S), x = Math.max(0, U === undefined ? S.ult.U : U); return D > 1 && x > 1 ? Math.pow(x, 1 / D) : x; } // 升维前的数量级
+function uPre(S, U) { const D = dmDim(S); if (U !== undefined || !S.ult.UB || S.ult.U < 1e299) { const x = Math.max(0, U === undefined ? S.ult.U : U); if (x < 1e299) return D > 1 && x > 1 ? Math.pow(x, 1 / D) : x; } return Math.pow(10, Math.min(300, uLgU(S) / D)); } // 升维前的数量级
 function uEff(S) { return uPre(S) / fdPsi(S); } // 折叠前的数量级：阻力只看它
 function x5On(S) { return !!(S.ult && S.ult.on && S.ult.Ub >= 100000); } // ee5 之后的非重置内容
 function rfRepCost(x, L) { return x.c0 * Math.pow(x.g, L); }
@@ -1700,7 +1809,7 @@ function rfDragMult(S) { return (rfu(S, 'd1') ? 3 : 1) * (rfu(S, 'd2') ? 3 : 1) 
 function rfOuterMult(S) { return (rfu(S, 'res') ? 1 + 0.5 * L10(1 + S.ult.rf.PPt) : 1) * (rfu(S, 'omega') ? 3 : 1) * arMult(S); }
 function rfStart(S) { return rfu(S, 'st5') ? 100000 : rfu(S, 'st4') ? 20000 : rfu(S, 'st3') ? 5000 : rfu(S, 'st2') ? 2500 : rfu(S, 'st1') ? 1000 : 100; }
 function ppMult(S) { const n = S.ult.rf.n; return (n >= 10 ? 2 : 1) * (n >= 40 ? 2 : 1) * (n >= 100 ? 3 : 1) * Math.pow(1.25, rfRepLv(S, 'rp')) * Math.pow(1.15, crLv(S, 'p')) * (S.ult.rf.mx ? mxCalc(S).P : 1); }
-function ppGain(S) { const r = S.ult.rf, U = uPre(S, Math.max(r.Ur, S.ult.U)); if (!(U >= 4000)) return 0; return Math.floor(3 * Math.pow(U / 4000, 1.5) * ppMult(S)); }
+function ppGain(S) { const r = S.ult.rf, big = Math.max(r.Ur, S.ult.U) >= 1e299 && r.UrB, U = big ? Math.pow(10, Math.min(300, uLgU(S, tnMax(r.UrB, S.ult.UB)) / dmDim(S))) : uPre(S, Math.max(r.Ur, S.ult.U)); if (!(U >= 4000)) return 0; return Math.floor(3 * Math.pow(U / 4000, 1.5) * ppMult(S)); }
 function canRefactor(S) { return rfOn(S) && ppGain(S) >= 1; }
 function doRefactor(S) {
   if (!canRefactor(S)) return 0; const u = S.ult, r = u.rf, g = ppGain(S); r.PP += g; r.PPt += g; r.n++; r.last = u.t;
@@ -1766,14 +1875,14 @@ function oAnalyze(S) {
 function oCheckCodex(S) { const A = G.oA; if (!A || A.err || !A.items) return []; const got = []; UCX2.forEach((c, i) => { if (!S.ult.o.cx[i] && c[2](A, S)) { S.ult.o.cx[i] = 1; got.push(c[0]); } }); return got; }
 
 /* ===================== v1.4.0 · 递归（无限续章） ===================== */
-const ULT_ACH = new Set(['挑战者', '维度大师', '五维超形体', '十维超形体', '超弦', 'ee50 终极点', 'ee100 终极点', 'ee200 终极点', '升维', '十次升维', '一点五维', '二维', '共振大师', 'ee20 终极点', 'ee25 终极点', 'ee30 终极点', '点火', '十级发动机', '稀有', '传说', '满装', 'ee15 终极点', '超维折叠', '万重折叠', '六阶矩阵', '七阶矩阵', '核心', 'ee10 终极点', 'ee12 终极点', '矩阵', '满格', '共振结构', 'ee8 终极点', 'ee6 终极点', 'ee7 终极点', '档案员', '馆长', '晶体', '第五个变量', '百次重构', '重构', '十次重构', '第四个变量', '1e10000 终极点', '1e20000 终极点', '1e50000 终极点', '1e100000 终极点', '范式', '范式转移', '终极', '第一块积木', '收藏家', '形状大全', '1e10 终极点', '1e50 终极点', '终极古戈尔', '嵌套', '套娃', '指数之上', '1e200 终极点', '1e500 终极点', '1e1000 终极点', '1e2000 终极点', '1e4000 终极点', '双层收藏家', '双层大全', '终极灵光']);
+const ULT_ACH = new Set(['突破浮点', 'ee1000 终极点', 'eee5 终极点', '挑战者', '维度大师', '五维超形体', '十维超形体', '超弦', 'ee50 终极点', 'ee100 终极点', 'ee200 终极点', '升维', '十次升维', '一点五维', '二维', '共振大师', 'ee20 终极点', 'ee25 终极点', 'ee30 终极点', '点火', '十级发动机', '稀有', '传说', '满装', 'ee15 终极点', '超维折叠', '万重折叠', '六阶矩阵', '七阶矩阵', '核心', 'ee10 终极点', 'ee12 终极点', '矩阵', '满格', '共振结构', 'ee8 终极点', 'ee6 终极点', 'ee7 终极点', '档案员', '馆长', '晶体', '第五个变量', '百次重构', '重构', '十次重构', '第四个变量', '1e10000 终极点', '1e20000 终极点', '1e50000 终极点', '1e100000 终极点', '范式', '范式转移', '终极', '第一块积木', '收藏家', '形状大全', '1e10 终极点', '1e50 终极点', '终极古戈尔', '嵌套', '套娃', '指数之上', '1e200 终极点', '1e500 终极点', '1e1000 终极点', '1e2000 终极点', '1e4000 终极点', '双层收藏家', '双层大全', '终极灵光']);
 const RCMAX = 10;
 function rcOn(S) { return !!(S.inf && S.inf.brk && (S.inf.best || 0) >= 1000); }
 function rcCost(L) { return 1e8 * Math.pow(30, L); }
 function rcBuy(S) { if (!rcOn(S) || S.inf.rc >= RCMAX || S.inf.IP < rcCost(S.inf.rc)) return false; S.inf.IP -= rcCost(S.inf.rc); S.inf.rc++; return true; }
 function rcRate(S) { return rcOn(S) ? (K.rcB + 0.008 * (S.inf.rc || 0)) * ((S.inf.best || 0) >= 5000 ? 1.25 : 1) : 0; } // 每天的复利比例
 function canUlt(S) { return rcOn(S) && S.inf.X >= 10000 && !S.ult.on; }
-function doUlt(S) { if (!canUlt(S)) return false; S.ult.on = 1; S.ult.U = 2; S.ult.Ut = 2; S.ult.Ub = 2; S.ult.t = 0; S.ult.at = S.st.time; recalcUlt(S); return true; }
+function doUlt(S) { if (!canUlt(S)) return false; S.ult.on = 1; S.ult.U = 2; S.ult.Ut = 2; S.ult.Ub = 2; S.ult.UB = tnFromLog(2); S.ult.UbB = S.ult.UB; S.ult.UtB = S.ult.UB; S.ult.t = 0; S.ult.at = S.st.time; recalcUlt(S); return true; }
 /* ===================== v1.4.0 · 终极与构造 ===================== */
 const UV = {
   x: { n: '𝑥', g: 1.0, c0: 0.3, a: 0.5 },
@@ -1861,7 +1970,7 @@ function recalcUlt(S) {
   G.uF = tot; // 公式本身的值（log）
   let m = 0; const cx = Object.keys(u.cx).length; m += cx * L10(2); m += UMS.filter(x => u.Ub >= x[0]).length * L10(3);
   if (u.up.add && A.groups > 1) m += 2 * L10(A.groups); if (u.up.fill) m += A.items * L10(3); if (u.up.end) m += 3;
-  G.uM = m; G.uPsi = fdPsi(S); G.uR = tot === NI ? NI : (tot + m) * G.uPsi; G.uD = dmDim(S); if (G.uR > 1 && G.uD > 1) G.uR = Math.pow(G.uR, G.uD); if (!(G.uR <= 1e300)) G.uR = 1e300; // 当前版本的数值上限：ee300 // 每秒终极点（log）；折叠把整个数量级乘上 Ψ
+  G.uM = m; G.uPsi = fdPsi(S); G.uR = tot === NI ? NI : (tot + m) * G.uPsi; G.uD = dmDim(S); G.uRB = G.uR === NI ? TN_ZERO : (G.uR > 1 && G.uD > 1 ? tnPow(tn(G.uR), G.uD) : tn(G.uR)); if (G.uR !== NI) G.uR = Math.min(1e300, tnNumber(G.uRB)); // 速率以层塔计算，可超出普通数字的范围 // 每秒终极点（log）；折叠把整个数量级乘上 Ψ
 }
 function uCheckCodex(S) { const A = G.uA; if (!A || A.err || !A.items) return []; const got = []; UCX.forEach((c, i) => { if (!S.ult.cx[i] && c[2](A)) { S.ult.cx[i] = 1; got.push(c[0]); } }); return got; }
 function uBuyVar(S, v) { const u = S.ult; if (!u.unl[v]) return false; const c = uVarCost(v, u.lv[v]); if (u.U < c) return false; u.U = ls(u.U, c); u.lv[v]++; return true; }
@@ -1874,8 +1983,18 @@ function uBuyTok(S, k) { const u = S.ult; let c;
 function uBuyUp(S, id) { const u = S.ult, x = UUM[id]; if (!x || u.up[id] || u.U < x.c) return false; u.U = ls(u.U, x.c); u.up[id] = 1; return true; }
 function uSetSlot(S, i, v, p) { const f = S.ult.f; if (i < 0 || i >= S.ult.slots) return; f.s[i] = { v: v || '', p: p || 1 }; }
 function uSetJoint(S, i, j) { const f = S.ult.f; if (i < 0 || i >= S.ult.slots - 1) return; f.j[i] = j === '×' ? '×' : '+'; }
+function ultSync(S) { const u = S.ult, r = u.rf; if (!(u.U <= 1e300)) u.U = 1e300;
+  if (!u.UB || u.U < 1e299) u.UB = u.U > NI ? tnFromLog(u.U) : TN_ZERO;
+  if (!u.UbB) u.UbB = tnFromLog(u.Ub > NI ? u.Ub : 0); if (u.Ub < 1e299) u.UbB = tnMax(u.UbB, tnFromLog(u.Ub > NI ? u.Ub : 0));
+  if (!u.UtB || u.Ut < 1e299) u.UtB = u.Ut > NI ? tnFromLog(u.Ut) : TN_ZERO;
+  if (r) { if (!r.UrB || r.Ur < 1e299) r.UrB = r.Ur > NI ? tnFromLog(r.Ur) : TN_ZERO; } }
+function ultGain(S, h) { const u = S.ult, r = u.rf; if (G.uR === NI) return;
+  if (G.uR < 1e299 && u.U < 1e299) { const gg = G.uR + L10(h); u.U = la(u.U, gg); u.Ut = la(u.Ut, gg); if (u.U > u.Ub) u.Ub = u.U; u.UB = tnFromLog(u.U); u.UtB = tnFromLog(u.Ut); }
+  else { const gain = tnPow10(tnAdd(G.uRB, tn(L10(h)))); u.UB = tnAdd(u.UB || TN_ZERO, gain); u.UtB = tnAdd(u.UtB || TN_ZERO, gain); u.U = Math.min(1e300, tnLg(u.UB)); u.Ut = Math.min(1e300, Math.max(u.Ut, u.U)); u.Ub = Math.max(u.Ub, u.U); }
+  u.UbB = tnMax(u.UbB || TN_ZERO, u.UB); if (r) { r.UrB = tnMax(r.UrB || TN_ZERO, u.UB); if (u.U > r.Ur) r.Ur = u.U; } }
+function uLgU(S, B) { const b = B || S.ult.UB; return b ? Math.max(0, tnLgLg(b)) : (S.ult.U > 1 ? L10(S.ult.U) : 0); } // lg（lg 终极点）的值，即 lg U
 function stepUlt(S, dt) {
-  if (!(S.ult.U <= 1e300)) S.ult.U = 1e300;
+  ultSync(S);
   const u = S.ult; u.t += dt;
   // 自适应子步：变量一步内的增长超过当前数量级的 5% 时拆分，保证离线与大步长的精度
   const growth = () => { let g = 0; const dr = uDrag(S); UVK.forEach(v => { if (u.unl[v]) g += uGrow(S, v) / dr; }); if (oOn(S)) { const od = oDrag(S); OVK.forEach(v => { if (u.o.unl[v]) g += 6 * oGrow(S, v) / od; }); } return g / 86400; };
@@ -1883,11 +2002,11 @@ function stepUlt(S, dt) {
   while (rest > 1e-9 && guard++ < 400) { const g = growth(), lim = 0.05 * Math.max(100, u.U), h = g * rest > lim ? Math.max(rest / (400 - guard + 1), lim / g) : rest;
     const dr = uDrag(S); UVK.forEach(v => { if (u.unl[v]) u.V[v] += uGrow(S, v) * h / 86400 / dr; });
     if (oOn(S)) { const od = oDrag(S); OVK.forEach(v => { if (u.o.unl[v]) u.o.V[v] += oGrow(S, v) * h / 86400 / od; }); }
-    recalcUlt(S); if (G.uR !== NI && rest > h) { const gg = G.uR + L10(h); u.U = la(u.U, gg); u.Ut = la(u.Ut, gg); if (u.U > u.Ub) u.Ub = u.U; } rest -= h; if (rest <= h * 1e-9) break; }
+    recalcUlt(S); if (rest > h) ultGain(S, h); rest -= h; if (rest <= h * 1e-9) break; }
   if (oOn(S)) {
     if (u.up.oauto && u.o.auto) for (let k = 0; k < 40; k++) { let best = null; OVK.forEach(v => { if (u.o.unl[v] && (!best || oVarCost(v, u.o.lv[v]) < oVarCost(best, u.o.lv[best]))) best = v; }); if (!best || oVarCost(best, u.o.lv[best]) > u.U - 0.3) break; oBuyVar(S, best); } }
   recalcUlt(S);
-  if (G.uR !== NI) { const g = G.uR + L10(dt); u.U = la(u.U, g); u.Ut = la(u.Ut, g); if (u.U > u.Ub) u.Ub = u.U; }
+  ultGain(S, dt);
   if (u.up.auto && u.auto) { for (let k = 0; k < 40; k++) { let best = null; UVK.forEach(v => { if (u.unl[v] && (!best || uVarCost(v, u.lv[v]) < uVarCost(best, u.lv[best]))) best = v; }); if (!best || uVarCost(best, u.lv[best]) > u.U - 0.3) break; uBuyVar(S, best); } }
   rfStep(S, dt); dmStep(S, dt); recalcUlt(S);
   const got = uCheckCodex(S).concat(oOn(S) ? oCheckCodex(S).map(n => '外层·' + n) : []); if (got.length) { u.nw = (u.nw || []).concat(got); } return got;
@@ -2447,7 +2566,7 @@ function deserialize(str) {
 function encodeSave(S) { const s = serialize(S); return typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(s))) : Buffer.from(s).toString('base64'); }
 function decodeSave(b) { const s = typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(b.trim()))) : Buffer.from(b, 'base64').toString(); return deserialize(s); }
 
-if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, CAPP, XCAP, XMAX, IUP, IUM, iu, infAt, infCharge, infNeed, ipMult, ipGain, canInf, doInf, iuCan, iuBuy, beCost, beBuy, beSpeed, ptsX, fmtX, ptsFmt, RCMAX, rcOn, rcCost, rcBuy, rcRate, canUlt, doUlt, UV, UVK, UCN, UUP, UUM, UMS, UCX, uNew, TRS, TRM, SRUP, SRM, PTN, dm2, trOn, trAct, trLv, trGoal, ascReset, trEnter, trExit, trCheck, trD, ptOn, ptLit, ptCost, ptLight, ptD, srOn, srLv, srCost, srBuy, srRate, dim2Step, DMT, DMTM, DRES, DMMS, dmNew, dmOn, dmu, dmMs, dmExCost, dmResCost, dmResAmp, dmResD, dmDim, dmMult, dmX, dmGain, canAscend, doAscend, dmBuy, dmExBuy, dmResBuy, dmStep, uPre, EGC, EGG, EGQ, EGMS, egNew, egOn, egE, egMs, egBagMax, egMultLog, egMult, egBuyCost, egLvCost, egBuy, egLvUp, egBuyMax, egStep, egLg, egFold, egGrow, egDrawCost, egDraw, egMerge, egAutoMerge, egEquip, egUnequip, fdOn, fdPsi, fdRate, uEff, mxMax, mxGrowCost, MXF, MXB, MXSZ, mxNew, mxOn, mxBuyCost, mxLvCost, mxBuy, mxLvUp, mxGrow, mxPlace, mxCalc, deepDrag, RFREP, CRUP, x5On, rfRepCost, rfRepLv, rfRepBuy, crLv, crCost, crBuy, crRate, shapeSig, arArchive, arSum, arMult, RFUP, RFM, RFMS, rfNew, rfu, rfOn, rfGrowMult, rfDragMult, rfOuterMult, rfStart, ppMult, ppGain, canRefactor, doRefactor, rfCan, rfBuy, rfStep, ULT_ACH, OV, OVK, OTMAX, OTC, UMS2, UCX2, oNew, oOn, oPow, oVarCost, oTokCost, oBuyTok, oBuyVar, oUnlockVar, oSetSlot, oSetJoint, oMsN, oGrow, oDrag, oAnalyze, oCheckCodex, uVarLog, uGrow, uDrag, uBoost, uConLog, uVarCost, UTMAX, uMulCost, uSlotCost, uP2Cost, uP3Cost, uPow, uAnalyze, recalcUlt, uCheckCodex, uBuyVar, uUnlockVar, uBuyTok, uBuyUp, uSetSlot, uSetJoint, stepUlt, GEN, IMS, BUP, BUM, bu, im, genOn, genCost, genMult, genBuy, powEff, buCan, buBuy, repCost, repBuy, beyS, beyV, sanitize, spCostS, CLS, CLSM, SPATH, SPM, RSHOP, RSHM, GWN, GWE, XP13, CM, bhOn, rec, xpOn, reqOk, spCost, spSpent, spCanBuy, spBuy, spSwitch, rsLv, rsCost, rsBuy, gwCount, bhTau, siMult, radRate, gwSpeed, bhBeta, bhQ, bhMu, bhAl, colX, colGain, canCollapse, doCollapse, bhMeff, frMax, TWN, TWD, twSpeed, twFloorTime, twAdvance, twSprint, twClimb, FZP, fzDeal, fzTap, aleph7, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
+if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, CAPP, XCAP, XMAX, IUP, IUM, iu, infAt, infCharge, infNeed, ipMult, ipGain, canInf, doInf, iuCan, iuBuy, beCost, beBuy, beSpeed, ptsX, fmtX, ptsFmt, RCMAX, rcOn, rcCost, rcBuy, rcRate, canUlt, doUlt, UV, UVK, UCN, UUP, UUM, UMS, UCX, uNew, tn, tnFromLog, tnMk, tnLog10, tnPow10, tnMul, tnDiv, tnAdd, tnSub, tnPow, tnCmp, tnGt, tnGte, tnLt, tnMax, tnMin, tnNumber, tnLg, tnLgLg, tnSlog, tnFmt, TN_ZERO, TN_ONE, ultSync, ultGain, uLgU, TRS, TRM, SRUP, SRM, PTN, dm2, trOn, trAct, trLv, trGoal, ascReset, trEnter, trExit, trCheck, trD, ptOn, ptLit, ptCost, ptLight, ptD, srOn, srLv, srCost, srBuy, srRate, dim2Step, DMT, DMTM, DRES, DMMS, dmNew, dmOn, dmu, dmMs, dmExCost, dmResCost, dmResAmp, dmResD, dmDim, dmMult, dmX, dmGain, canAscend, doAscend, dmBuy, dmExBuy, dmResBuy, dmStep, uPre, EGC, EGG, EGQ, EGMS, egNew, egOn, egE, egMs, egBagMax, egMultLog, egMult, egBuyCost, egLvCost, egBuy, egLvUp, egBuyMax, egStep, egLg, egFold, egGrow, egDrawCost, egDraw, egMerge, egAutoMerge, egEquip, egUnequip, fdOn, fdPsi, fdRate, uEff, mxMax, mxGrowCost, MXF, MXB, MXSZ, mxNew, mxOn, mxBuyCost, mxLvCost, mxBuy, mxLvUp, mxGrow, mxPlace, mxCalc, deepDrag, RFREP, CRUP, x5On, rfRepCost, rfRepLv, rfRepBuy, crLv, crCost, crBuy, crRate, shapeSig, arArchive, arSum, arMult, RFUP, RFM, RFMS, rfNew, rfu, rfOn, rfGrowMult, rfDragMult, rfOuterMult, rfStart, ppMult, ppGain, canRefactor, doRefactor, rfCan, rfBuy, rfStep, ULT_ACH, OV, OVK, OTMAX, OTC, UMS2, UCX2, oNew, oOn, oPow, oVarCost, oTokCost, oBuyTok, oBuyVar, oUnlockVar, oSetSlot, oSetJoint, oMsN, oGrow, oDrag, oAnalyze, oCheckCodex, uVarLog, uGrow, uDrag, uBoost, uConLog, uVarCost, UTMAX, uMulCost, uSlotCost, uP2Cost, uP3Cost, uPow, uAnalyze, recalcUlt, uCheckCodex, uBuyVar, uUnlockVar, uBuyTok, uBuyUp, uSetSlot, uSetJoint, stepUlt, GEN, IMS, BUP, BUM, bu, im, genOn, genCost, genMult, genBuy, powEff, buCan, buBuy, repCost, repBuy, beyS, beyV, sanitize, spCostS, CLS, CLSM, SPATH, SPM, RSHOP, RSHM, GWN, GWE, XP13, CM, bhOn, rec, xpOn, reqOk, spCost, spSpent, spCanBuy, spBuy, spSwitch, rsLv, rsCost, rsBuy, gwCount, bhTau, siMult, radRate, gwSpeed, bhBeta, bhQ, bhMu, bhAl, colX, colGain, canCollapse, doCollapse, bhMeff, frMax, TWN, TWD, twSpeed, twFloorTime, twAdvance, twSprint, twClimb, FZP, fzDeal, fzTap, aleph7, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
 
 /* ===================== 公式晋升 v1.0.0 · 界面（前端） ===================== */
 const SAVE_KEY = 'formula-ascend-save-v1';
@@ -2482,7 +2601,7 @@ function offlineUlt(sec, silent) {
   const steps = Math.min(4000, Math.max(20, Math.ceil(sec / 3))), dt = sec / steps;
   for (let i = 0; i < steps; i++) step(S, dt);
   checkAch(S); recalc(S); viewSig = ''; heroTier = 0; if (silent) return;
-  const li = [`终极点：${fmt(b.U)} → <b>${fmt(u.U)}</b>`];
+  const li = [`终极点：${fmt(b.U)} → <b>${UBf()}</b>`];
   UVK.forEach(v => { if (u.unl[v]) li.push(`${UV[v].n}：${fmt(b.V[v])} → ${fmt(u.V[v])}`); });
   if (oOn(S)) OVK.forEach(v => { if (u.o.unl[v]) li.push(`${OV[v].n}：${fmt(b.OV[v])} → ${fmt(u.o.V[v])}`); });
   const nl = UVK.reduce((s, v) => s + u.lv[v], 0) + OVK.reduce((s, v) => s + u.o.lv[v], 0) - b.lv; if (nl > 0) li.push(`自动演算购买了 ${nl} 个变量等级`);
@@ -2653,8 +2772,8 @@ function renderHeroUlt() {
   if (heroTier !== sig) { heroTier = sig; $('formula').innerHTML = uFormulaHTML(); $('formula').parentElement.classList.add('t6'); $('tierb').textContent = '终极';
     $('pts').nextElementSibling.textContent = '终极点'; const fr = $('formulaResult').nextElementSibling; if (fr) fr.textContent = '终极点 / 秒';
     $('reads').innerHTML = UVK.filter(v => S.ult.unl[v]).map(v => `<span class="chip"><i>${UV[v].n}</i><span data-uv="${v}"></span></span>`).join('') + (oOn(S) ? OVK.filter(v => S.ult.o.unl[v]).map(v => `<span class="chip"><i>${OV[v].n}</i><span data-ov="${v}"></span></span>`).join('') : '') + (fdOn(S) ? '<span class="chip"><i>Ψ</i><span data-psi="1"></span></span>' : '') + (dmOn(S) ? '<span class="chip"><i>D</i><span data-dim="1"></span></span>' : '') + Object.keys(S.ult.cn).map(c => `<span class="chip"><i>${UCN[c].n}</i>${fx(Math.pow(10, uConLog(S, c)), 3)}</span>`).join(''); }
-  $('pts').textContent = fmt(S.ult.U); $('formulaResult').textContent = fmt(G.uR);
-  $('rate').innerHTML = (G.uA && G.uA.err) ? `<span class="co">公式无效：${G.uA.err}</span>` : `每秒获得 <b class="num">${fmt(G.uR)}</b> 终极点 · 公式的值 <b class="num">${fmt(G.uF)}</b>` + (oOn(S) && G.oA && G.oA.err ? ` · <span class="co">外层无效（${G.oA.err}），暂按内层计算</span>` : '') + (trAct(S) ? ` · <span class="co">维度挑战「${TRM[trAct(S)].n}」：目标 ee${trGoal(S, trAct(S))}</span>` : '');
+  $('pts').textContent = UBf(); $('formulaResult').textContent = URf();
+  $('rate').innerHTML = (G.uA && G.uA.err) ? `<span class="co">公式无效：${G.uA.err}</span>` : `每秒获得 <b class="num">${URf()}</b> 终极点 · 公式的值 <b class="num">${fmt(G.uF)}</b>` + (oOn(S) && G.oA && G.oA.err ? ` · <span class="co">外层无效（${G.oA.err}），暂按内层计算</span>` : '') + (trAct(S) ? ` · <span class="co">维度挑战「${TRM[trAct(S)].n}」：目标 ee${trGoal(S, trAct(S))}</span>` : '');
   $('reads').querySelectorAll('[data-uv]').forEach(el => { const v = el.dataset.uv, t = fmt(uVarLog(S, v)); if (el.textContent !== t) el.textContent = t; });
   $('reads').querySelectorAll('[data-dim]').forEach(el => { const t = fx(dmDim(S), 4); if (el.textContent !== t) el.textContent = t; });
   $('reads').querySelectorAll('[data-psi]').forEach(el => { const t = '×' + fmtBig(fdPsi(S)); if (el.textContent !== t) el.textContent = t; });
@@ -2677,13 +2796,13 @@ function renderHero() {
   $('boostnote').textContent = S.boostT > 0 ? `灵感爆发 ${Math.ceil(S.boostT)} 秒` : '';
 }
 function renderBarUlt() {
-  $('statPoints').textContent = fmt(S.ult.U); $('statRate').textContent = fmt(G.uR); $('statInterval').textContent = '1 秒';
+  $('statPoints').textContent = UBf(); $('statRate').textContent = URf(); $('statInterval').textContent = '1 秒';
   const ks = document.querySelectorAll('.workspace-stats .k'); if (ks[0]) ks[0].textContent = '终极点'; if (ks[1]) ks[1].textContent = '每秒终极点'; if (ks[2]) ks[2].textContent = '结算间隔';
-  const html = `<div class="cur"><div class="k">终极点</div><div class="v num">${fmt(S.ult.U)}</div><div class="s">累计 ${fmt(S.ult.Ut)} · 图鉴 ${Object.keys(S.ult.cx).length} / ${UCX.length}</div></div>`;
+  const html = `<div class="cur"><div class="k">终极点</div><div class="v num">${UBf()}</div><div class="s">累计 ${UBtf()} · 图鉴 ${Object.keys(S.ult.cx).length} / ${UCX.length}</div></div>`;
   const html2 = html + (dmOn(S) ? `<div class="cur"><div class="k">维点</div><div class="v num">${fmtBig(S.ult.dm.DP)}</div><div class="s">D = ${fx(dmDim(S), 4)} · 升维 ${S.ult.dm.n} 次</div></div>` : '') + (x5On(S) ? `<div class="cur"><div class="k">时间晶体</div><div class="v num">${fmtBig(S.ult.rf.cr.n)}</div><div class="s">每小时 +${fx(crRate(S) * 3600, 2)} · 档案馆 ×${fx(arMult(S), 3)}</div></div>` : '') + (rfOn(S) ? `<div class="cur"><div class="k">范式点</div><div class="v num">${fmtBig(S.ult.rf.PP)}</div><div class="s">累计 ${fmtBig(S.ult.rf.PPt)} · 重构 ${S.ult.rf.n} 次</div></div>` : '');
   if ($('curs').innerHTML !== html2) $('curs').innerHTML = html2;
   renderActions($('acts'), (dmOn(S) ? [['udmA', '升维', () => canAscend(S), () => canAscend(S) ? '+' + fmtBig(dmGain(S)) + ' 维点' : '需要 ee15', 'cy']] : []).concat(rfOn(S) ? [['urf', '重构', () => canRefactor(S), () => canRefactor(S) ? '+' + fmtBig(ppGain(S)) + ' 范式点' : '需要 1e4000 终极点', 'cy']] : []));
-  renderActions($('workspaceActions'), [['tab:ub', '构造台', () => true, () => G.uA && G.uA.err ? '公式无效' : '每秒 ' + fmt(G.uR) + ' 终极点', 'cy'], ['tab:ush', '积木商店', () => true, () => '拥有 ' + fmt(S.ult.U) + ' 终极点', 'go']].concat(rfOn(S) ? [['urf', '重构', () => canRefactor(S), () => canRefactor(S) ? '+' + fmtBig(ppGain(S)) + ' 范式点' : '需要 1e4000 终极点', 'cy']] : []));
+  renderActions($('workspaceActions'), [['tab:ub', '构造台', () => true, () => G.uA && G.uA.err ? '公式无效' : '每秒 ' + URf() + ' 终极点', 'cy'], ['tab:ush', '积木商店', () => true, () => '拥有 ' + UBf() + ' 终极点', 'go']].concat(rfOn(S) ? [['urf', '重构', () => canRefactor(S), () => canRefactor(S) ? '+' + fmtBig(ppGain(S)) + ' 范式点' : '需要 1e4000 终极点', 'cy']] : []));
 }
 function renderBar() {
   if (S.ult && S.ult.on) return renderBarUlt();
@@ -3219,7 +3338,7 @@ VIEWS.ub = () => {
   let h = `<div class="sec">构造台<span class="h">点选一个槽位，再点下方的积木放进去；点击槽位之间的符号切换 + 与 ×</span></div><div class="grid">
   <div class="card" style="grid-column:1/-1"><div class="uslots" tabindex="0" aria-label="内层公式槽位">${row}</div>
   <div class="row upal">${pal}</div><div class="row">${pw}</div>
-  <div class="fm" ${B('uval', () => G.uA && G.uA.err ? '⚠ ' + G.uA.err : '公式的值 ' + fmt(G.uF) + ' · 加成 ×' + fmt(G.uM) + ' → 每秒 ' + fmt(G.uR) + ' 终极点')}></div>
+  <div class="fm" ${B('uval', () => G.uA && G.uA.err ? '⚠ ' + G.uA.err : '公式的值 ' + fmt(G.uF) + ' · 加成 ×' + fmt(G.uM) + ' → 每秒 ' + URf() + ' 终极点')}></div>
   <div class="muted" ${B('uinv', () => '积木：× ' + u.mul + ' 个 · ² ' + u.p2 + ' 个 · ³ ' + u.p3 + ' 个 · 槽位 ' + u.slots + ' 个' + (u.up.tow ? ' · 幂之塔生效' : ''))}></div>
   <p class="note">规则：同一个乘积（用 × 连在一起的部分）里，每个积木只能出现一次；用 + 连接的不同项之间可以重复。乘积里每个变量的「每天增长的数量级」会乘上它的指数，再相加。</p></div></div>`;
   h += `<div class="sec">变量<span class="h">变量的值会随时间不断增长；购买等级可以让它长得更快</span></div><div class="grid">`;
@@ -3302,7 +3421,7 @@ VIEWS.umx = () => {
 VIEWS.ufd = () => { const r = S.ult.rf;
   return `<div class="sec">超维折叠<span class="h">ee8 之后，整个公式被提升到 Ψ 次方：终极点的数量级 ×Ψ</span></div><div class="grid">
   <div class="card"><div class="sieve" ${B('fdp', () => 'Ψ = ×' + fmtBig(fdPsi(S)))}></div><div class="muted" ${B('fdr', () => 'Ψ 每天增长 e^' + fx(fdRate(S), 3) + ' 倍（即 ×' + fx(Math.exp(fdRate(S)), 3) + ' / 天），永不重置')}></div>
-  <div class="fm" ${B('fde', () => '折叠前的数量级 ' + fmt(uEff(S)) + ' → 折叠后 ' + fmt(S.ult.U))}></div>
+  <div class="fm" ${B('fde', () => '折叠前的数量级 ' + fmt(uEff(S)) + ' → 折叠后 ' + UBf())}></div>
   <p class="note">演算阻力与深层阻力只看折叠前的数量级，所以你的公式和变量仍然重要；Ψ 把它们的成果整体放大。</p></div>
   <div class="card"><div class="nm">折叠速率的来源</div><ul class="ms"><li>基础：+${fx(K.fdB, 2)} / 天</li><li ${B('fd1', () => 'Φ 折叠因子（矩阵）：+' + fx(0.12 * Math.log(mxCalc(S).F), 3) + ' / 天')}></li><li ${B('fd2', () => '折叠加速（范式升级）：+' + (r.up.fd2 ? '0.1' : '0') + ' / 天')}></li><li ${B('fd3', () => '晶格 · 折叠：+' + fx(0.015 * Math.min(10, crLv(S, 'f')), 3) + ' / 天')}></li><li ${B('fd4', () => '无尽折叠：+' + fx(0.02 * Math.min(10, rfRepLv(S, 'rf')), 3) + ' / 天')}></li></ul>
   <p class="note">Φ 因子的效果按对数折算：越往后，增加速率越需要更巧的矩阵摆放。</p></div></div>`; };
@@ -3326,7 +3445,7 @@ VIEWS.ueg = () => { const g = egE(S), r = S.ult.rf, sel = g.sel;
   return h; };
 VIEWS.udm = () => { const m = S.ult.dm;
   let h = `<div class="sec">升维<span class="h">新的重置层：终极点的数量级本身被提升到 D 次方</span></div><div class="grid">
-  <div class="card"><div class="sieve" ${B('dmd', () => 'D = ' + fx(dmDim(S), 4))}></div><div class="fm" ${B('dmf', () => 'lg 终极点 = (升维前的数量级)^D：' + fmt(uPre(S)) + ' → ' + fmt(S.ult.U))}></div>
+  <div class="card"><div class="sieve" ${B('dmd', () => 'D = ' + fx(dmDim(S), 4))}></div><div class="fm" ${B('dmf', () => 'lg 终极点 = (升维前的数量级)^D：' + fmt(uPre(S)) + ' → ' + tnFmt(tnLog10(S.ult.UB || tnFromLog(S.ult.U))))}></div>
   <div class="ds">维点 = ⌊1 + ((lg lg 终极点 − 15) ÷ 1.5)³ × 倍率⌋（本轮最高）。升维会重置终极点、变量、当前范式点与发动机的数量和等级；范式树、重构次数、超维折叠、晶格矩阵、品质发动机、档案馆、晶体与构造台全部保留。</div>
   <div class="row"><button class="btn" data-a="udmA" ${B('dmb', () => ({ c: 'btn ' + (canAscend(S) ? 'cy' : ''), d: !canAscend(S) }))}>升维<small ${B('dmbs', () => canAscend(S) ? '+' + fmtBig(dmGain(S)) + ' 维点' : '需要 ee15')}></small></button></div>
   <div class="muted" ${B('dms', () => '维点 ' + fmtBig(m.DP) + ' · 累计 ' + fmtBig(m.DPt) + ' · 已升维 ' + m.n + ' 次 · 倍率 ×' + fx(dmMult(S), 2))}></div>
@@ -3508,7 +3627,8 @@ VIEWS.ach = () => {
   const n = Object.keys(S.ach).length;
   return `<div class="sec">成就<span class="h">${n} / ${ACH.length} · 每个成就使 a 的值 ×1.05（当前 ×${fmt(n * L10(1.05))}）</span></div><div class="grid">${ACH.map((a, i) => `<div class="card ${S.ach[i] ? '' : 'dim'}"><div class="t"><span class="nm">${a[0]}</span>${S.ach[i] ? '<span class="pill ok">已达成</span>' : ''}</div><div class="ds">${a[1]}</div></div>`).join('')}</div>`;
 };
-function ultStatRows() { const u = S.ult, o = u.o; const r = [['终极用时', () => fmtT(u.t)], ['终极点', () => fmt(u.U)], ['累计终极点', () => fmt(u.Ut)], ['最高终极点', () => fmt(u.Ub)], ['每秒终极点', () => fmt(G.uR)], ['内层公式的值', () => fmt(G.uFin)]];
+const UBf = () => tnFmt(S.ult.UB || tnFromLog(S.ult.U)), URf = () => tnFmt(tnPow10(G.uRB || tn(G.uR === NI ? -300 : G.uR))), UBbf = () => tnFmt(S.ult.UbB || tnFromLog(S.ult.Ub)), UBtf = () => tnFmt(S.ult.UtB || tnFromLog(S.ult.Ut));
+function ultStatRows() { const u = S.ult, o = u.o; const r = [['终极用时', () => fmtT(u.t)], ['终极点', () => UBf()], ['累计终极点', () => UBtf()], ['最高终极点', () => UBbf()], ['每秒终极点', () => URf()], ['终极点的超对数', () => '10↑↑' + tnSlog(S.ult.UB || tnFromLog(S.ult.U)).toFixed(4)], ['数值引擎', () => '层塔 TowerNum · 15 位有效数字 · 可表示到 10↑↑10 以上'], ['内层公式的值', () => fmt(G.uFin)]];
   if (oOn(S)) r.push(['外层公式的值', () => fmt(G.uF)]);
   UVK.forEach(v => { if (u.unl[v]) r.push([UV[v].n + ' 的等级 / 值', () => u.lv[v] + ' / ' + fmt(u.V[v])]); });
   if (oOn(S)) OVK.forEach(v => { if (o.unl[v]) r.push([OV[v].n + ' 的等级 / 值', () => o.lv[v] + ' / ' + fmt(o.V[v])]); });
@@ -3538,7 +3658,7 @@ VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
   <div class="row"><button class="btn sm" data-a="save">立即保存</button><button class="btn sm" data-a="exp">导出存档</button><button class="btn sm" data-a="imp">导入存档</button></div>
   <textarea id="saveBox" placeholder="导出的存档字符串会出现在这里；导入时把存档粘贴进来再点「导入存档」"></textarea></div>
   <div class="card"><div class="nm">危险操作</div><div class="ds">彻底删除进度，从头开始。</div><div class="row"><button class="btn sm warn" data-a="hard">删除存档并重新开始</button></div></div>
-  </div><p class="note">无尽演算 v1.5.1 · 共 7 阶、8 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、无穷之塔、质因数分解、黑洞、6 条星路、霍金辐射、引力波观测站、4 个无限发生器、24 个无限与破限升级、递归、构造台（4 个变量、3 个常数、15 个终极升级、15 种公式图鉴）、嵌套（外层公式、4 个外层变量、8 种外层图鉴）、重构（21 个范式升级、3 个无尽范式）、晶格矩阵（6 种特殊因子、5 种特殊积木，最大 7×7）、超维折叠、十级发动机（6 种品质）、升维（维度 D、22 个维度节点、6 个共振器、维度能量、6 个维度挑战、8 种超形体、超弦反应堆）、公式档案馆、时间晶体、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
+  </div><p class="note">无尽演算 v1.5.2 · 共 7 阶、8 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、无穷之塔、质因数分解、黑洞、6 条星路、霍金辐射、引力波观测站、4 个无限发生器、24 个无限与破限升级、递归、构造台（4 个变量、3 个常数、15 个终极升级、15 种公式图鉴）、嵌套（外层公式、4 个外层变量、8 种外层图鉴）、重构（21 个范式升级、3 个无尽范式）、晶格矩阵（6 种特殊因子、5 种特殊积木，最大 7×7）、超维折叠、十级发动机（6 种品质）、升维（维度 D、22 个维度节点、6 个共振器、维度能量、6 个维度挑战、8 种超形体、超弦反应堆）、公式档案馆、时间晶体、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
 
 /* ---------------- 操作 ---------------- */
 function act(a) {
