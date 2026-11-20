@@ -97,6 +97,8 @@
     <nav aria-label="版本索引">
       <p class="nav-label">版本索引</p>
       <ol>
+        <li><a href="#v1.5.2"><span class="version">v1.5.2</span><span class="nav-title">层塔大数引擎</span></a></li>
+        <li><a href="#v1.5.1"><span class="version">v1.5.1</span><span class="nav-title">维度挑战</span></a></li>
         <li><a href="#v1.5.0"><span class="version">v1.5.0</span><span class="nav-title">升维</span></a></li>
         <li><a href="#v1.4.7"><span class="version">v1.4.7</span><span class="nav-title">发动机</span></a></li>
         <li><a href="#v1.4.6"><span class="version">v1.4.6</span><span class="nav-title">超维折叠</span></a></li>
@@ -117,6 +119,28 @@
       </ol>
     </nav>
     <main aria-label="版本更新记录">
+      <article id="v1.5.2" aria-labelledby="title-v1.5.2">
+        <header><span class="version">v1.5.2</span><h2 id="title-v1.5.2">层塔大数引擎</h2></header>
+        <p class="lead">终极点不再受普通浮点数的表示范围限制。新的 <strong>TowerNum</strong> 数值引擎把科学计数层与更高的层塔统一起来，为更长的终局内容保留精度和可存档性。</p>
+        <ul class="changes">
+          <li>新增层塔大数引擎，终极点、产量、累计值、最高值和离线结算可以继续表示到远超普通 JavaScript 浮点数的范围；终极统计会显示当前使用的数值引擎与超对数。</li>
+          <li>离线进度和终极点显示改用层塔数值，离线结算弹窗、公式页、统计页、升维页和顶部状态栏会保持一致，不再把超大数压成 <strong>Infinity</strong> 或错误的科学计数。</li>
+          <li>加入自适应离线子步，在变量增长跨越较大数量级时自动细分计算，减少在线与离线结果的偏差；矩阵计算增加缓存，降低大矩阵和高频重绘的开销。</li>
+          <li>同步修正终极页签的解锁显示、发动机未解锁时的批量购买保护、折叠页的发动机贡献与高维阻尼提示，以及 6×6、7×7 矩阵在窄屏下的格子可读性。</li>
+        </ul>
+      </article>
+
+      <article id="v1.5.1" aria-labelledby="title-v1.5.1">
+        <header><span class="version">v1.5.1</span><h2 id="title-v1.5.1">维度挑战</h2></header>
+        <p class="lead">升维层新增维度挑战、超形体和超弦反应堆，让维度系统开始反过来改造已有的终极玩法。</p>
+        <ul class="changes">
+          <li>新增 6 个维度挑战，每个挑战有 3 个等级。进入挑战会开始一轮类似升维的重置，但不获得维点；在限制条件下达到目标即可完成该等级。</li>
+          <li>新增 8 种超形体，从 3 维立方体逐步解锁到 10 维超立方体。用维点点亮顶点，点亮进度会转化为维度 D，并提供动态画布预览。</li>
+          <li>新增超弦反应堆。维度越高，超弦产出越快；超弦可以购买 6 类升级，强化维度、阻尼、能量、共振、维点和超弦产量。</li>
+          <li>维度里程碑扩展到 75、100、150 次，并新增 8 项成就，涵盖挑战、超形体、超弦和 ee50、ee100、ee200 终极点。</li>
+        </ul>
+      </article>
+
       <article id="v1.5.0" aria-labelledby="title-v1.5.0">
         <header><span class="version">v1.5.0</span><h2 id="title-v1.5.0">升维</h2></header>
         <p class="lead">终极点达到 <strong>ee15</strong> 后解锁第九个重置层「升维」，可用本轮成绩换取<strong>维点</strong>。维度 <strong>D</strong> 会把终极产量的数量级提升到 D 次方。</p>
