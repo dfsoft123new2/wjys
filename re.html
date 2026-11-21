@@ -17,10 +17,15 @@
 :root[data-theme="dark"]{--bg:#0c1018;--sf:#141a26;--sf2:#111724;--ink:#e7ebf3;--mut:#9aa5b6;--fnt:#647084;--line:#232c3c;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.25);--acs:rgba(120,160,255,.14);
  --c1:#6e9bff;--c2:#33c7b5;--c3:#f2b33d;--c4:#a585ff;--c5:#ff6f86;--c6:#e8c34a;color-scheme:dark}
 *,*::before,*::after{box-sizing:inherit}
+*{scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit}
 .num,.big{font-variant-numeric:tabular-nums}
 #app{max-width:1240px;margin:0 auto;padding:12px 16px 40px}
+.signature{display:flex;justify-content:flex-end;align-items:baseline;gap:5px;margin-top:18px;color:var(--mut);font:20px/1 var(--serif)}
+.signature-limit{display:inline-flex;flex-direction:column;align-items:center}
+.signature-limit small{font-size:10px;line-height:1.15;white-space:nowrap}
 .top{display:flex;align-items:center;gap:10px;padding:6px 2px 12px}
 .brand{display:flex;align-items:baseline;gap:8px;font:900 22px/1 var(--serif);letter-spacing:2px}
 .brand .sig{color:var(--ac);font-size:26px}
@@ -120,6 +125,7 @@ table.gn td:first-child,table.gn th:first-child{text-align:left}
 #modal p{color:var(--mut);margin:8px 0}#modal p b{color:var(--ink)}
 .kv{display:grid;grid-template-columns:1fr auto;gap:6px 16px;font-size:14px}.kv span:nth-child(odd){color:var(--mut)}
 @media (max-width:820px){.main{grid-template-columns:1fr}.rail{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px}.sec{min-width:150px}.promo{grid-template-columns:1fr}.hero{padding:14px 14px 12px}}
+@media (max-width:520px){.top{flex-wrap:wrap;gap:6px}.main{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -132,6 +138,7 @@ table.gn td:first-child,table.gn th:first-child{text-align:left}
     <div class="promo" id="promo"></div>
   </section>
   <div class="main"><nav class="rail" id="rail" aria-label="板块"></nav><main class="view" id="view"></main></div>
+  <footer class="signature" aria-label="lim，n 趋于无穷，you"><span class="signature-limit">lim<small>n → ∞</small></span><i>you</i></footer>
 </div>
 <div id="toasts" aria-live="polite"></div><div id="modal" role="dialog" aria-modal="true"></div>
 <script>
@@ -449,10 +456,18 @@ const MERS = [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203
 const MYEAR = [0, 0, 0, 0, 1456, 1588, 1588, 1772, 1883, 1911, 1914, 1876, 1952, 1952, 1952, 1952, 1952, 1957, 1961, 1961, 1963, 1963, 1963, 1971, 1978, 1979, 1979, 1982, 1988, 1983, 1985,
   1992, 1994, 1996, 1996, 1997, 1998, 1999, 2001, 2003, 2004, 2005, 2005, 2006, 2008, 2009, 2008, 2013, 2016, 2017, 2018, 2024];
 function mpOn(S) { return up(S, 'f6'); }
-function mpSpeed(S) { return 2e5 * Math.pow(3, Math.min(12, S.mp.L)) * (up(S, 'f7') ? 100 : 1); }
-function mpCost(L) { return L >= 12 ? Infinity : 1 + 0.8 * L; } // 无限点（log10），最多 12 级
-function mpBuy(S) { if (!mpOn(S)) return false; const c = mpCost(S.mp.L); if (!(c < Infinity) || tL(S.cur.I) < c) return false; S.cur.I = tSubL(S.cur.I, c); S.mp.L++; return true; }
-function mpStep(S, dt) { if (!mpOn(S) || S.mp.n >= MERS.length) return; const x0 = S.mp.x; S.mp.x = Math.min(2e8, Math.cbrt(x0 * x0 * x0 + 3000 * Math.LN10 * mpSpeed(S) * dt)); while (S.mp.n < MERS.length && MERS[S.mp.n] <= S.mp.x) S.mp.n++; }
+const MP_END = 2e8, MP_LOG_WORK = L10(MP_END ** 3);
+function mpSpeedLog(S) { return L10(2e5) + L10(3) * S.mp.L + (up(S, 'f7') ? 2 : 0); }
+function mpSpeed(S) { return Math.min(Number.MAX_VALUE, 10 ** mpSpeedLog(S)); }
+function mpCost(L) { return 1 + 0.8 * L; } // 无限点（log10）
+function mpCan(S) { return mpOn(S) && tnGte(S.cur.I, tF(mpCost(S.mp.L))); }
+function mpBuy(S) { if (!mpCan(S)) return false; S.cur.I = tnSub(S.cur.I, tF(mpCost(S.mp.L))); S.mp.L++; return true; }
+function mpStep(S, dt) {
+  if (!(dt > 0) || !mpOn(S) || S.mp.n >= MERS.length) return;
+  const work = 10 ** Math.min(MP_LOG_WORK, mpSpeedLog(S) + L10(3000 * Math.LN10) + L10(dt));
+  S.mp.x = Math.min(MP_END, Math.cbrt(S.mp.x ** 3 + work));
+  while (S.mp.n < MERS.length && MERS[S.mp.n] <= S.mp.x) S.mp.n++;
+}
 function mpDigits(p) { return Math.floor(p * Math.log10(2)) + 1; }
 
 /* ===================== 产量与各层获取 ===================== */
@@ -792,8 +807,8 @@ V['5gn'] = () => `<div class="grid"><div class="card wide"><div class="row"><div
   <p class="note">k 级发生器每秒生产 k−1 级发生器，1 级生产无限之力。每买一台，这一级的产量 ×1.07。${S.brk ? '无限已被打破：点数可以超过 1.8e308。' : '买下「连续统假设」即可打破无限。'}</p></div></div>`;
 V['5mp'] = () => `<div class="grid"><div class="card wide"><div class="hd"><span class="nm">GIMPS · 互联网梅森素数大搜索</span><span class="pill" ${B(() => '已发现 ' + S.mp.n + ' / 52')}></span></div>
   <div class="ds">梅森素数是形如 2^p − 1 的素数。卢卡斯–莱默检验按顺序检查每个指数 p；p 越大，检验越慢（约与 p² 成正比）。</div>
-  <div class="row"><div><div class="big" ${B(() => '正在检验 p ≈ ' + Math.floor(S.mp.x).toLocaleString('en-US'))}></div><div class="ds" ${B(() => '测试速度 ' + fmtL(L10(mpSpeed(S))) + ' / 秒 · 无限点获取 ×' + (1 + 0.2 * S.mp.n).toFixed(1))}></div></div><span class="sp"></span>
-  ${btn('mp', '升级测试机', () => { const c = mpCost(S.mp.L); return { ok: c < Infinity && tL(S.cur.I) >= c, s: c < Infinity ? fmtL(c) + ' 无限点 · ×3（' + S.mp.L + '/12）' : '已满级' }; }, 'go')}</div>
+  <div class="row"><div><div class="big" ${B(() => '正在检验 p ≈ ' + Math.floor(S.mp.x).toLocaleString('en-US'))}></div><div class="ds" ${B(() => '测试速度 ' + fmtL(mpSpeedLog(S)) + ' / 秒 · 无限点获取 ×' + (1 + 0.2 * S.mp.n).toFixed(1))}></div></div><span class="sp"></span>
+  ${btn('mp', '升级测试机', () => ({ ok: mpCan(S), s: fmtL(mpCost(S.mp.L)) + ' 无限点 · ×3（' + S.mp.L + ' 级）' }), 'go')}</div>
   <p class="note">截至 2026 年，人类一共知道 52 个梅森素数；最大的 2^136,279,841 − 1 由 GIMPS 于 2024 年 10 月发现，有 41,024,320 位。第五章的终极晋升需要找到前 45 个。</p></div>
   ${MERS.map((p, i) => i < S.mp.n ? `<div class="card own"><div class="hd"><span class="nm">第 ${i + 1} 个 · 2<sup>${p.toLocaleString('en-US')}</sup> − 1</span><span class="pill">${MYEAR[i] || '古代'}</span></div><div class="ds">${mpDigits(p).toLocaleString('en-US')} 位</div></div>` : '').join('')}</div>`;
 /* ---------- Ω 终极 ---------- */
