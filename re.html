@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>无尽演算 2.0.0</title>
+<title>棍母</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
@@ -180,7 +180,7 @@ table.gn td:first-child,table.gn th:first-child{text-align:left;font-family:var(
 </head>
 <body>
 <div id="app">
-  <header class="top"><div class="brand"><span class="sig">Σ</span>无尽演算<small>2.0.0</small></div><span id="chap"></span><span class="sp"></span>
+  <header class="top"><div class="brand"><span class="sig">Σ</span>棍母<small>0.0.0</small></div><span id="chap"></span><span class="sp"></span>
     <button class="lnk" data-a="g:ach">成就</button><button class="lnk" data-a="g:stat">统计</button><button class="lnk" data-a="g:opt">设置</button><button class="lnk" data-a="theme" aria-label="切换深浅色">◐</button></header>
   <div class="page">
     <section class="hero" id="hero">
@@ -914,7 +914,7 @@ V.stat = () => { const r = [['游戏时间', () => fmtTime(S.t)], ['当前章节
   return `<div class="card"><div class="kv">${r.map(x => `<span>${x[0]}</span><span ${B(x[1])}></span>`).join('')}</div></div>`; };
 V.opt = () => `<div class="grid"><div class="card"><div class="nm">外观</div><div class="row"><button class="btn" data-a="th:0">跟随系统</button><button class="btn" data-a="th:1">浅色</button><button class="btn" data-a="th:2">深色</button></div></div>
   <div class="card"><div class="nm">存档</div><div class="ds">每 15 秒自动保存。2.0 使用新的存档位置，不会覆盖 1.x 的存档。</div><div class="row"><button class="btn" data-a="save">立即保存</button><button class="btn" data-a="exp">导出</button><button class="btn" data-a="imp">导入</button><button class="btn" data-a="wipe" style="color:var(--bad)">删除存档</button></div></div>
-  <div class="card wide"><div class="nm">关于</div><div class="ds">无尽演算 2.0.0 · 重置版。六个晋升阶段：算术、代数、几何、分析、无穷与终极。</div></div></div>`;
+  <div class="card wide"><div class="nm">关于</div><div class="ds">棍母 0.0.0 · 重置版。六个晋升阶段：算术、代数、几何、分析、无穷与终极。</div></div></div>`;
 /* ---------- 渲染 ---------- */
 function curTabs() { return (SUB[UI.sel] || []).filter(t => !t[2] || t[2](S)); }
 function sigOf() { const u = S.ult; return JSON.stringify([UI.sel, UI.gsel, UI.tab[UI.sel], S.sec, Object.keys(S.up).length, S.brk, Object.keys(S.pg).length, svOn(S), poOn(S), frOn(S), pgOn(S), mpOn(S), gnOn(S), S.mp.n, ['C', 'R', 'G', 'E', 'I', 'c', 'l', 'ab'].map(k => autoOn(S, k)),
@@ -987,7 +987,7 @@ function boot() { let s = null; try { s = localStorage.getItem(SAVE_KEY); } catc
   if (s) { try { S = deserialize(s); } catch (e) { S = newState(); toast('存档无法读取，已开始新游戏'); } }
   applyTheme(); recalc(S); const away = (Date.now() - (S.last || Date.now())) / 1000;
   if (away > 60) { const p0 = tL(S.P); offline(S, Math.min(away, 30 * 86400)); recalc(S); modal(`<h3>欢迎回来</h3><p>你离开了 ${fmtTime(away)}。离线期间游戏照常运行。</p><p>点数：${fmtL(p0)} → <b>${fT(S.P)}</b></p>`); }
-  else if (!S.seen.intro) { S.seen.intro = 1; modal('<h3>无尽演算 2.0</h3><p>一切从一个数开始。购买因子 <b>a</b> 与 <b>b</b>，让点数增长；点数够了就<b>进位</b>，换取进位点和升级。</p><p>每一章的目标写在公式下方：达成点数目标和本章里程碑后即可<b>晋升</b>，公式会获得新的运算，新的板块随之开放。一共五章，加上终章。</p>'); }
+  else if (!S.seen.intro) { S.seen.intro = 1; modal('<h3>棍母 0.0</h3><p>一切从一个数开始。购买因子 <b>a</b> 与 <b>b</b>，让点数增长；点数够了就<b>进位</b>，换取进位点和升级。</p><p>每一章的目标写在公式下方：达成点数目标和本章里程碑后即可<b>晋升</b>，公式会获得新的运算，新的板块随之开放。一共五章，加上终章。</p>'); }
   UI.sel = S.sec; render(); requestAnimationFrame(loop); }
 window.addEventListener('pagehide', save); document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 boot();
