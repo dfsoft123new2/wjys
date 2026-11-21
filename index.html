@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>无尽演算 v1.5.4</title>
+<title>无尽演算 v1.5.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -478,11 +478,14 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 .formula i.fd{color:var(--coral)}
 .ptc{width:100%;max-width:240px;display:block;margin:6px auto;border:1px solid var(--line2);border-radius:10px;background:rgba(0,0,0,0.04)}
 .lockd{display:none!important}
+.lmt{touch-action:none;user-select:none}
+.lmt.drag{opacity:.35}
+.lmt.ghost{position:fixed;z-index:9999;pointer-events:none;opacity:.9;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
 <div class="wrap" id="shell" data-view="factor">
-  <header class="top"><div class="brand">无尽演算<small>v1.5.4</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
+  <header class="top"><div class="brand">无尽演算<small>v1.5.5</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
   <div class="rail-brand" aria-hidden="true"><b>Σ</b><strong>无尽演算</strong><em>Axiom</em></div>
   <section class="hero" id="hero">
     <div class="pts"><span class="big num" id="pts">0</span><span class="lbl">点数</span></div>
@@ -508,7 +511,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 <script>
 /* ===================== 公式晋升 v1.0.0 · 核心引擎（后端） ===================== */
 'use strict';
-const VERSION = '1.5.4';
+const VERSION = '1.5.5';
 /* ===================== 层塔 TowerNum —— 无尽演算的大数库（v1.5.2） =====================
  * 每个数是一个普通对象 { s, k, m, e }：
  *   s：符号 −1 / 0 / 1
@@ -668,7 +671,7 @@ const PROMO_TEXT = {
   3: ['公式升级为 (a·b)^c · t^(c−1) · r · θ · α', '时间因子 t：本次重生经过的时间，指数随 c 增长', '新重置层「公理化」，产出公理与公理因子 α', '新功能「研究所」：消耗定理/公理进行限时研究', '「猜想」挑战（由公理升级解锁）', '重生、证明升级各扩展一行'],
   4: ['公式升级为 (a·b·d)^c · t^(c−1) · r · (θ·α)^λ', '新因子 d（用定理购买）与 λ（用公理购买）', '新功能「常数」：分配算力计算 π 等常数的位数', '猜想开放第三难度与两个新猜想', '所有重置层扩展新升级，研究所扩展新课题'],
   5: ['公式升级为 … · κ^(c+λ)：常数之积 κ 直接进入公式', '算力 ×2，研究槽位 +1，常数 γ 解锁', '分形花园与梅森素数搜寻：让 κ 的指数成长数十倍', '达到 e10000 晋升六阶'],
-  6: ['整个公式获得指数 Ω：P = [ … ]^Ω，所有旧内容都被 Ω 放大', '时间因子 t 的指数从 c−1 提升为 c', '新重置层「超限」，产出序数', 'ω 序数引擎：随时间与技能增长，持续提升 Ω', '七个章节逐步解锁：数学家学院、引理合成、图着色、新猜想与新常数', '章节一路延伸到 ee7 与更远处'],
+  6: ['整个公式获得指数 Ω：P = [ … ]^Ω，所有旧内容都被 Ω 放大', '时间因子 t 的指数提升为 c，与 a·b·d 合并：(a·b·d·t)^c', '新重置层「超限」，产出序数', 'ω 序数引擎：随时间与技能增长，持续提升 Ω', '七个章节逐步解锁：数学家学院、引理合成、图着色、新猜想与新常数', '章节一路延伸到 ee7 与更远处'],
   7: ['最终阶段：公式的指数变成三层指数塔 [ … ]^((Ω·ψ)^ℵ)', '晋升七阶不会清空升级与各层货币，只重置点数与因子', '新因子 ℵ（阿列夫）：基数，指数之上的指数', '无穷之塔：一层层攀登，与历史上最大的数相遇', '质因数分解：轻松的小游戏，每解开一个数都推动攀登', '新的研究、猜想与超限升级；此后不再有新的阶，只有新的玩法'],
 };
 
@@ -1155,7 +1158,8 @@ const ACH = [
 ];
 
 /* ---------------- 状态 ---------------- */
-function newState() {
+function newState() { return bigInstall(newState0()); }
+function newState0() {
   return {
     ver: VERSION, tier: 1,
     P: NI, Pbest: NI, Pall: NI, tick: 0, ticks: 0,
@@ -1169,7 +1173,7 @@ function newState() {
     auto: { col: { on: 0, v: '0.05' }, a: 1, b: 1, dt: 1, c: 1, d: 1, l: 1, rb: { on: 0, m: 0, v: '1' }, pf: { on: 0, m: 0, v: '1' }, ax: { on: 0, m: 0, v: '1' }, tr: { on: 0, m: 0, v: '1' }, cj: 1 },
     pr: { n: 1, L: 0 }, ms: { 3: [], 4: [], 5: [] }, boostT: 0,
     OR: NI, ORc: NI, trN: 0, trT: 0, trTot: 0, chap: 0,
-    om: { w: 0, c1: 1, t1: 0, c2: 1, t2: 0 }, ac: { got: {}, seat: [], xp: {} }, lm: { g: [], q: 0, t: 0, max: 1 }, gc: {},
+    om: { w: 0, c1: 1, t1: 0, c2: 1, t2: 0 }, ac: { got: {}, seat: [], xp: {} }, lm: { g: [], q: 0, t: 0, max: 1, auto: 1 }, gc: {},
     inf: { n: 0, IP: 0, IPt: 0, ch: 0, u: {}, brk: 0, X: 0, best: 0, be: 0, auto: 0, av: '60', lt: 0, ga: [0, 0, 0, 0], gb: [0, 0, 0, 0], pw: 0, bu: {}, rep: 0, ag: 1, rc: 0 },
     ult: uNew(),
     bh: { col: 0, xh: 0, M: 0, SI: NI, SIt: NI, path: '', k: 0, rec: {}, vis: {}, rs: {}, R: 0, gw: 0, gt: 0, ct: 0, sw: 0 },
@@ -1200,7 +1204,7 @@ function autoUnl(S, id) {
 }
 function factorVisible(S, id) { const f = FD[id]; if (S.tier < f.t) return false; if (f.need && S.u[f.need] !== 1) return false; return true; }
 
-function recalc(S) {
+function recalc(S) { TICK++;
   if (S.ult && S.ult.on) { recalcUlt(S); return; }
   const T = S.tier, ch = S.chal, u = S.u, D = S.cst.D;
   const h = id => u[id] === 1, R = id => !!S.res.done[id], C = id => S.cc[id] || 0;
@@ -1263,7 +1267,7 @@ function recalc(S) {
   if (T === 1) p = G.A + G.B + G.Rf;
   else if (T === 2) p = c * (G.A + G.B) + G.Rf + G.THf;
   else if (T === 3) p = c * (G.A + G.B) + (c - 1 + G.tE) * G.Tf + G.Rf + G.THf + G.AXf;
-  else { p = c * (G.A + G.B + G.D) + ((T >= 6 ? c : c - 1) + G.tE) * G.Tf + G.Rf + G.lam * (G.THf + G.AXf); if (T >= 5) p += (c + G.lam) * G.K; }
+  else { p = (T >= 6 ? c * (G.A + G.B + G.D + G.Tf) + G.tE * G.Tf : c * (G.A + G.B + G.D) + (c - 1 + G.tE) * G.Tf) + G.Rf + G.lam * (G.THf + G.AXf); if (T >= 5) p += (c + G.lam) * G.K; }
   G.Om = T >= 6 ? omega6(S) : 1; G.psi = T >= 6 ? psi6(S) : 1; G.al = T >= 7 ? aleph7(S) + bhAl(S) + (iu(S, 'i10') ? 0.05 : 0) : 1; G.mu = bhMu(S); G.F = p; G.EX = Math.pow(G.Om * G.psi, G.al) * G.mu; if (T >= 6) p *= G.EX;
   G.scA = bhOn(S) ? K.scAt * Math.pow(10, Math.min(290, bhBeta(S) * bhMeff(S))) : K.scAt; G.scQ = bhOn(S) ? bhQ(S) : K.scQ;
   G.scRaw = p; G.sc = false; if (T >= 7 && p > G.scA) { p = G.scA * Math.pow(p / G.scA, G.scQ); G.sc = true; }
@@ -1464,7 +1468,7 @@ function runAuto(S) {
   if (bhOn(S) && rsLv(S, 'auto') >= 1 && S.auto.col.on && !S.chal) { const x = colX(S), d = parseFloat(S.auto.col.v) || 0.05; if (colGain(S) !== NI && x >= S.bh.xh + d) { doCollapse(S); return 'col'; } }
   if (S.tier >= 6) {
     if (acSeated(S, 'tur')) { while (S.om.c1 >= 1) useOm1(S); if (S.chap >= 5) while (S.om.c2 >= 1) useOm2(S); }
-    if (S.trTot >= 12) lmMergeAll(S);
+    if (lmAutoOn(S)) lmMergeAll(S);
     if (!S.chal && autoLayer(S, 'tr', G.trGain, S.ORc, S.trT)) { doTrans(S); return 'tr'; }
   }
   if (!S.chal && autoLayer(S, 'ax', G.axGain, S.AXc, S.axT)) { doAxiom(S); return 'ax'; }
@@ -1475,6 +1479,7 @@ function runAuto(S) {
 
 /* ---------------- 主循环 ---------------- */
 function step(S, dt) {
+  TICK++; bigInstall(S);
   if (S.ult && S.ult.on) { S.st.time += dt; stepUlt(S, dt); if (S.mp && S.mp.n < MERS.length) mpStep(S, dt); return; }
   S.st.time += dt; S.st.tierT[S.tier] = (S.st.tierT[S.tier] || 0) + dt;
   S.rbT += dt; S.pfT += dt; S.axT += dt; S.trT += dt;
@@ -1580,17 +1585,18 @@ function mxOn(S) { return !!(S.ult && S.ult.on && S.ult.rf.up.mx); }
 function mxM(S) { return S.ult.rf.mx; }
 function mxBuyCost(S, t) { const x = MXF[t] || MXB[t]; return x.c0 * Math.pow(MXF[t] ? 8 : 12, mxM(S).own[t]); }
 function mxLvCost(S, t) { return MXF[t].c0 * 2 * Math.pow(3, mxM(S).lv[t] - 1); }
-function mxBuy(S, t) { if (!mxOn(S) || !(MXF[t] || MXB[t])) return false; const r = S.ult.rf, c = mxBuyCost(S, t); if (r.PP < c) return false; r.PP -= c; mxM(S).own[t]++; return true; }
-function mxLvUp(S, t) { if (!mxOn(S) || !MXF[t]) return false; const r = S.ult.rf, c = mxLvCost(S, t); if (r.PP < c) return false; r.PP -= c; mxM(S).lv[t]++; return true; }
+function mxBuy(S, t) { mxDirty(); if (!mxOn(S) || !(MXF[t] || MXB[t])) return false; const r = S.ult.rf, c = mxBuyCost(S, t); if (r.PP < c) return false; r.PP -= c; mxM(S).own[t]++; return true; }
+function mxLvUp(S, t) { mxDirty(); if (!mxOn(S) || !MXF[t]) return false; const r = S.ult.rf, c = mxLvCost(S, t); if (r.PP < c) return false; r.PP -= c; mxM(S).lv[t]++; return true; }
 function mxGrowCost(S) { const nx = MXSZ.find(x => x[0] === mxM(S).n + 1); return nx ? nx[1] * Math.pow(0.8, crLv(S, 'c')) : Infinity; }
-function mxGrow(S) { const m = mxM(S); if (!mxOn(S) || m.n >= mxMax(S)) return false; const c = mxGrowCost(S); const cr = S.ult.rf.cr; if (cr.n < c) return false; cr.n -= c;
+function mxGrow(S) { mxDirty(); const m = mxM(S); if (!mxOn(S) || m.n >= mxMax(S)) return false; const c = mxGrowCost(S); const cr = S.ult.rf.cr; if (cr.n < c) return false; cr.n -= c;
   const old = m.c.slice(); m.c = Array(49).fill(''); for (let r = 0; r < m.n; r++) for (let c = 0; c < m.n; c++) m.c[r * (m.n + 1) + c] = old[r * m.n + c]; m.n++; return true; }
-function mxPlace(S, i, t) { const m = mxM(S); if (!mxOn(S) || i < 0 || i >= m.n * m.n) return false; if (t && !(MXF[t] || MXB[t])) return false;
+function mxPlace(S, i, t) { mxDirty(); const m = mxM(S); if (!mxOn(S) || i < 0 || i >= m.n * m.n) return false; if (t && !(MXF[t] || MXB[t])) return false;
   if (t) { const used = m.c.slice(0, m.n * m.n).filter((x, k) => x === t && k !== i).length; if (used >= m.own[t]) return false; } m.c[i] = t || ''; return true; }
+let TICK = 0; const MXF1 = { t: -1, m: null, out: null }; function mxDirty() { MXF1.t = -1; }
 const MXCACHE = new WeakMap(); // v1.5.2 性能：矩阵结果缓存，只在矩阵或相关升级变化时重算
-function mxCalc(S) { const m = S.ult && S.ult.rf ? S.ult.rf.mx : null; if (!m) return mxCalcRaw(S);
+function mxCalc(S) { const m = S.ult && S.ult.rf ? S.ult.rf.mx : null; if (!m) return mxCalcRaw(S); if (MXF1.t === TICK && MXF1.m === m) return MXF1.out;
   const sig = m.n + '|' + m.c.join(',') + '|' + m.lv.G + ',' + m.lv.D + ',' + m.lv.P + ',' + m.lv.X + ',' + (m.lv.F || 1) + ',' + (m.lv.L || 1) + '|' + (S.ult.rf.up.mx2 ? 1 : 0) + (S.ult.rf.up.mx ? 1 : 0) + '|' + crLv(S, 'm') + '|' + trAct(S);
-  const c = MXCACHE.get(m); if (c && c.sig === sig) return c.out; const out = mxCalcRaw(S); MXCACHE.set(m, { sig: sig, out: out }); return out; }
+  const c = MXCACHE.get(m); let out; if (c && c.sig === sig) out = c.out; else { out = mxCalcRaw(S); MXCACHE.set(m, { sig: sig, out: out }); } MXF1.t = TICK; MXF1.m = m; MXF1.out = out; return out; }
 function mxCalcRaw(S) { // 返回各类因子的总倍率与每个格子的强度
   const m = mxM(S), N = m.n, at = (r, c) => (r >= 0 && c >= 0 && r < N && c < N) ? m.c[r * N + c] : '', out = { G: 1, D: 1, P: 1, X: 1, cell: [] };
   out.F = 1; out.L = 1; if (!mxOn(S) || trAct(S) === 'nomx') return out; const amp = (S.ult.rf.up.mx2 ? 1.2 : 1) * (1 + 0.1 * crLv(S, 'm')), add = { G: 0, D: 0, P: 0, X: 0, F: 0, L: 0 };
@@ -1812,9 +1818,10 @@ function crBuy(S, id) { const cr = S.ult.rf.cr, x = CRUP.find(q => q.id === id);
 function crRate(S) { return x5On(S) ? (1 + L10(1 + S.ult.rf.PPt)) * Math.pow(1.4, crLv(S, 's')) * (S.ult.rf.mx ? mxCalc(S).X : 1) / 3600 : 0; } // 每秒
 function shapeSig(S) { const u = S.ult, part = (f, n, pw) => { const t = []; for (let i = 0; i < n; i++) { const s = f.s[i]; if (!s || !s.v) continue; if (t.length) t.push(f.j[i - 1] === '×' ? '·' : '+'); t.push(s.v + (pw(s.p) > 1 ? '^' + pw(s.p) : '')); } return t.join(''); };
   return part(u.f, u.slots, p => uPow(S, p)) + (oOn(S) ? ' ‖ ' + part(u.o.f, u.o.slots, p => oPow(S, p)) : ''); }
-function arArchive(S, best) { if (!x5On(S) && best < 100000) return; const ar = S.ult.rf.ar; const k = shapeSig(S); if (!(ar[k] >= best)) ar[k] = best;
+function arArchive(S, best) { AR_V++; if (!x5On(S) && best < 100000) return; const ar = S.ult.rf.ar; const k = shapeSig(S); if (!(ar[k] >= best)) ar[k] = best;
   const ks = Object.keys(ar); if (ks.length > 30) { ks.sort((a, b) => ar[a] - ar[b]); delete ar[ks[0]]; } }
-function arSum(S) { const ar = S.ult.rf.ar; let s = 0; for (const k in ar) if (ar[k] >= 100000) s += L10(ar[k]); return s; }
+let AR_V = 0; const ARC = { v: -1, o: null, s: 0 };
+function arSum(S) { const ar = S.ult.rf.ar; if (ARC.v === AR_V && ARC.o === ar) return ARC.s; let s = 0; for (const k in ar) if (ar[k] >= 100000) s += L10(ar[k]); ARC.v = AR_V; ARC.o = ar; ARC.s = s; return s; }
 function arMult(S) { return 1 + 0.03 * arSum(S) * Math.pow(1.15, crLv(S, 'r')) * (S.ult.rf.mx ? mxCalc(S).L : 1); }
 
 /* ===================== v1.4.3 · 重构（终极阶段的第一个重置层） ===================== */
@@ -2418,6 +2425,14 @@ function lmMerge(S, i, j) {
   if (a === 99 && b === 99) nv = 2; else if (a === 99) { if (b > 4) return false; nv = b + 1; } else if (b === 99) { if (a > 4) return false; nv = a + 1; } else if (a === b) nv = a + 1; else return false;
   g[j] = nv; g[i] = 0; if (nv > S.lm.max) S.lm.max = nv; lmRefill(S); return true;
 }
+function lmAutoUnl(S) { return S.lm.max >= 6; } // 手动合成到 6 级后解锁自动合并
+function lmAutoOn(S) { return lmAutoUnl(S) && S.lm.auto !== 0; }
+function lmMove(S, i, j) { // 移动到空格 / 同级合成 / 不同级交换位置
+  const g = lmGrid(S); if (i === j || i < 0 || j < 0 || i > 15 || j > 15 || !g[i]) return '';
+  if (!g[j]) { g[j] = g[i]; g[i] = 0; return 'move'; }
+  if (lmMerge(S, i, j)) return 'merge';
+  const t = g[i]; g[i] = g[j]; g[j] = t; return 'swap';
+}
 function lmMergeAll(S) {
   const g = lmGrid(S); let n = 0;
   for (let it = 0; it < 200; it++) {
@@ -2464,7 +2479,7 @@ function step6(S, dt) {
   if (S.chap >= 5) { if (S.om.c2 < 2) { S.om.t2 += dt * r1; while (S.om.t2 >= OM2T && S.om.c2 < 2) { S.om.t2 -= OM2T; S.om.c2++; } } if (S.om.c2 >= 2) S.om.t2 = 0; }
   while (S.ac.seat.length > acSeats(S)) S.ac.seat.pop();
   const xm = acXpMult(S); S.ac.seat.forEach(id => { S.ac.xp[id] = (S.ac.xp[id] || 0) + dt * xm; });
-  if (S.chap >= 2) { const I = 600 / lmMult(S); S.lm.t += dt; let k = 0; while (S.lm.t >= I && k < 100000) { S.lm.t -= I; lmSpawn(S); k++; if (S.trTot >= 12 && k % 8 === 0) lmMergeAll(S); } }
+  if (S.chap >= 2) { const I = 600 / lmMult(S); S.lm.t += dt; let k = 0; while (S.lm.t >= I && k < 100000) { S.lm.t -= I; lmSpawn(S); k++; if (lmAutoOn(S) && k % 8 === 0) lmMergeAll(S); } }
   while (S.chap < CH6.length - 1 && S.Pbest >= CH6[S.chap + 1].k) S.chap++;
   step12(S, dt);
 }
@@ -2615,17 +2630,44 @@ function migrate(S) { // 旧存档迁移：章节表变化后重新计算章节�
 }
 
 /* ---------------- 存档 ---------------- */
-function serialize(S) { return JSON.stringify(S, (k, v) => v === NI ? '-inf' : v); }
+/* ===================== v1.5.5 · 层塔存储：所有无界的数值变量都以层塔（TowerNum）存储 =====================
+ * 每个字段的真实值保存在隐藏的 __tn（层塔）中，并附带一个双精度缓存 __v 供引擎快速读取。
+ * 'L'：字段在引擎里是 log10 值 —— 层塔里存的是真实的数值 10^x；'N'：字段是普通数值。
+ * '*'：对象里的所有数值键；'#'：数组的所有元素。存档时写出 { $tn, $L }。
+ */
+const BIGF = [
+  ['', 'L', ['P', 'Pbest', 'Pall', 'RP', 'RPc', 'TH', 'THc', 'AX', 'AXc', 'OR', 'ORc']], ['', 'N', ['IN', 'INt']],
+  ['pr', 'N', ['n']], ['om', 'N', ['w']], ['bh', 'L', ['SI', 'SIt']], ['bh', 'N', ['M']], ['cst.D', 'N', '*'], ['mp', 'N', ['w', 'x']],
+  ['inf', 'N', ['IP', 'IPt', 'X', 'best']], ['inf.ga', 'N', '#'], ['inf.gb', 'N', '#'],
+  ['ult', 'L', ['U', 'Ut', 'Ub']], ['ult.V', 'N', '*'], ['ult.o.V', 'N', '*'],
+  ['ult.rf', 'N', ['PP', 'PPt']], ['ult.rf', 'L', ['Ur']], ['ult.rf.ar', 'N', '*'], ['ult.rf.cr', 'N', ['n', 't']], ['ult.rf.fd', 'N', ['L']],
+  ['ult.rf.eg', 'L', ['EP', 'EPt']], ['ult.rf.eg.A', 'L', '#'],
+  ['ult.dm', 'N', ['DP', 'DPt', 'E', 'Et']], ['ult.dm.sr', 'N', ['n', 't']], ['ult.dm.ifl', 'N', ['L', 'core', 'coret']],
+];
+function bigPath(S, p) { if (!p) return S; let o = S; const ks = p.split('.'); for (let i = 0; i < ks.length; i++) { o = o ? o[ks[i]] : null; if (!o || typeof o !== 'object') return null; } return o; }
+function bigTN(x, L) { return L ? (x > -Infinity && x === x ? tnFromLog(x) : TN_ZERO) : (x === x ? tn(x) : TN_ZERO); }
+function bigDef(o, k, L) {
+  const d = Object.getOwnPropertyDescriptor(o, k); if (!d || d.get || typeof d.value !== 'number') return;
+  if (!o.__tn) { Object.defineProperty(o, '__tn', { value: {}, writable: true }); Object.defineProperty(o, '__v', { value: {}, writable: true }); Object.defineProperty(o, '__L', { value: {}, writable: true }); }
+  o.__L[k] = L ? 1 : 0; o.__v[k] = d.value; o.__tn[k] = bigTN(d.value, L);
+  Object.defineProperty(o, k, { enumerable: true, configurable: true, get() { return this.__v[k]; }, set(x) { this.__v[k] = x; this.__tn[k] = bigTN(x, this.__L[k]); } });
+}
+const BIGDONE = new WeakMap();
+function bigInstall(S) { if (!S) return S; for (let i = 0; i < BIGF.length; i++) { const f = BIGF[i], o = bigPath(S, f[0]); if (!o) continue; const dyn = f[2] === '*' || f[2] === '#'; let done = BIGDONE.get(o); if (!dyn && done && done[i]) continue; const L = f[1] === 'L', ks = dyn ? Object.keys(o) : f[2]; for (let j = 0; j < ks.length; j++) bigDef(o, ks[j], L); if (!dyn) { if (!done) { done = {}; BIGDONE.set(o, done); } done[i] = 1; } } return S; }
+function bigGet(o, k) { return o && o.__tn && o.__tn[k] ? o.__tn[k] : null; } // 取出某个字段的层塔原值
+function bigCount(S) { let n = 0; for (const f of BIGF) { const o = bigPath(S, f[0]); if (o && o.__tn) n += Object.keys(o.__tn).length; } return n; }
+
+function serialize(S) { return JSON.stringify(S, function (k, v) { if (this && this.__tn && Object.prototype.hasOwnProperty.call(this.__tn, k)) return { $tn: this.__tn[k], $L: this.__L[k] }; return v === NI ? '-inf' : v; }); }
 function deserialize(str) {
-  const o = JSON.parse(str, (k, v) => v === '-inf' ? NI : v);
+  const o = JSON.parse(str, (k, v) => v === '-inf' ? NI : (v && typeof v === 'object' && v.$tn) ? (v.$L ? (v.$tn.s > 0 ? tnLg(v.$tn) : NI) : tnNumber(v.$tn)) : v);
   const base = newState();
   (function merge(t, s) { for (const k in s) { if (s[k] && typeof s[k] === 'object' && !Array.isArray(s[k]) && t[k] && typeof t[k] === 'object' && !Array.isArray(t[k])) merge(t[k], s[k]); else t[k] = s[k]; } })(base, o);
-  return migrate(base);
+  return bigInstall(migrate(base));
 }
 function encodeSave(S) { const s = serialize(S); return typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(s))) : Buffer.from(s).toString('base64'); }
 function decodeSave(b) { const s = typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(b.trim()))) : Buffer.from(b, 'base64').toString(); return deserialize(s); }
 
-if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, CAPP, XCAP, XMAX, IUP, IUM, iu, infAt, infCharge, infNeed, ipMult, ipGain, canInf, doInf, iuCan, iuBuy, beCost, beBuy, beSpeed, ptsX, fmtX, ptsFmt, RCMAX, rcOn, rcCost, rcBuy, rcRate, canUlt, doUlt, UV, UVK, UCN, UUP, UUM, UMS, UCX, uNew, IFUP, IFUM, PMIS, PMM, IFMS, ifS, ifOn, pbOn, ifLv, ifEta, ifMs, ifRate, ifCost, ifBuy, pbSlots, pbDur, pbReward, pbStart, pbRecall, ifStep, dmExp, tn, tnFromLog, tnMk, tnLog10, tnPow10, tnMul, tnDiv, tnAdd, tnSub, tnPow, tnCmp, tnGt, tnGte, tnLt, tnMax, tnMin, tnNumber, tnLg, tnLgLg, tnSlog, tnFmt, TN_ZERO, TN_ONE, ultSync, ultGain, uLgU, TRS, TRM, SRUP, SRM, PTN, dm2, trOn, trAct, trLv, trGoal, ascReset, trEnter, trExit, trCheck, trD, ptOn, ptLit, ptCost, ptLight, ptD, srOn, srLv, srCost, srBuy, srRate, dim2Step, DMT, DMTM, DRES, DMMS, dmNew, dmOn, dmu, dmMs, dmExCost, dmResCost, dmResAmp, dmResD, dmDim, dmMult, dmX, dmGain, canAscend, doAscend, dmBuy, dmExBuy, dmResBuy, dmStep, uPre, EGC, EGG, EGQ, EGMS, egNew, egOn, egE, egMs, egBagMax, egMultLog, egMult, egBuyCost, egLvCost, egBuy, egLvUp, egBuyMax, egStep, egLg, egFold, egGrow, egDrawCost, egDraw, egMerge, egAutoMerge, egEquip, egUnequip, fdOn, fdPsi, fdRate, uEff, mxMax, mxGrowCost, MXF, MXB, MXSZ, mxNew, mxOn, mxBuyCost, mxLvCost, mxBuy, mxLvUp, mxGrow, mxPlace, mxCalc, deepDrag, RFREP, CRUP, x5On, rfRepCost, rfRepLv, rfRepBuy, crLv, crCost, crBuy, crRate, shapeSig, arArchive, arSum, arMult, RFUP, RFM, RFMS, rfNew, rfu, rfOn, rfGrowMult, rfDragMult, rfOuterMult, rfStart, ppMult, ppGain, canRefactor, doRefactor, rfCan, rfBuy, rfStep, ULT_ACH, OV, OVK, OTMAX, OTC, UMS2, UCX2, oNew, oOn, oPow, oVarCost, oTokCost, oBuyTok, oBuyVar, oUnlockVar, oSetSlot, oSetJoint, oMsN, oGrow, oDrag, oAnalyze, oCheckCodex, uVarLog, uGrow, uDrag, uBoost, uConLog, uVarCost, UTMAX, uMulCost, uSlotCost, uP2Cost, uP3Cost, uPow, uAnalyze, recalcUlt, uCheckCodex, uBuyVar, uUnlockVar, uBuyTok, uBuyUp, uSetSlot, uSetJoint, stepUlt, GEN, IMS, BUP, BUM, bu, im, genOn, genCost, genMult, genBuy, powEff, buCan, buBuy, repCost, repBuy, beyS, beyV, sanitize, spCostS, CLS, CLSM, SPATH, SPM, RSHOP, RSHM, GWN, GWE, XP13, CM, bhOn, rec, xpOn, reqOk, spCost, spSpent, spCanBuy, spBuy, spSwitch, rsLv, rsCost, rsBuy, gwCount, bhTau, siMult, radRate, gwSpeed, bhBeta, bhQ, bhMu, bhAl, colX, colGain, canCollapse, doCollapse, bhMeff, frMax, TWN, TWD, twSpeed, twFloorTime, twAdvance, twSprint, twClimb, FZP, fzDeal, fzTap, aleph7, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, mpGimps, mpKappa, mpShowP, MERS_OLD, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
+if (typeof module !== 'undefined' && typeof window === 'undefined') module.exports = { VERSION, NI, la, ls, lg, l1, K, G, FD, FORDER, RU, PU, AU, UPG, PM, AM, CJ, RS, RSM, CS, ACH, TIERS, newState, recalc, step, buyFactor, buyUpg, buyAllUpg, doRebirth, doProof, doAxiom, doPromote, canRebirth, canProof, canAxiom, canPromote, enterChal, exitChal, chalGoal, chalAvail, resCan, resStart, resSlots, runAuto, autoUnl, checkAch, cstUnl, cjTotal, fmt, fmtT, serialize, deserialize, encodeSave, decodeSave, factorVisible, factorMax, upgVisible, upgLocked, TB, PROMO_TEXT, autoUnl, upgState, respec, preMet, primeCount, twinCount, PRM, PRM_MS, sieveCost, sieveSpeed, buySieve, isPrimeBig, lastPrime, MSQ, MSL, msGrid, msLines, msLineOk, MS, msSet, applySpark, fx, fn, cstStep, CAPP, XCAP, XMAX, IUP, IUM, iu, infAt, infCharge, infNeed, ipMult, ipGain, canInf, doInf, iuCan, iuBuy, beCost, beBuy, beSpeed, ptsX, fmtX, ptsFmt, RCMAX, rcOn, rcCost, rcBuy, rcRate, canUlt, doUlt, UV, UVK, UCN, UUP, UUM, UMS, UCX, uNew, IFUP, IFUM, PMIS, PMM, IFMS, ifS, ifOn, pbOn, ifLv, ifEta, ifMs, ifRate, ifCost, ifBuy, pbSlots, pbDur, pbReward, pbStart, pbRecall, ifStep, dmExp, tn, tnFromLog, tnMk, tnLog10, tnPow10, tnMul, tnDiv, tnAdd, tnSub, tnPow, tnCmp, tnGt, tnGte, tnLt, tnMax, tnMin, tnNumber, tnLg, tnLgLg, tnSlog, tnFmt, TN_ZERO, TN_ONE, ultSync, ultGain, uLgU, TRS, TRM, SRUP, SRM, PTN, dm2, trOn, trAct, trLv, trGoal, ascReset, trEnter, trExit, trCheck, trD, ptOn, ptLit, ptCost, ptLight, ptD, srOn, srLv, srCost, srBuy, srRate, dim2Step, DMT, DMTM, DRES, DMMS, dmNew, dmOn, dmu, dmMs, dmExCost, dmResCost, dmResAmp, dmResD, dmDim, dmMult, dmX, dmGain, canAscend, doAscend, dmBuy, dmExBuy, dmResBuy, dmStep, uPre, EGC, EGG, EGQ, EGMS, egNew, egOn, egE, egMs, egBagMax, egMultLog, egMult, egBuyCost, egLvCost, egBuy, egLvUp, egBuyMax, egStep, egLg, egFold, egGrow, egDrawCost, egDraw, egMerge, egAutoMerge, egEquip, egUnequip, fdOn, fdPsi, fdRate, uEff, mxMax, mxGrowCost, MXF, MXB, MXSZ, mxNew, mxOn, mxBuyCost, mxLvCost, mxBuy, mxLvUp, mxGrow, mxPlace, mxCalc, BIGF, bigInstall, bigGet, bigCount, mxDirty, deepDrag, RFREP, CRUP, x5On, rfRepCost, rfRepLv, rfRepBuy, crLv, crCost, crBuy, crRate, shapeSig, arArchive, arSum, arMult, RFUP, RFM, RFMS, rfNew, rfu, rfOn, rfGrowMult, rfDragMult, rfOuterMult, rfStart, ppMult, ppGain, canRefactor, doRefactor, rfCan, rfBuy, rfStep, ULT_ACH, OV, OVK, OTMAX, OTC, UMS2, UCX2, oNew, oOn, oPow, oVarCost, oTokCost, oBuyTok, oBuyVar, oUnlockVar, oSetSlot, oSetJoint, oMsN, oGrow, oDrag, oAnalyze, oCheckCodex, uVarLog, uGrow, uDrag, uBoost, uConLog, uVarCost, UTMAX, uMulCost, uSlotCost, uP2Cost, uP3Cost, uPow, uAnalyze, recalcUlt, uCheckCodex, uBuyVar, uUnlockVar, uBuyTok, uBuyUp, uSetSlot, uSetJoint, stepUlt, GEN, IMS, BUP, BUM, bu, im, genOn, genCost, genMult, genBuy, powEff, buCan, buBuy, repCost, repBuy, beyS, beyV, sanitize, spCostS, CLS, CLSM, SPATH, SPM, RSHOP, RSHM, GWN, GWE, XP13, CM, bhOn, rec, xpOn, reqOk, spCost, spSpent, spCanBuy, spBuy, spSwitch, rsLv, rsCost, rsBuy, gwCount, bhTau, siMult, radRate, gwSpeed, bhBeta, bhQ, bhMu, bhAl, colX, colGain, canCollapse, doCollapse, bhMeff, frMax, TWN, TWD, twSpeed, twFloorTime, twAdvance, twSprint, twClimb, FZP, fzDeal, fzTap, aleph7, FR, FRM, frUnl, frCost, frCan, frBuy, frSum, MERS, mpWork, mpSpeed, mpCost, mpBuy, mpDigits, mpGimps, mpKappa, mpShowP, MERS_OLD, kappaMult, trReqOf, MPMAX, mpStep, MDOM, EXS, EXM, exUnl, exSlots, exOn, exTeamMult, exInMult, exDur, exReward, exStart, exCancel, inMul, SW, SWM, SWN, swAdj, swHas, swReach, swCan, swBuy, swAdd, swMul, g24Solve, g24Deal, g24Max, g24Int, g24Reward, g24Claim, g24Skip, NG, ngUnl, ngGrid, ngLineOk, ngSolved, ngCount, psi6, migrate, cmpVer, OU, LARR, LCUR, TM, MATH, MATHM, CH6, GRAPHS, gcUnl, gcSolved, gcCount, gcSet, lvOf, xpFor, acSeated, acL, acSeats, acNext, acRecruit, acSeat, omRate, omMul1, useOm1, useOm2, lmGrid, lmMerge, lmMergeAll, lmMove, lmAutoUnl, lmAutoOn, lmMult, lmSpawn, omega6, canTrans, doTrans, OM1T, OM2T };
 
 /* ===================== 公式晋升 v1.0.0 · 界面（前端） ===================== */
 const SAVE_KEY = 'formula-ascend-save-v1';
@@ -2807,7 +2849,7 @@ function formulaHTML(T) {
   if (T === 1) return P + a + d + b + d + r;
   if (T === 2) return P + `(${a}${d}${b})<sup>${c}</sup>${d}${r}${d}${th}`;
   if (T === 3) return P + `(${a}${d}${b})<sup>${c}</sup>${d}${t}<sup>${c}−1</sup>${d}${r}${d}${th}${d}${al}`;
-  const base = P + `(${a}${d}${b}${d}${dd})<sup>${c}</sup>${d}${t}<sup>${c}${T >= 6 ? '' : '−1'}</sup>${d}${r}${d}(${th}${d}${al})<sup>${lm}</sup>`;
+  const base = T >= 6 ? P + `(${a}${d}${b}${d}${dd}${d}${t})<sup>${c}</sup>${d}${r}${d}(${th}${d}${al})<sup>${lm}</sup>` : P + `(${a}${d}${b}${d}${dd})<sup>${c}</sup>${d}${t}<sup>${c}−1</sup>${d}${r}${d}(${th}${d}${al})<sup>${lm}</sup>`;
   if (T === 4) return base; const t5 = base + `${d}${k}<sup>${c}+${lm}</sup>`; if (T === 5) return t5;
   return P + `<span class="op" style="font-size:1.25em">[</span>` + t5.slice(P.length) + `<span class="op" style="font-size:1.25em">]</span><sup>${T >= 7 ? '<span class="op">(</span>' : ''}<i class="fl" data-a="tab:promo">Ω</i>${S.chap >= 7 ? '<span class="op">·</span><i class="fl" data-a="tab:sw">ψ</i>' : ''}${T >= 7 ? '<span class="op">)</span><sup><i class="ft" data-a="tab:tw">ℵ</i></sup>' : ''}${T >= 7 && bhOn(S) ? '<span class="op">·</span><i class="fp" data-a="tab:col">μ</i>' : ''}</sup>`;
 }
@@ -2993,7 +3035,7 @@ function scrollToView() {
 
 /* ---------------- 视图 ---------------- */
 function sigOf() {
-  return [view === 'lm' ? JSON.stringify(S.lm.g) + lmSel : view === 'gc' ? JSON.stringify(S.gc) + gcSel.c + gcSel.g : view === 'ex' ? JSON.stringify(exPick) + S.ex.act.length + S.ex.n : view === 'sw' ? Object.keys(S.sw).length + swSel : view === 'g24' ? S.g24.h.join() + JSON.stringify(g24ui.cards) + g24ui.sel + g24ui.op + (S.g24.ch >= 1) : view === 'ng' ? ngSel + JSON.stringify(S.ng[ngSel] || []) : view === 'ub' ? JSON.stringify(S.ult.f) + JSON.stringify(S.ult.o.f) + (S.ult.o.sel || 0) + oOn(S) + OVK.map(v => S.ult.o.unl[v] ? 1 : 0).join('') + [S.ult.o.mul, S.ult.o.e2, S.ult.o.e3, S.ult.o.e4, S.ult.o.e5, S.ult.o.e6, S.ult.o.slots].join() + !!S.ult.up.oauto + JSON.stringify(S.ult.f) + S.ult.slots + (S.ult.sel || 0) + UVK.map(v => (S.ult.unl[v] ? 1 : 0)).join('') + S.ult.mul + S.ult.p2 + S.ult.p3 + Object.keys(S.ult.cn).join() + !!S.ult.up.auto : view === 'uif' ? JSON.stringify([pbOn(S), pbSlots(S), ifS(S).pb.map(p => p ? p.m : 0), IFMS.map((x, i) => ifMs(S, i) ? 1 : 0)]) : view === 'utr' ? JSON.stringify([dm2(S).tr]) : view === 'upt' ? JSON.stringify(dm2(S).pt) : view === 'usr' ? JSON.stringify(dm2(S).sr.lv) : view === 'udm' ? JSON.stringify([S.ult.dm.n, S.ult.dm.up, DMT.map(x => S.ult.dm.DP >= x.c ? 1 : 0), canAscend(S), dmu(S, 'au')]) : view === 'urs' ? JSON.stringify([S.ult.dm.rs, dmu(S, 'e1')]) : view === 'ueg' ? JSON.stringify([egE(S).bag, egE(S).eq, egE(S).sel, egE(S).b.map(x => x > 0 ? 1 : 0), EGMS.map((m, i) => egMs(S, i) ? 1 : 0)]) : view === 'umx' ? JSON.stringify([S.ult.rf.mx.c, S.ult.rf.mx.own, S.ult.rf.mx.lv, S.ult.rf.mx.n, S.ult.rf.mx.sel]) : view === 'uar' ? Object.keys(S.ult.rf.ar).length + shapeSig(S) + CRUP.map(x => (x.req && !S.ult.rf.up[x.req]) ? 0 : 1).join('') : view === 'urf' ? [S.ult.rf.n, !!S.ult.rf.up.omega, x5On(S), Object.keys(S.ult.rf.up).join(''), RFUP.map(x => rfCan(S, x.id) ? 1 : 0).join(''), rfu(S, 'au'), canRefactor(S)].join() : view === 'ush' ? [S.ult.o.mul, S.ult.o.e2, S.ult.o.e3, S.ult.o.e4, S.ult.o.e5, S.ult.o.e6, rfu(S, 'e6'), S.ult.o.slots, oMsN(S), oOn(S)].join() + [S.ult.mul, S.ult.p2, S.ult.p3, S.ult.slots].join() + Object.keys(S.ult.cn).join() + Object.keys(S.ult.up).join() + UMS.filter(m => S.ult.Ub >= m[0]).length : view === 'ucx' ? Object.keys(S.ult.cx).join() + '|' + Object.keys(S.ult.o.cx).join() + oOn(S) : view === 'inf' ? rcOn(S) + '' + canUlt(S) + Object.keys(S.inf.u).join() + S.inf.brk + IUP.map(x => iuCan(S, x.id) ? 1 : 0).join('') + Object.keys(S.inf.bu).join() + BUP.map(x => buCan(S, x.id) ? 1 : 0).join('') + genOn(S) + im(S, 25) + IMS.filter(m => S.inf.n >= m[0]).length : view === 'col' ? S.bh.col + ':' + (rsLv(S, 'auto') >= 1) : view === 'sp' ? S.bh.path + S.bh.k + JSON.stringify(S.bh.rec) + spCanBuy(S) : view === 'rs' ? JSON.stringify(S.bh.rs) : view === 'gw' ? S.bh.gw + '' : view === 'tw' ? Math.floor(S.tw.f / 1) + '' : view === 'fz' ? S.fz.cur + ':' + S.fz.fs.length + ':' + (S.fz.ch >= 1) + fzShake : view === 'fr' ? JSON.stringify(S.fr) + !!S.res.done.s37 : view === 'mp' ? S.mp.n + '/' + S.mp.L : '', S.chap, S.trTot >= 1, S.trTot >= 5, Object.keys(S.ac.got).length, S.ac.seat.join(), acSeats(S), view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
+  return [view === 'lm' ? JSON.stringify(S.lm.g) + lmSel : view === 'lm' ? JSON.stringify(S.lm.g) + lmSel + lmAutoUnl(S) + (S.lm.auto !== 0) : view === 'gc' ? JSON.stringify(S.gc) + gcSel.c + gcSel.g : view === 'ex' ? JSON.stringify(exPick) + S.ex.act.length + S.ex.n : view === 'sw' ? Object.keys(S.sw).length + swSel : view === 'g24' ? S.g24.h.join() + JSON.stringify(g24ui.cards) + g24ui.sel + g24ui.op + (S.g24.ch >= 1) : view === 'ng' ? ngSel + JSON.stringify(S.ng[ngSel] || []) : view === 'ub' ? JSON.stringify(S.ult.f) + JSON.stringify(S.ult.o.f) + (S.ult.o.sel || 0) + oOn(S) + OVK.map(v => S.ult.o.unl[v] ? 1 : 0).join('') + [S.ult.o.mul, S.ult.o.e2, S.ult.o.e3, S.ult.o.e4, S.ult.o.e5, S.ult.o.e6, S.ult.o.slots].join() + !!S.ult.up.oauto + JSON.stringify(S.ult.f) + S.ult.slots + (S.ult.sel || 0) + UVK.map(v => (S.ult.unl[v] ? 1 : 0)).join('') + S.ult.mul + S.ult.p2 + S.ult.p3 + Object.keys(S.ult.cn).join() + !!S.ult.up.auto : view === 'uif' ? JSON.stringify([pbOn(S), pbSlots(S), ifS(S).pb.map(p => p ? p.m : 0), IFMS.map((x, i) => ifMs(S, i) ? 1 : 0)]) : view === 'utr' ? JSON.stringify([dm2(S).tr]) : view === 'upt' ? JSON.stringify(dm2(S).pt) : view === 'usr' ? JSON.stringify(dm2(S).sr.lv) : view === 'udm' ? JSON.stringify([S.ult.dm.n, S.ult.dm.up, DMT.map(x => S.ult.dm.DP >= x.c ? 1 : 0), canAscend(S), dmu(S, 'au')]) : view === 'urs' ? JSON.stringify([S.ult.dm.rs, dmu(S, 'e1')]) : view === 'ueg' ? JSON.stringify([egE(S).bag, egE(S).eq, egE(S).sel, egE(S).b.map(x => x > 0 ? 1 : 0), EGMS.map((m, i) => egMs(S, i) ? 1 : 0)]) : view === 'umx' ? JSON.stringify([S.ult.rf.mx.c, S.ult.rf.mx.own, S.ult.rf.mx.lv, S.ult.rf.mx.n, S.ult.rf.mx.sel]) : view === 'uar' ? Object.keys(S.ult.rf.ar).length + shapeSig(S) + CRUP.map(x => (x.req && !S.ult.rf.up[x.req]) ? 0 : 1).join('') : view === 'urf' ? [S.ult.rf.n, !!S.ult.rf.up.omega, x5On(S), Object.keys(S.ult.rf.up).join(''), RFUP.map(x => rfCan(S, x.id) ? 1 : 0).join(''), rfu(S, 'au'), canRefactor(S)].join() : view === 'ush' ? [S.ult.o.mul, S.ult.o.e2, S.ult.o.e3, S.ult.o.e4, S.ult.o.e5, S.ult.o.e6, rfu(S, 'e6'), S.ult.o.slots, oMsN(S), oOn(S)].join() + [S.ult.mul, S.ult.p2, S.ult.p3, S.ult.slots].join() + Object.keys(S.ult.cn).join() + Object.keys(S.ult.up).join() + UMS.filter(m => S.ult.Ub >= m[0]).length : view === 'ucx' ? Object.keys(S.ult.cx).join() + '|' + Object.keys(S.ult.o.cx).join() + oOn(S) : view === 'inf' ? rcOn(S) + '' + canUlt(S) + Object.keys(S.inf.u).join() + S.inf.brk + IUP.map(x => iuCan(S, x.id) ? 1 : 0).join('') + Object.keys(S.inf.bu).join() + BUP.map(x => buCan(S, x.id) ? 1 : 0).join('') + genOn(S) + im(S, 25) + IMS.filter(m => S.inf.n >= m[0]).length : view === 'col' ? S.bh.col + ':' + (rsLv(S, 'auto') >= 1) : view === 'sp' ? S.bh.path + S.bh.k + JSON.stringify(S.bh.rec) + spCanBuy(S) : view === 'rs' ? JSON.stringify(S.bh.rs) : view === 'gw' ? S.bh.gw + '' : view === 'tw' ? Math.floor(S.tw.f / 1) + '' : view === 'fz' ? S.fz.cur + ':' + S.fz.fs.length + ':' + (S.fz.ch >= 1) + fzShake : view === 'fr' ? JSON.stringify(S.fr) + !!S.res.done.s37 : view === 'mp' ? S.mp.n + '/' + S.mp.L : '', S.chap, S.trTot >= 1, S.trTot >= 5, Object.keys(S.ac.got).length, S.ac.seat.join(), acSeats(S), view, S.tier, S.chal, Object.keys(S.u).join(','), Object.keys(S.res.done).length, S.res.act.length, cjTotal(S), S.pfTot >= 8, S.pfTot >= 3, S.pfTot >= 1, S.axTot >= 2, S.axTot >= 20, S.axTot >= 30, S.u.r6, S.u.r4, msSize, S.cst.got.e, S.cst.got.phi, S.cst.got.r2, S.cst.got.ga, Object.keys(S.ach).length, window.innerWidth <= 640].join('|');
 }
 function B(key, fn) { binds.push([key, fn]); return `data-b="${key}"`; }
 function buildView() {
@@ -3227,11 +3269,11 @@ VIEWS.lm = () => {
   const g = lmGrid(S);
   const cells = g.map((v, i) => `<button class="lmt lv${Math.min(v === 99 ? 0 : v, 16)} ${lmSel === i ? 'sel' : ''}" data-a="lmc:${i}" aria-label="格子 ${i + 1}">${v === 99 ? '★' : v || ''}</button>`).join('');
   return `<div class="sec">引理工坊<span class="h">两个同级引理合成高一级；★ 可与 4 级及以下任意引理合成</span></div><div class="grid">
-  <div class="card"><div class="lmg">${cells}</div><div class="row"><button class="btn sm go" data-a="lmall">一键合并</button>${S.trTot >= 12 ? '<span class="pill ok">自动合并中</span>' : ''}</div>
-  <div class="muted">点击一个引理，再点击另一个同级引理即可合成。</div></div>
+  <div class="card"><div class="lmg">${cells}</div><div class="row"><button class="btn sm go" data-a="lmall">一键合并</button>${lmAutoUnl(S) ? `<label class="tgl"><input type="checkbox" data-in="lmauto" ${S.lm.auto !== 0 ? 'checked' : ''}>自动合并</label>` : '<span class="pill">合成出 6 级引理后解锁自动合并</span>'}</div>
+  <div class="muted">点击一个引理，再点击：空格 → 移动过去；同级引理 → 合成；不同级引理 → 交换位置。也可以直接拖动引理。</div></div>
   <div class="card"><div class="nm">工坊状态</div><div class="muted" ${B('lms', () => '最高等级 ' + S.lm.max + ' · 对 Ω 贡献 +' + fx(K.omS * 0.025 * Math.max(0, S.lm.max - 1) * (S.u.o16 === 1 ? 1.5 : 1), 3))}></div>
   <div class="muted" ${B('lmt', () => '每 ' + fmtT(600 / lmMult(S)) + ' 生成一个引理 · 下一个 ' + fmtT(600 / lmMult(S) - S.lm.t))}></div><div class="muted" ${B('lmq', () => '等待放入的引理：' + S.lm.q + ' / 32')}></div>
-  <p class="note">每一级都需要前一级数量的两倍，所以最高等级大约是已生成引理数的 log₂。格子满时新引理会排队，队列满了就会浪费，记得常来合并。</p></div></div>`;
+  <p class="note" ${B('lmnote', () => '每一级都需要前一级数量的两倍，所以最高等级大约是已生成引理数的 log₂。' + (lmAutoOn(S) ? '自动合并已开启：新引理会自动合成，你也可以随时手动整理位置。' : lmAutoUnl(S) ? '自动合并已关闭：格子满时新引理会排队，队列满了就会浪费。' : '格子满时新引理会排队，队列满了就会浪费，记得常来合并；合成出 6 级引理后会解锁自动合并。'))}></p></div></div>`;
 };
 const GL = [ // 图的版面坐标（0–1）
   (() => { const p = []; for (let r of [0.42, 0.18]) for (let k = 0; k < 3; k++) p.push([0.5 + r * Math.sin(2 * Math.PI * k / 3), 0.55 - r * Math.cos(2 * Math.PI * k / 3)]); return p; })(),
@@ -3565,6 +3607,15 @@ VIEWS.uif = () => { const f = ifS(S);
   ${IFUP.map(x => `<div class="card"><div class="t"><span class="nm">${x.n}</span><span class="pill" ${B('ifl_' + x.id, () => ifLv(S, x.id) + (x.max ? ' / ' + x.max : '') + ' 级')}></span></div><div class="ds">${x.d}</div><div class="row"><button class="btn sm" data-a="ifb:${x.id}" ${B('ifb_' + x.id, () => { const full = x.max && ifLv(S, x.id) >= x.max, c = ifCost(x, ifLv(S, x.id)), can = !full && ifS(S).core >= c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: full ? '已满级' : '升级 · ' + fmtBig(c) + ' 晶核' }; })}></button></div></div>`).join('')}</div>`;
   return h; };
 
+(function lmDragInit() { let from = -1, x0 = 0, y0 = 0, moved = false, ghost = null;
+  document.addEventListener('pointerdown', ev => { const el = ev.target.closest && ev.target.closest('.lmt'); if (!el || !el.textContent.trim()) return; from = +el.dataset.a.split(':')[1]; x0 = ev.clientX; y0 = ev.clientY; moved = false; });
+  document.addEventListener('pointermove', ev => { if (from < 0) return; if (!moved && Math.hypot(ev.clientX - x0, ev.clientY - y0) > 8) { moved = true; const src = document.querySelector('.lmt[data-a="lmc:' + from + '"]'); if (src) { src.classList.add('drag'); ghost = src.cloneNode(true); ghost.className = src.className + ' ghost'; ghost.style.width = src.offsetWidth + 'px'; ghost.style.height = src.offsetHeight + 'px'; document.body.appendChild(ghost); } }
+    if (ghost) { ghost.style.left = (ev.clientX - ghost.offsetWidth / 2) + 'px'; ghost.style.top = (ev.clientY - ghost.offsetHeight / 2) + 'px'; } });
+  const end = ev => { if (from < 0) return; const f = from; from = -1; if (ghost) { ghost.remove(); ghost = null; } document.querySelectorAll('.lmt.drag').forEach(x => x.classList.remove('drag'));
+    if (!moved) return; lmDragSkip = Date.now(); const tgt = document.elementFromPoint(ev.clientX, ev.clientY), el = tgt && tgt.closest && tgt.closest('.lmt'); if (!el) return; const to = +el.dataset.a.split(':')[1]; if (to !== f) act('lmd:' + f + ':' + to); };
+  document.addEventListener('pointerup', end); document.addEventListener('pointercancel', () => { from = -1; if (ghost) { ghost.remove(); ghost = null; } });
+})();
+let lmDragSkip = 0;
 function prettySig(k) { const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹', IN = { x: '𝑥', y: '𝑦', z: '𝑧', w: '𝑤', pi: 'π', e: '𝑒', phi: 'φ' }, OUT = { U: '𝑈', a: '𝛼', b: '𝛽', g: '𝛾', d: '𝛿', e: '𝜀' };
   return k.split(' ‖ ').map((part, li) => part.replace(/([A-Za-z]+)(\^(\d+))?/g, (m, nm, _, p) => ((li ? OUT : IN)[nm] || nm) + (p ? p.split('').map(c => SUP[+c]).join('') : ''))).join('  ‖  '); }
 VIEWS.uar = () => {
@@ -3707,7 +3758,7 @@ VIEWS.ach = () => {
   return `<div class="sec">成就<span class="h">${n} / ${ACH.length} · 每个成就使 a 的值 ×1.05（当前 ×${fmt(n * L10(1.05))}）</span></div><div class="grid">${ACH.map((a, i) => `<div class="card ${S.ach[i] ? '' : 'dim'}"><div class="t"><span class="nm">${a[0]}</span>${S.ach[i] ? '<span class="pill ok">已达成</span>' : ''}</div><div class="ds">${a[1]}</div></div>`).join('')}</div>`;
 };
 const UBf = () => tnFmt(S.ult.UB || tnFromLog(S.ult.U)), URf = () => tnFmt(tnPow10(G.uRB || tn(G.uR === NI ? -300 : G.uR))), UBbf = () => tnFmt(S.ult.UbB || tnFromLog(S.ult.Ub)), UBtf = () => tnFmt(S.ult.UtB || tnFromLog(S.ult.Ut));
-function ultStatRows() { const u = S.ult, o = u.o; const r = [['终极用时', () => fmtT(u.t)], ['终极点', () => UBf()], ['累计终极点', () => UBtf()], ['最高终极点', () => UBbf()], ['每秒终极点', () => URf()], ['终极点的超对数', () => '10↑↑' + tnSlog(S.ult.UB || tnFromLog(S.ult.U)).toFixed(4)], ['数值引擎', () => '层塔 TowerNum · 15 位有效数字 · 可表示到 10↑↑10 以上'], ['内层公式的值', () => fmt(G.uFin)]];
+function ultStatRows() { const u = S.ult, o = u.o; const r = [['终极用时', () => fmtT(u.t)], ['终极点', () => UBf()], ['累计终极点', () => UBtf()], ['最高终极点', () => UBbf()], ['每秒终极点', () => URf()], ['终极点的超对数', () => '10↑↑' + tnSlog(S.ult.UB || tnFromLog(S.ult.U)).toFixed(4)], ['数值引擎', () => '层塔 TowerNum · 15 位有效数字 · 可表示到 10↑↑10 以上'], ['层塔存储的变量', () => bigCount(S) + ' 个'], ['内层公式的值', () => fmt(G.uFin)]];
   if (oOn(S)) r.push(['外层公式的值', () => fmt(G.uF)]);
   UVK.forEach(v => { if (u.unl[v]) r.push([UV[v].n + ' 的等级 / 值', () => u.lv[v] + ' / ' + fmt(u.V[v])]); });
   if (oOn(S)) OVK.forEach(v => { if (o.unl[v]) r.push([OV[v].n + ' 的等级 / 值', () => o.lv[v] + ' / ' + fmt(o.V[v])]); });
@@ -3739,7 +3790,7 @@ VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
   <div class="row"><button class="btn sm" data-a="save">立即保存</button><button class="btn sm" data-a="exp">导出存档</button><button class="btn sm" data-a="imp">导入存档</button></div>
   <textarea id="saveBox" placeholder="导出的存档字符串会出现在这里；导入时把存档粘贴进来再点「导入存档」"></textarea></div>
   <div class="card"><div class="nm">危险操作</div><div class="ds">彻底删除进度，从头开始。</div><div class="row"><button class="btn sm warn" data-a="hard">删除存档并重新开始</button></div></div>
-  </div><p class="note">无尽演算 v1.5.4 · 共 7 阶、8 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、无穷之塔、质因数分解、黑洞、6 条星路、霍金辐射、引力波观测站、4 个无限发生器、24 个无限与破限升级、递归、构造台（4 个变量、3 个常数、15 个终极升级、15 种公式图鉴）、嵌套（外层公式、4 个外层变量、8 种外层图鉴）、重构（21 个范式升级、3 个无尽范式）、晶格矩阵（6 种特殊因子、5 种特殊积木，最大 7×7）、超维折叠、十级发动机（6 种品质）、升维（维度 D、22 个维度节点、6 个共振器、维度能量、6 个维度挑战、8 种超形体、超弦反应堆、维度暴胀、维度探针）、公式档案馆、时间晶体、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
+  </div><p class="note">无尽演算 v1.5.5 · 共 7 阶、8 个重置层、${RU.length + PU.length + AU.length + OU.length} 个升级节点、${SW.length} 颗星、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、无穷之塔、质因数分解、黑洞、6 条星路、霍金辐射、引力波观测站、4 个无限发生器、24 个无限与破限升级、递归、构造台（4 个变量、3 个常数、15 个终极升级、15 种公式图鉴）、嵌套（外层公式、4 个外层变量、8 种外层图鉴）、重构（21 个范式升级、3 个无尽范式）、晶格矩阵（6 种特殊因子、5 种特殊积木，最大 7×7）、超维折叠、十级发动机（6 种品质）、升维（维度 D、22 个维度节点、6 个共振器、维度能量、6 个维度挑战、8 种超形体、超弦反应堆、维度暴胀、维度探针）、公式档案馆、时间晶体、3 个幻方、8 张图、8 幅数织、${EXS.length} 个远征地点、${MATH.length} 位数学家、${ACH.length} 个成就。</p>`;
 
 /* ---------------- 操作 ---------------- */
 function act(a) {
@@ -3759,7 +3810,8 @@ function act(a) {
     case 'om2': if (useOm2(S)) toast('超限幂：ω = ' + fmtBig(S.om.w)); break;
     case 'rec': { const m = acNext(S); if (acRecruit(S)) { toast(m.n + ' 加入了学院'); viewSig = ''; } break; }
     case 'seat': if (!acSeat(S, p[1])) toast('席位已满，请先让一位数学家离座'); viewSig = ''; break;
-    case 'lmc': { const i = +p[1], g = lmGrid(S); if (lmSel < 0) { if (g[i]) lmSel = i; } else if (lmSel === i) lmSel = -1; else { if (lmMerge(S, lmSel, i)) lmSel = -1; else lmSel = g[i] ? i : -1; } viewSig = ''; break; }
+    case 'lmc': { const i = +p[1], g = lmGrid(S); if (lmSel < 0) { if (g[i]) lmSel = i; } else if (lmSel === i) lmSel = -1; else { lmMove(S, lmSel, i); lmSel = -1; } viewSig = ''; break; }
+    case 'lmd': { lmMove(S, +p[1], +p[2]); lmSel = -1; viewSig = ''; break; }
     case 'lmall': { const n = lmMergeAll(S); lmSel = -1; toast(n ? '合并了 ' + n + ' 次' : '没有可以合并的引理'); viewSig = ''; break; }
     case 'gcg': gcSel.g = +p[1]; viewSig = ''; break;
     case 'gcc': gcSel.c = +p[1]; viewSig = ''; break;
@@ -3891,13 +3943,14 @@ function inp(k, el) {
     case 'rfauto': S.ult.rf.auto = el.checked ? 1 : 0; break;
     case 'egauto': egE(S).auto = el.checked ? 1 : 0; break;
     case 'dmauto': S.ult.dm.auto = el.checked ? 1 : 0; break;
+    case 'lmauto': S.lm.auto = el.checked ? 1 : 0; break;
     case 'pbauto': ifS(S).auto = el.checked ? 1 : 0; break;
     case 'dmam': S.ult.dm.am = el.value; break;
     case 'rfam': S.ult.rf.am = el.value; break;
     case 'colv': S.auto.col.v = el.value; break;
   }
 }
-document.addEventListener('click', e => { const el = e.target.closest('[data-a]'); if (el && !el.disabled) act(el.dataset.a); });
+document.addEventListener('click', e => { const el = e.target.closest('[data-a]'); if (el && !el.disabled && !(el.classList.contains('lmt') && Date.now() - lmDragSkip < 400)) act(el.dataset.a); });
 document.addEventListener('keydown', e => {
   if (!e.repeat && (e.key === 'Enter' || e.key === ' ') && e.target.matches('svg [role="button"][data-a]')) {
     e.preventDefault(); act(e.target.dataset.a);
