@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>无尽演算 2.0.1</title>
+<title>无尽演算 2.0.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -481,13 +481,20 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 .lmt{touch-action:none;user-select:none}
 .lmt.drag{opacity:.35}
 .lmt.ghost{position:fixed;z-index:9999;pointer-events:none;opacity:.9;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-.navsec{flex:none;align-self:center;font-size:12px;letter-spacing:2px;color:var(--muted);padding:10px 8px 2px 10px;white-space:nowrap}
-.navsec:first-child{padding-top:2px}
+:root{--sec0:#6b7280;--sec1:#0e7fae;--sec2:#b86e00;--sec3:#2a8a4f;--sec4:#7a4fc0;--sec5:#c0392b;--sec6:#a07400;--sec7:#2f63c8}
+:root[data-theme="dark"]{--sec0:#9aa3ae;--sec1:#4cb8e6;--sec2:#f0a63a;--sec3:#5cc488;--sec4:#ad8cf0;--sec5:#f0756a;--sec6:#e3b740;--sec7:#78a2f2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sec0:#9aa3ae;--sec1:#4cb8e6;--sec2:#f0a63a;--sec3:#5cc488;--sec4:#ad8cf0;--sec5:#f0756a;--sec6:#e3b740;--sec7:#78a2f2}}
+.navsec{flex:none;align-self:center;font-size:17px;font-weight:700;letter-spacing:1px;color:var(--sc);padding:8px 10px 4px 14px;white-space:nowrap;border-inline-start:3px solid var(--sc);margin-inline-start:10px}
+.navsec:first-child{margin-inline-start:0}
+.tab.on{color:var(--sc) !important;border-bottom-color:var(--sc) !important}
+[data-skin="workspace"] .navsec{display:block;margin:16px 0 4px;padding:2px 10px;font-size:17px}
+[data-skin="workspace"] .navsec:first-child{margin-top:2px}
+[data-skin="workspace"] .tab.on{background:color-mix(in srgb,var(--sc) 14%,transparent) !important}
 </style>
 </head>
 <body>
 <div class="wrap" id="shell" data-view="factor">
-  <header class="top"><div class="brand">无尽演算<small>2.0.1</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
+  <header class="top"><div class="brand">无尽演算<small>2.0.2</small></div><div class="top-tools"><div class="tierb" id="tierb">一阶</div><label class="skin-picker"><span class="skin-label">皮肤</span><select id="skin" aria-label="界面皮肤"><option value="blueprint">公式蓝图</option><option value="workspace">演算工作台</option></select></label></div></header>
   <div class="rail-brand" aria-hidden="true"><b>Σ</b><strong>无尽演算</strong><em>Axiom</em></div>
   <section class="hero" id="hero">
     <div class="pts"><span class="big num" id="pts">0</span><span class="lbl">点数</span></div>
@@ -513,7 +520,7 @@ main,.bar,.tabs,.hero,.grid,.card{min-width:0}
 <script>
 /* ===================== 公式晋升 v1.0.0 · 核心引擎（后端） ===================== */
 'use strict';
-const VERSION = '2.0.1';
+const VERSION = '2.0.2';
 /* ===================== 层塔 TowerNum —— 无尽演算的大数库（v1.5.2） =====================
  * 每个数是一个普通对象 { s, k, m, e }：
  *   s：符号 −1 / 0 / 1
@@ -671,7 +678,7 @@ const STAGE = [0, 1, 1, 2, 2, 3, 4, 5]; // tier → 阶段
 const TB = { rb: [0, 0, 2, 8, 3, 3, 3, 3], pf: [0, 0, 0, 2, 1, 1, 1, 1], ax: [0, 0, 0, 0, 1, 1, 1, 1] }; // 阶加成（log10）
 const PROMO_TEXT = {
   2: ['公式扩展为 (a·b)^c · r · θ', '新因子 c（指数），作用于 a·b 整体', '新版块「证明」：产出定理与定理因子 θ', '重生升级扩展第二行'],
-  3: ['公式升级为 (a·b)^c · t^(c−1) · r · θ · α', '时间因子 t：本次重生经过的时间，指数随 c 增长', '新版块「公理」：产出公理与公理因子 α', '「研究」：消耗定理或公理，直接完成课题', '「猜想」挑战（由公理升级解锁，可选）', '重生、证明升级各扩展一行'],
+  3: ['公式升级为 (a·b)^c · t^(c−1) · r · θ · α', '时间因子 t：本次重生经过的时间，指数随 c 增长', '新版块「公理」：产出公理与公理因子 α', '「研究所」：消耗定理或公理研究课题，每项 5 分钟到 4 小时，离线照常推进', '「猜想」挑战（由公理升级解锁，可选）', '重生、证明升级各扩展一行'],
   4: ['公式扩展为 (a·b·d)^c · t^(c−1) · r · (θ·α)^λ', '新因子 d（用定理购买）与 λ（用公理购买）', '「常数」：分配算力计算 π 等常数的位数', '猜想开放第三难度与两个新猜想', '各版块扩展新升级，研究扩展新课题'],
   5: ['公式升级为 … · κ^(c+λ)：常数之积 κ 直接进入公式', '算力 ×2，常数 γ 解锁', '分形花园与梅森素数搜寻：让 κ 的指数成长数十倍'],
   6: ['整个公式获得指数 Ω：P = [ … ]^Ω，所有旧内容都被 Ω 放大', '时间因子 t 的指数提升为 c，与 a·b·d 合并：(a·b·d·t)^c', '新版块「超限」：产出序数', 'ω 引擎：随时间增长，持续提升 Ω', '章节逐步解锁：数学家学院、引理工坊、星盘、新猜想与新常数'],
@@ -1061,6 +1068,7 @@ const ACH = [
   ['工坊大师', '辐射工坊升级总等级达到 40', S => Object.values(S.bh.rs).reduce((a, b) => a + b, 0) >= 40],
   ['平直时空', '深空指数 q 达到 0.75', S => bhOn(S) && bhQ(S) >= 0.75],
   ['回溯', '解锁全部 5 项回溯拓展', S => XP13.every(x => xpOn(S, x.id))],
+  ['全集', '数系扩张到全集 V', S => (S.ns || 0) >= 10],
   ['终章', '终极点达到 ee7，写完这本书', S => !!(S.ult && S.ult.fin)],
   ['普勒克斯', '完成第一次古戈尔', S => S.inf.n >= 1],
   ['古戈尔循环', '完成 10 次古戈尔', S => S.inf.n >= 10],
@@ -1252,7 +1260,7 @@ function recalc(S) { TICK++;
   // t
   let tS = (h('r17') ? L10(5) : 0) + (h('x5') ? L10(1 + S.axN) : 0) + (R('s5') ? 1 : 0) + C(5) * L10(5) + (h('p11') ? 0.05 * l1(S.TH) : 0) + (cu('e') ? 1.5 * L10(1 + D.e) : 0);
   G.tS = tS;
-  G.Tf = (T >= 3 && ch !== 5 && ch !== 12 && ch !== 18) ? l1(tS + fnLg(S.fn || 0, lg(Math.max(1, S.rbT)))) : 0;
+  G.Tf = (T >= 3 && ch !== 5 && ch !== 12 && ch !== 18) ? l1(tS + fnLg(S.fn || 0, lg(Math.max(S.ns >= 8 ? 3600 : 1, S.rbT)))) : 0;
   G.tE = (h('r22') ? 0.25 : 0) + (h('p20') ? 0.25 : 0) + (h('p13') ? 0.2 : 0) + (h('r17b') ? 0.2 : 0) + (hbOn(S, 'h4') ? 0.3 : 0);
   // d
   G.dB = 2 + (h('r21') ? 0.5 : 0) + (h('p17') ? 0.5 : 0) + (h('x11') ? 1 : 0) + (R('s12') ? 1 : 0) + 0.25 * C(7) + (pgCnt(S, [8, 10, 12]) === 3 ? 0.5 : 0);
@@ -1374,7 +1382,7 @@ function resetPoints(S, keepF) {
   if (!keepF) { S.lv.a = 1; S.lv.b = 0; S.lv.dt = 0; S.lv.c = 0; }
 }
 function resetRebirthLayer(S) {
-  S.RP = NI; if (!(S.bh && S.bh.col >= 1)) S.RPc = NI; S.rbN = 0;
+  if (S.ns < 9) S.RP = NI; if (!(S.bh && S.bh.col >= 1)) S.RPc = NI; S.rbN = 0;
   const keepAll = S.pfTot >= 12, keepRow = S.pfTot >= 5, keepBasic = S.pfTot >= 1;
   RU.forEach(x => {
     if (S.u[x.id] !== 1) return;
@@ -1402,7 +1410,9 @@ function canRebirth(S) { return G.rbGain >= 0; }
 function doRebirth(S) {
   if (!canRebirth(S)) return false;
   const g = G.rbGain; S.RP = la(S.RP, g); S.RPc = la(S.RPc, g); S.rbN++; S.rbTot++;
-  const a0 = S.lv.a, b0 = S.lv.b, t0 = S.rbT; resetPoints(S, S.pfTot >= 50);
+  const a0 = S.lv.a, b0 = S.lv.b, c0 = S.lv.c, t0 = S.rbT, pm0 = S.rbPm; resetPoints(S, S.pfTot >= 50);
+  if (S.ns >= 5) S.lv.c = c0;
+  if (S.ns >= 7 && pm0 > 0) S.P = pm0 / 2;
   if (S.ns >= 1 && S.pfTot < 50) { S.lv.a = Math.max(1, Math.floor(a0 * 0.2)); S.lv.b = Math.floor(b0 * 0.2); }
   if (S.ns >= 3) S.rbT = t0;
   recalc(S); return true;
@@ -1418,7 +1428,7 @@ function doProof(S) {
   if (g === NI && !done) return false;
   if (g !== NI) { S.TH = la(S.TH, g); S.THc = la(S.THc, g); }
   S.pfN++; S.pfTot++;
-  resetRebirthLayer(S); S.pfT = 0; recalc(S); return done || true;
+  { const rp0 = S.RP; resetRebirthLayer(S); if (S.ns >= 6 && rp0 > NI) S.RP = Math.max(S.RP, rp0 - 1); }; S.pfT = 0; recalc(S); return done || true;
 }
 function enterChal(S, id) {
   if (!chalAvail(S, id) || S.chal) return false;
@@ -1453,12 +1463,14 @@ function doPromote(S) {
 /* ---------------- 研究 ---------------- */
 function resCan(S, id) {
   const r = RSM[id]; if (!r || S.res.done[id] || S.tier < r.t || (r.ch && S.chap < r.ch) || (r.cur === 'SI' && !bhOn(S))) return false;
+  if (S.res.act.some(a => a.id === id)) return false;
+  if (S.res.act.length >= resSlots(S)) return false;
   return curGet(S, r.cur) >= r.c;
 }
 function resStart(S, id) {
   if (!resCan(S, id)) return false; const r = RSM[id];
   curSet(S, r.cur, ls(curGet(S, r.cur), r.c));
-  S.res.done[id] = 1; return true;
+  S.res.act.push({ id, t: r.h * 3600 }); return true;
 }
 
 /* ---------------- 自动 ---------------- */
@@ -1561,7 +1573,13 @@ const NSYS = [
   { n: 'ℤ', nm: '整数', c: 3, d: '重生时保留 20% 的 a、b 等级。' },
   { n: 'ℚ', nm: '有理数', c: 12, d: '重生点按本轮达到过的最高点数计算，花掉的点数不再让它变少。' },
   { n: 'ℝ', nm: '实数', c: 40, d: '重生不再把时间因子 t 清零；只有更高的重置才会清零它。' },
-  { n: 'ℂ', nm: '复数', c: 150, d: '每秒自动获得「此刻重生可得」重生点的 1%，不需要重生。' }];
+  { n: 'ℂ', nm: '复数', c: 150, d: '每秒自动获得「此刻重生可得」重生点的 1%，不需要重生。' },
+  { n: 'ℍ', nm: '四元数', p: '失去交换律：i·j = k，但 j·i = −k', c: 400, d: '重生时保留因子 c 的等级。' },
+  { n: '𝕆', nm: '八元数', p: '连结合律也失去了：(x·y)·z ≠ x·(y·z)', c: 700, d: '证明时保留十分之一的重生点。' },
+  { n: '𝕊', nm: '十六元数', p: '出现零因子：两个不为零的数，乘积可以是零', c: 1200, d: '重生后点数不再从零开始，而是从本轮最高点数的平方根起步。' },
+  { n: '*ℝ', nm: '超实数', p: '另一个方向：在实数里加入无穷小 ε 与无穷大 1/ε', c: 3000, d: '时间因子 t 至少按 1 小时计算。' },
+  { n: 'No', nm: '超现实数', p: '包含所有实数、超实数与所有序数，是最大的有序域', c: 8000, d: '重生点不再被任何重置清空。' },
+  { n: 'V', nm: '全集', p: '一切集合组成的整体。在 ZFC 中它太大，不是集合，而是一个「真类」', c: 15000, d: '古戈尔重置不再清空定理与公理。' }];
 function nsCan(S) { const x = NSYS[(S.ns || 0) + 1]; return !!x && S.RP >= x.c; }
 function nsBuy(S) { if (!nsCan(S)) return false; S.RP = ls(S.RP, NSYS[S.ns + 1].c); S.ns++; return true; }
 /* 定理手册（证明版块）：从已掌握的定理里选几条随身携带，随时可换 */
@@ -2199,7 +2217,7 @@ function canInf(S) { return infAt(S) && !S.chal && S.inf.ch >= infNeed(S); }
 function doInf(S) {
   if (!canInf(S)) return false; const g = ipGain(S);
   S.inf.IP += g; S.inf.IPt += g; S.inf.n++; S.inf.ch = 0;
-  S.OR = NI; S.RP = NI; S.TH = NI; S.AX = NI; resetPoints(S, false); recalc(S); return g;
+  S.OR = NI; if (S.ns < 9) S.RP = NI; if (S.ns < 10) { S.TH = NI; S.AX = NI; } resetPoints(S, false); recalc(S); return g;
 }
 function iuCan(S, id) { const u = IUM[id]; return !!u && S.tier >= 7 && !S.inf.u[id] && S.inf.IP >= u.c && (!u.pre || u.pre.every(p => S.inf.u[p])); }
 function iuBuy(S, id) { if (!iuCan(S, id)) return false; S.inf.IP -= IUM[id].c; S.inf.u[id] = 1; if (id === 'i16') { S.inf.brk = 1; S.inf.X = Math.max(S.inf.X, XCAP); } return true; }
@@ -2380,8 +2398,8 @@ function mpSpeed(S) { return 2 * Math.pow(3, S.mp.L) * (S.res.done.s38 ? 4 : 1) 
 function mpKappa(S) { const n = S.mp.n; return 1 + 0.05 * Math.min(n, MERS_OLD) + 0.01 * Math.max(0, n - MERS_OLD); }
 function mpIsPrime(n) { if (n < 400000) return n >= 2 && !MPS[n]; if (n % 2 === 0) return false; const r = Math.floor(Math.sqrt(n)); for (let d = 3; d <= r; d += 2) { if (!MPS[d] && n % d === 0) return false; } return true; }
 let MP_SHOW = [0, 0]; function mpShowP(S) { const x = Math.floor(S.mp.x || S.mp.p); if (x < 400000) return S.mp.p; if (MP_SHOW[0] === x) return MP_SHOW[1]; let k = x; while (!mpIsPrime(k)) k++; MP_SHOW = [x, k]; return k; }
-function mpCost(L) { return 26 + 4.5 * L; }
-const MPMAX = 14;
+function mpCost(L) { const k = L - 13; return L < 14 ? 26 + 4.5 * L : 89 + 20 * k * (k + 1); } // 第 15–20 级随第四阶段的定理增长陆续可买
+const MPMAX = 20; // 2.0.1：已知 52 个梅森素数，测试机上限从 14 级扩大到 20 级
 function mpBuy(S) { if (S.tier < 5 || S.mp.L >= MPMAX || S.TH < mpCost(S.mp.L)) return false; S.TH = ls(S.TH, mpCost(S.mp.L)); S.mp.L++; return true; }
 function mpStep(S, dt) {
   let budget = mpSpeed(S) * dt, guard = 0;
@@ -2424,7 +2442,7 @@ const MATH = [ // 数学家学院：按顺序招募，花费为序数（log）
   { id: 'fer', n: '费马', f: '数论', c: 21, d: L => `序数获取 ×${fmt(0.4 * L)}` },
   { id: 'eul', n: '欧拉', f: '分析', c: 29, d: L => `算力 ×${fx(1 + 0.5 * L, 2)}` },
   { id: 'gau', n: '高斯', f: '数学王子', c: 38, d: L => `全体数学家经验获取 ×${fx(1 + 0.1 * L, 2)}` },
-  { id: 'rie', n: '黎曼', f: '复分析', c: 48, d: L => `引理生成速度 ×${fx(1 + 0.05 * L, 3)}` },
+  { id: 'rie', n: '黎曼', f: '复分析', c: 48, d: L => `研究速度 ×${fx(1 + 0.05 * L, 3)}` },
   { id: 'can', n: '康托尔', f: '集合论', c: 60, d: L => `ω 引擎速度 ×${fx(1 + 0.5 * L, 2)}` },
   { id: 'noe', n: '诺特', f: '抽象代数', c: 73, d: L => `θ、α 的指数 +${fx(0.04 * L, 3)}` },
   { id: 'hil', n: '希尔伯特', f: '公理化方法', c: 88, d: L => `Ω +${fx(0.01 * L, 3)}` },
@@ -2492,7 +2510,7 @@ function useOm1(S) { return false; if (S.tier < 6 || S.om.c1 < 1) return false; 
 function useOm2(S) { return false; if (S.tier < 6 || S.chap < 5 || S.om.c2 < 1) return false; S.om.c2--; S.om.w = Math.min(1e300, Math.max(1, S.om.w) * 10); return true; }
 const OM1T = 21600, OM2T = 86400;
 /* ---------- 引理工坊 ---------- */
-function lmMult(S) { return (1 + 0.05 * acL(S, 'rie')) * (1 + 0.15 * acL(S, 'fib')) * (S.u.o8 === 1 ? 2 : 1) * (S.res.done.s23 ? 2 : 1) * swMul(S, 'lm') * (S.res.done.s29 ? 2 : 1); }
+function lmMult(S) { return (1 + 0.15 * acL(S, 'fib')) * (S.u.o8 === 1 ? 2 : 1) * (S.res.done.s23 ? 2 : 1) * swMul(S, 'lm') * (S.res.done.s29 ? 2 : 1); }
 function lmGrid(S) { const g = S.lm.g; while (g.length < 16) g.push(0); return g; }
 function lmSpawn(S) { const g = lmGrid(S), em = []; for (let i = 0; i < 16; i++) if (!g[i]) em.push(i); if (!em.length) { if (S.lm.q < 32) S.lm.q++; return; } g[em[Math.floor(Math.random() * em.length)]] = Math.random() < 0.05 ? 99 : 1; }
 function lmRefill(S) { const g = lmGrid(S); while (S.lm.q > 0 && g.some(v => !v)) { S.lm.q--; lmSpawn(S); } }
@@ -2601,7 +2619,7 @@ const SW = (() => {
   [[1000, 'psi', 0.02, 'ψ +0.02'], [1100, 'om', 10, 'ω 引擎速度 ×10'], [1300, 'inMul', 1.5, '所有灵感获取 ×1.5'], [1500, 'psi', 0.02, 'ψ +0.02'], [1700, 'xp', 2, '数学家经验 ×2'], [1900, 'lm', 1.5, '引理生成速度 ×1.5'],
   [2200, 'psi', 0.02, 'ψ +0.02'], [2500, 'om', 1000, 'ω 引擎速度 ×1000'], [2900, 'inMul', 1.5, '所有灵感获取 ×1.5'], [3400, 'cAdd', 0.5, 'c +0.5'], [4000, 'seat', 1, '学院席位 +1'], [4600, 'psi', 0.02, 'ψ +0.02']].forEach((a, i) => add(2, i, ...a));
   [[8000, 'psi', 0.04, 'ψ +0.04'], [9500, 'lm', 2, '引理生成速度 ×2'], [11000, 'psi', 0.04, 'ψ +0.04'], [13000, 'thax', 1, 'θ、α 的指数各 +1'], [15500, 'psi', 0.04, 'ψ +0.04'], [18000, 'lamAdd', 0.5, 'λ +0.5'],
-  [21000, 'psi', 0.04, 'ψ +0.04'], [25000, 'inMul', 2, '所有灵感获取 ×2'], [30000, 'psi', 0.04, 'ψ +0.04'], [36000, 'xp', 2, '数学家经验 ×2'], [44000, 'psi', 0.04, 'ψ +0.04'], [54000, 'om', 100, 'ω 引擎速度 ×100']].forEach((a, i) => add(3, i, ...a));
+  [21000, 'psi', 0.04, 'ψ +0.04'], [25000, 'inMul', 2, '所有灵感获取 ×2'], [30000, 'psi', 0.04, 'ψ +0.04'], [36000, 'resSpd', 1.2, '研究速度 ×1.2'], [44000, 'psi', 0.04, 'ψ +0.04'], [54000, 'om', 100, 'ω 引擎速度 ×100']].forEach((a, i) => add(3, i, ...a));
   return L;
 })();
 const SWM = {}; SW.forEach(n => SWM[n.id] = n);
@@ -3065,6 +3083,7 @@ const TABS = [
 ];
 function treeCan(L) { const arr = LAYER[L].tree, have = curGet(S, LAYER[L].cur); return arr.some(x => upgState(S, x) === 'ok' && have >= x.c); }
 const ULT_TABS = new Set(['ub', 'ush', 'ucx', 'urf', 'umx', 'ach', 'stat', 'opt']);
+const SECI = { 重生: 1, 证明: 2, 公理: 3, 超限: 4, 坍缩: 5, 古戈尔: 6, 重构: 7, 总览: 0 };
 const NAV_SYMBOL = { ns: 'ℤ', hb: '✎', fn: '∿', pg: '⬠', uif: 'η', utr: '⚑', upt: '⧈', usr: '∿', udm: '⬡', urs: '≋', ueg: '⊛', ufd: 'Ψ', umx: '▦', uar: '✦', urf: '↺', ub: '∮', ush: '⊞', ucx: '❖', factor: 'ƒ', rb: '↻', pf: '∴', ax: 'α', fr: '△', mp: 'M', col: '⊙', inf: '∞', sp: '✴', rs: '☀', gw: '∿', tw: 'ℵ', fz: '∏', tr: 'Ω', om: 'ω', acad: '∑', lm: '⊕', gc: '◇', ex: '↗', sw: '✧', g24: '24', ng: '▤', cj: '?', res: '⌕', pr: 'ℙ', ms: '▦', cst: 'π', promo: '↑', ach: '☆', stat: '≡', opt: '⚙' };
 let navKey = '', shownTab = '', pendingNav = false;
 function revealTab() {
@@ -3087,7 +3106,7 @@ function renderTabs() {
   }
   if (picker.value !== view) picker.value = view;
   let lastSec = '';
-  const html = visible.map(t => (t.sec !== lastSec ? (lastSec = t.sec, `<span class="navsec">${t.sec}</span>`) : '') + `<button class="tab ${view === t.id ? 'on' : ''}"${view === t.id ? ' aria-current="page"' : ''} data-a="tab:${t.id}"><span class="nav-symbol" aria-hidden="true">${NAV_SYMBOL[t.id] || '·'}</span>${t.n}${t.dot && view !== t.id && t.dot() ? '<span class="dot"></span>' : ''}</button>`).join('');
+  const html = visible.map(t => (t.sec !== lastSec ? (lastSec = t.sec, `<span class="navsec" style="--sc:var(--sec${SECI[t.sec] || 0})">${t.sec}</span>`) : '') + `<button style="--sc:var(--sec${SECI[t.sec] || 0})" class="tab ${view === t.id ? 'on' : ''}"${view === t.id ? ' aria-current="page"' : ''} data-a="tab:${t.id}"><span class="nav-symbol" aria-hidden="true">${NAV_SYMBOL[t.id] || '·'}</span>${t.n}${t.dot && view !== t.id && t.dot() ? '<span class="dot"></span>' : ''}</button>`).join('');
   if (tabs.innerHTML !== html) {
     const active = tabs.contains(document.activeElement) ? document.activeElement.dataset.a : '';
     const x = tabs.scrollLeft, y = tabs.scrollTop;
@@ -3247,7 +3266,7 @@ VIEWS.cj = () => {
   return h;
 };
 VIEWS.res = () => {
-  let h = `<div class="sec">研究<span class="h">付出定理或公理，课题立刻完成并永久保留</span></div>`;
+  let h = `<div class="sec">研究所<span class="h">槽位 <b ${B('rsl', () => S.res.act.length + ' / ' + resSlots(S))}></b> · 研究永久保留，离线照常推进</span></div>`;
   if (S.res.act.length) h += `<div class="grid">${S.res.act.map((a, i) => `<div class="card"><div class="nm">${RSM[a.id].n}</div><div class="prog"><div ${B('rp' + i, () => { const x = S.res.act[i]; return x ? { w: 100 * (1 - x.t / (RSM[x.id].h * 3600)) } : { w: 100 }; })}></div></div><div class="muted" ${B('rt' + i, () => { const x = S.res.act[i]; return x ? '剩余 ' + fmtT(x.t) : '完成'; })}></div></div>`).join('')}</div>`;
   const tiers = [...new Set(RS.map(r => r.t))];
   tiers.forEach(t => {
@@ -3257,7 +3276,7 @@ VIEWS.res = () => {
       const done = S.res.done[r.id], run = S.res.act.find(a => a.id === r.id);
       const un = (r.un || []).map(u => '「' + UPG[u].n + '」').join('');
       h += `<div class="card ${t > S.tier ? 'dim' : ''}"><div class="t"><span class="nm">${r.n}</span>${done ? '<span class="pill ok">已完成</span>' : run ? '<span class="pill am">进行中</span>' : ''}</div>
-      <div class="ds">${r.d}${un ? '；解锁升级' + un : ''}</div><div class="muted">费用 ${fmt(r.c)} ${CURN[r.cur]}</div>
+      <div class="ds">${r.d}${un ? '；解锁升级' + un : ''}</div><div class="muted">费用 ${fmt(r.c)} ${CURN[r.cur]} · 耗时 ${fmtT(r.h * 3600)}</div>
       ${!done && !run && t <= S.tier ? `<div class="row"><button class="btn sm" data-a="res:${r.id}" ${B('rb_' + r.id, () => { const can = resCan(S, r.id); return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: can ? '开始研究' : S.res.act.length >= resSlots(S) ? '槽位已满' : CURN[r.cur] + '不足' }; })}></button></div>` : ''}</div>`;
     });
     h += `</div>`;
@@ -3867,16 +3886,16 @@ VIEWS.opt = () => `<div class="sec">设置</div><div class="grid">
   <div class="row"><button class="btn sm" data-a="save">立即保存</button><button class="btn sm" data-a="exp">导出存档</button><button class="btn sm" data-a="imp">导入存档</button></div>
   <textarea id="saveBox" placeholder="导出的存档字符串会出现在这里；导入时把存档粘贴进来再点「导入存档」"></textarea></div>
   <div class="card"><div class="nm">危险操作</div><div class="ds">彻底删除进度，从头开始。</div><div class="row"><button class="btn sm warn" data-a="hard">删除存档并重新开始</button></div></div>
-  </div><p class="note">无尽演算 2.0.1 · 共 5 个阶段与终极、7 个重置层（重生、证明、公理、超限、坍缩、古戈尔、重构）、${RU.length + PU.length + AU.length + OU.length} 个升级节点、数系 5 级、定理手册 ${HBK.length} 条、函数图像 ${FNS.length} 种、尺规作图 ${PGS.length} 个正多边形、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、ω 引擎与 ${ORL.length} 级序数阶梯、${MATH.length} 位数学家、引理工坊、${SW.length} 颗星、无穷之塔、黑洞（6 项属性）、观测站、4 个古戈尔发生器、${IUP.length + BUP.length} 个古戈尔与破限升级、构造台（4 个变量、3 个常数、√ 与 ! 积木、${UCX.length} 种公式图鉴）、嵌套、重构（${RFUP.length} 个范式升级）、晶格矩阵（最大 5×5）、${ACH.length} 个成就。终章：终极点达到 ee7。</p>`;
+  </div><p class="note">无尽演算 2.0.2 · 共 5 个阶段与终极、7 个重置层（重生、证明、公理、超限、坍缩、古戈尔、重构）、${RU.length + PU.length + AU.length + OU.length} 个升级节点、数系 5 级、定理手册 ${HBK.length} 条、函数图像 ${FNS.length} 种、尺规作图 ${PGS.length} 个正多边形、${CJ.length} 个猜想、${RS.length} 项研究、${CS.length} 个常数、4 种分形、梅森素数搜寻、ω 引擎与 ${ORL.length} 级序数阶梯、${MATH.length} 位数学家、引理工坊、${SW.length} 颗星、无穷之塔、黑洞（6 项属性）、观测站、4 个古戈尔发生器、${IUP.length + BUP.length} 个古戈尔与破限升级、构造台（4 个变量、3 个常数、√ 与 ! 积木、${UCX.length} 种公式图鉴）、嵌套、重构（${RFUP.length} 个范式升级）、晶格矩阵（最大 5×5）、${ACH.length} 个成就。终章：终极点达到 ee7。</p>`;
 
 
 /* ---------------- 2.0 新内容的视图 ---------------- */
 VIEWS.ns = () => { const n = S.ns || 0;
   let h = `<div class=\"sec\">数系<span class=\"h\">数的世界每扩张一次，重生的一条规则就随之改变；数系永久保留</span></div><div class=\"grid\">`;
   NSYS.forEach((x, i) => { if (i > n + 1) return; const own = i <= n;
-    h += `<div class=\"card ${own ? 'spon' : ''}\"><div class=\"t\"><span class=\"nm\"><span class=\"sym l\">${x.n}</span> ${x.nm}</span>${own ? '<span class=\"pill ok\">已掌握</span>' : `<span class=\"pill\">${fmt(x.c)} 重生点</span>`}</div><div class=\"ds\">${x.d}</div>
+    h += `<div class=\"card ${own ? 'spon' : ''}\"><div class=\"t\"><span class=\"nm\"><span class=\"sym l\">${x.n}</span> ${x.nm}</span>${own ? '<span class=\"pill ok\">已掌握</span>' : `<span class=\"pill\">${fmt(x.c)} 重生点</span>`}</div>${x.p ? `<div class=\"muted\">${x.p}</div>` : ''}<div class=\"ds\">${x.d}</div>
     ${own ? '' : `<div class=\"row\"><button class=\"btn sm\" data-a=\"nsb\" ${B('nsb', () => ({ c: 'btn sm ' + (nsCan(S) ? 'go' : ''), d: !nsCan(S) }))}>扩张到 ${x.n}</button></div>`}</div>`; });
-  return h + `</div><p class=\"note\">ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ：每一次扩张，都是为了让原来「做不了」的运算变得可以做——减法需要负数，除法需要分数，开方需要无理数与虚数。</p>`; };
+  return h + `</div><p class=\"note\">ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ：每一次扩张，都是为了让原来「做不了」的运算变得可以做——减法需要负数，除法需要分数，开方需要无理数与虚数。复数之后，路分成了两条：沿着代数走，是四元数、八元数、十六元数，每走一步都要失去一条熟悉的运算律；沿着「大小」走，是带无穷小的超实数，以及把所有序数都装进去的超现实数。最后的全集 V 包含一切集合——它大到连自己都不是一个集合。</p>`; };
 VIEWS.hb = () => { const L = HBK.filter(x => hbUnl(S, x.id)), nx = HBK.find(x => !hbUnl(S, x.id));
   return `<div class=\"sec\">定理手册<span class=\"h\">随身携带 <b ${B('hbn', () => S.hb.length + ' / ' + hbSlots(S))}></b> 条，随时可以更换</span></div><div class=\"grid\">${L.map(x => { const on = hbOn(S, x.id);
     return `<div class=\"card ${on ? 'spon' : ''}\"><div class=\"t\"><span class=\"nm\">${x.n}</span>${on ? '<span class=\"pill ok\">携带中</span>' : ''}</div><div class=\"ds\">${x.d}</div><div class=\"row\"><button class=\"btn sm ${on ? 'warn' : 'go'}\" data-a=\"hbt:${x.id}\" ${on || S.hb.length < hbSlots(S) ? '' : 'disabled'}>${on ? '放回' : '携带'}</button></div></div>`; }).join('')}</div>
