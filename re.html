@@ -1655,7 +1655,7 @@ const MXB = { M: { n: '×', nm: '乘法块', d: '上下左右相邻的因子强�
 delete MXF.X; delete MXF.F; delete MXF.L;
 const MXSZ = [[3, 1e9], [4, 1e11], [5, 1e13]]; // 扩大到 N×N 所需范式点
 function mxNew() { return { n: 2, c: Array(49).fill(''), own: { G: 0, D: 0, P: 0, X: 0, F: 0, L: 0, M: 0, Q: 0, Z: 0, C: 0, O: 0 }, lv: { G: 1, D: 1, P: 1, X: 1, F: 1, L: 1 }, sel: 0 }; }
-function mxMax(S) { return S.ult.rf.up.mx3 ? 7 : 5; }
+function mxMax() { return MXSZ[MXSZ.length - 1][0]; }
 function mxOn(S) { return !!(S.ult && S.ult.on && S.ult.rf.up.mx); }
 function mxM(S) { return S.ult.rf.mx; }
 function mxBuyCost(S, t) { const x = MXF[t] || MXB[t]; return x.c0 * Math.pow(MXF[t] ? 8 : 12, mxM(S).own[t]); }
@@ -1663,7 +1663,8 @@ function mxLvCost(S, t) { return MXF[t].c0 * 2 * Math.pow(3, mxM(S).lv[t] - 1); 
 function mxBuy(S, t) { mxDirty(); if (!mxOn(S) || !(MXF[t] || MXB[t])) return false; const r = S.ult.rf, c = mxBuyCost(S, t); if (!cPay(r, 'PP', c)) return false; mxM(S).own[t]++; return true; }
 function mxLvUp(S, t) { mxDirty(); if (!mxOn(S) || !MXF[t]) return false; const r = S.ult.rf, c = mxLvCost(S, t); if (!cPay(r, 'PP', c)) return false; mxM(S).lv[t]++; return true; }
 function mxGrowCost(S) { const nx = MXSZ.find(x => x[0] === mxM(S).n + 1); return nx ? nx[1] : Infinity; }
-function mxGrow(S) { mxDirty(); const m = mxM(S); if (!mxOn(S) || m.n >= mxMax(S)) return false; const c = mxGrowCost(S); if (!cPay(S.ult.rf, 'PP', c)) return false;
+function mxCanGrow(S) { return mxOn(S) && cGe(S.ult.rf, 'PP', mxGrowCost(S)); }
+function mxGrow(S) { if (!mxOn(S) || !cPay(S.ult.rf, 'PP', mxGrowCost(S))) return false; mxDirty(); const m = mxM(S);
   const old = m.c.slice(); m.c = Array(49).fill(''); for (let r = 0; r < m.n; r++) for (let c = 0; c < m.n; c++) m.c[r * (m.n + 1) + c] = old[r * m.n + c]; m.n++; return true; }
 function mxPlace(S, i, t) { mxDirty(); const m = mxM(S); if (!mxOn(S) || i < 0 || i >= m.n * m.n) return false; if (t && !(MXF[t] || MXB[t])) return false;
   if (t) { const used = m.c.slice(0, m.n * m.n).filter((x, k) => x === t && k !== i).length; if (used >= m.own[t]) return false; } m.c[i] = t || ''; return true; }
@@ -3075,7 +3076,7 @@ const TABS = [
   { id: 'ush', n: '积木商店', on: () => !!S.ult.on, dot: () => uShopCan(), sec: '重构' },
   { id: 'ucx', n: '图鉴', on: () => !!S.ult.on, sec: '重构' },
   { id: 'urf', n: '重构', on: () => rfOn(S), dot: () => canRefactor(S) || RFUP.some(x => rfCan(S, x.id)), sec: '重构' },
-  { id: 'umx', n: '矩阵', on: () => mxOn(S), dot: () => mxOn(S) && (Object.keys(MXF).concat(Object.keys(MXB)).some(t => S.ult.rf.PP >= mxBuyCost(S, t)) || S.ult.rf.PP >= mxGrowCost(S)), sec: '重构' },
+  { id: 'umx', n: '矩阵', on: () => mxOn(S), dot: () => mxCanGrow(S) || (mxOn(S) && Object.keys(MXF).concat(Object.keys(MXB)).some(t => S.ult.rf.PP >= mxBuyCost(S, t))), sec: '重构' },
   { id: 'promo', n: '晋升', on: () => true, dot: () => canPromote(S), sec: '总览' },
   { id: 'ach', n: '成就', on: () => true, sec: '总览' },
   { id: 'stat', n: '统计', on: () => true, sec: '总览' },
@@ -3610,7 +3611,7 @@ VIEWS.umx = () => {
   <div class="row">${pal || '<span class="faint">先在下方购买因子与积木</span>'}</div><div class="row"><button class="btn sm warn" data-a="mxc">清空此格</button></div></div>
   <div class="card"><div class="nm">矩阵加成</div><ul class="ms"><li ${B('mxg1', () => 'Γ 所有变量增长 ×' + fx(mxCalc(S).G, 3))}></li><li ${B('mxg2', () => 'Δ 演算阻力 ÷' + fx(mxCalc(S).D, 3))}></li><li ${B('mxg3', () => 'Π 范式点获取 ×' + fx(mxCalc(S).P, 3))}></li><li ${B('mxg4', () => 'Χ 范式点获取 ×' + fx(mxCalc(S).X, 3))}></li>${fdOn(S) || m.own.F ? `<li ${B('mxg5', () => 'Φ 折叠因子 ×' + fx(mxCalc(S).F, 3) + '（折叠速率 +' + fx(0.12 * Math.log(mxCalc(S).F), 3) + ' / 天）')}></li>` : ''}${m.own.L ? `<li ${B('mxg6', () => 'Λ 档案馆加成 ×' + fx(mxCalc(S).L, 3))}></li>` : ''}</ul>
   <p class="note">每个因子的加成 = 基础值 × 等级 × 强度。× 乘法块让上下左右的因子强度 ×1.5，² 幂块让斜向的因子 ×2，∑ 和块让同一行与同一列的因子 ×1.25，⊗ 交叉块让两条斜线上的因子 ×1.2，◎ 核心块放在奇数矩阵正中心时让所有因子 ×1.5，效果可以叠乘。${S.ult.rf.up.mx2 ? '矩阵共鸣：所有因子 ×1.2。' : ''}</p>
-  ${N < mxMax(S) ? `<div class="row"><button class="btn sm" data-a="mxg" ${B('mxgb', () => { const c = mxGrowCost(S), can = S.ult.rf.cr.n >= c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '扩大到 ' + (m.n + 1) + '×' + (m.n + 1) + ' · ' + fmtBig(c) + ' 范式点' }; })}></button></div>` : `<div class="faint">矩阵已是当前最大的 ${N}×${N}${mxMax(S) < 7 ? '（范式升级「矩阵扩容」可以继续扩大）' : ''}</div>`}</div></div>`;
+  ${N < mxMax() ? `<div class="row"><button class="btn sm" data-a="mxg" ${B('mxgb', () => { const c = mxGrowCost(S), can = mxCanGrow(S); return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '扩大到 ' + (m.n + 1) + '×' + (m.n + 1) + ' · ' + fmtBig(c) + ' 范式点' }; })}></button></div>` : `<div class="faint">矩阵已达到本版上限 ${mxMax()}×${mxMax()}</div>`}</div></div>`;
   h += `<div class="sec">特殊因子<span class="h">用范式点购买；同类因子共享等级</span></div><div class="grid">${Object.keys(MXF).map(t => { const x = MXF[t]; return `<div class="card"><div class="t"><span class="nm"><b>${x.n}</b> ${x.nm}</span><span class="pill" ${B('mxo_' + t, () => '拥有 ' + m.own[t] + ' · 等级 ' + m.lv[t])}></span></div><div class="ds">${x.d}：每个因子 +${fx(x.b, 2)} × 等级 × 强度</div>
     <div class="row"><button class="btn sm" data-a="mxb:${t}" ${B('mxbb_' + t, () => { const c = mxBuyCost(S, t), can = S.ult.rf.PP >= c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '再买一个 · ' + fmtBig(c) + ' 范式点' }; })}></button>${m.own[t] ? `<button class="btn sm" data-a="mxl:${t}" ${B('mxlb_' + t, () => { const c = mxLvCost(S, t), can = S.ult.rf.PP >= c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '升级 · ' + fmtBig(c) + ' 范式点' }; })}></button>` : ''}</div></div>`; }).join('')}</div>`;
   h += `<div class="sec">特殊积木<span class="h">本身不产生加成，只增强周围的因子</span></div><div class="grid">${Object.keys(MXB).map(t => { const x = MXB[t]; return `<div class="card"><div class="t"><span class="nm"><b>${x.n}</b> ${x.nm}</span><span class="pill" ${B('mxo_' + t, () => '拥有 ' + m.own[t])}></span></div><div class="ds">${x.d}</div><div class="row"><button class="btn sm" data-a="mxb:${t}" ${B('mxbb_' + t, () => { const c = mxBuyCost(S, t), can = S.ult.rf.PP >= c; return { c: 'btn sm ' + (can ? 'go' : ''), d: !can, t: '购买 · ' + fmtBig(c) + ' 范式点' }; })}></button></div></div>`; }).join('')}</div>`;
